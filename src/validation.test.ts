@@ -4,7 +4,6 @@ import {
   isBoolean,
   isNull,
   isNumber,
-  isObject,
   dictionary,
   isString,
   isUndefined,
@@ -257,57 +256,6 @@ describe('validation', () => {
     })
   })
 
-  describe('data structures', () => {
-    describe('isObject', () => {
-      it('validates null', () => {
-        expect(isObject(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isObject(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isObject(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isObject(false)).toEqual(false)
-        expect(isObject(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isObject(NaN)).toEqual(false)
-        expect(isObject(Infinity)).toEqual(false)
-        expect(isObject(0)).toEqual(false)
-        expect(isObject(1)).toEqual(false)
-        expect(isObject(3.14159)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isObject('')).toEqual(false)
-        expect(isObject('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isObject(Symbol())).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isObject([])).toEqual(true)
-      })
-      it('validates empty objects', () => {
-        expect(isObject({})).toEqual(true)
-      })
-      it('validates objects with keys', () => {
-        expect(
-          isObject({
-            a: 1,
-          }),
-        ).toEqual(true)
-        expect(
-          isObject({
-            a: () => 'fun!',
-          }),
-        ).toEqual(true)
-      })
-    })
-  })
-
   describe('algebraic data types', () => {
     describe('literal types', () => {
       describe('primitive', () => {
@@ -404,6 +352,14 @@ describe('validation', () => {
         })
       })
       describe('records', () => {
+        it('validates null', () => {
+          const isObj = record({})
+          expect(isObj(null)).toEqual(false)
+        })
+        it('validates undefined', () => {
+          const isObj = record({})
+          expect(isObj(undefined)).toEqual(false)
+        })
         it('validates empty records', () => {
           const isObj = record({})
           expect(isObj({})).toEqual(true)
@@ -438,6 +394,12 @@ describe('validation', () => {
         })
       })
       describe('dictionaries', () => {
+        it('validates null', () => {
+          expect(dictionary(isString)(null)).toEqual(false)
+        })
+        it('validates undefined', () => {
+          expect(dictionary(isString)(undefined)).toEqual(false)
+        })
         it('validates empty records', () => {
           expect(dictionary(isString)({})).toEqual(true)
         })

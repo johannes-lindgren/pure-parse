@@ -12,7 +12,7 @@ A minimalistic JSON validation library with 100% type inference.
 Parse your JSON strings with `parseJson`: 
 
 ```ts
-import { parseJson } from "@johannes-lindgren/ts-is";
+import { parseJson } from "@johannes-lindgren/json";
 
 const data = parseJson()('{ "a": 1 }')
 if (data instanceof Error) {
@@ -22,12 +22,10 @@ if (data instanceof Error) {
 }
 ```
 
-Note that `parseJson` is a curried function; that is because you usually will want to pass a validator function
-
-to also validate the data, pass a validator function
+Note that `parseJson` is a curried function; that is because you usually will want to pass a validator function:
 
 ```ts
-import { parseJson, isNumber } from "@johannes-lindgren/ts-is";
+import { parseJson, isNumber } from "@johannes-lindgren/json";
 
 const data = parseJson(isNumber)('123')
 if (data instanceof Error) {
@@ -36,3 +34,5 @@ if (data instanceof Error) {
   // data is of type `number`
 }
 ```
+
+A validation function takes one argument and returns a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates). There are 

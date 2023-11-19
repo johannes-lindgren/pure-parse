@@ -45,13 +45,6 @@ export const isSymbol = (data: unknown): data is symbol =>
 export const isUnknown = (data: unknown): data is unknown => true
 
 /*
- * Data Structures
- */
-
-export const isObject = (data: unknown): data is object =>
-  typeof data === 'object' && !isNull(data)
-
-/*
  *
  * Algebraic Data Types
  *
@@ -111,17 +104,19 @@ export const record =
       [K in keyof T]-?: typeof isUndefined extends T[K] ? K : never
     }[keyof T]]?: PredicateType<T[K]>
   } =>
-    isObject(data) &&
+    typeof data === 'object' &&
+    data !== null &&
     Object.keys(schema).every(
       (key) =>
-        // @ts-ignore
-        schema[key]?.(data[key]),
+        // We have force TypeScript to consider `data` as a record, otherwise it won't allow us to index `data` with a string (TS7053).
+        schema[key]?.((data as Record<string, unknown>)[key]),
     )
 
 export const dictionary =
   <T>(isType: Validator<T>) =>
   (data: unknown): data is Record<string, T> =>
-    isObject(data) &&
+    typeof data === 'object' &&
+    data !== null &&
     !Array.isArray(data) &&
     Object.keys(data).every(isString) &&
     Object.values(data).every(isType)
