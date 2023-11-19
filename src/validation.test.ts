@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  isArray,
+  array,
   isBoolean,
   isNull,
   isNumber,
@@ -14,10 +14,23 @@ import {
   isSymbol,
   optional,
   tuple,
+  isUnknown,
 } from './validation'
 
 describe('validation', () => {
   describe('primitives', () => {
+    describe('isUnknown', () => {
+      it('is always true', () => {
+        expect(isUnknown(null)).toEqual(true)
+        expect(isUnknown(undefined)).toEqual(true)
+        expect(isUnknown(false)).toEqual(true)
+        expect(isUnknown(true)).toEqual(true)
+        expect(isUnknown(123)).toEqual(true)
+        expect(isUnknown('aaaaa')).toEqual(true)
+        expect(isUnknown({})).toEqual(true)
+        expect(isUnknown([])).toEqual(true)
+      })
+    })
     describe('isNull', () => {
       it('validates null', () => {
         expect(isNull(null)).toEqual(true)
@@ -245,51 +258,6 @@ describe('validation', () => {
   })
 
   describe('data structures', () => {
-    describe('isArray', () => {
-      it('validates null', () => {
-        expect(isArray(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isArray(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isArray(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isArray(false)).toEqual(false)
-        expect(isArray(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isArray(NaN)).toEqual(false)
-        expect(isArray(Infinity)).toEqual(false)
-        expect(isArray(0)).toEqual(false)
-        expect(isArray(1)).toEqual(false)
-        expect(isArray(3.14159)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isArray('')).toEqual(false)
-        expect(isArray('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isArray(Symbol())).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isArray({})).toEqual(false)
-      })
-      it('validates empty arrays', () => {
-        expect(isArray([])).toEqual(true)
-      })
-      it('validates arrays', () => {
-        expect(isArray([1, 2, 3])).toEqual(true)
-        expect(isArray(['a', 'b', 'c'])).toEqual(true)
-        expect(isArray([false, true])).toEqual(true)
-        expect(isArray([[]])).toEqual(true)
-        expect(isArray([{}])).toEqual(true)
-        expect(isArray([1, 'a', false, [], {}])).toEqual(true)
-      })
-    })
-
     describe('isObject', () => {
       it('validates null', () => {
         expect(isObject(null)).toEqual(false)
@@ -490,6 +458,59 @@ describe('validation', () => {
         })
         it('invalidates arrays', () => {
           expect(dictionary(isString)([])).toEqual(false)
+        })
+      })
+    })
+    describe('recursive types', () => {
+      describe('isArray', () => {
+        it('validates null', () => {
+          expect(array(isUnknown)(null)).toEqual(false)
+        })
+        it('validates undefined', () => {
+          expect(array(isUnknown)(undefined)).toEqual(false)
+        })
+        it('validates unassigned values', () => {
+          let data
+          expect(array(isUnknown)(data)).toEqual(false)
+        })
+        it('validates booleans', () => {
+          expect(array(isUnknown)(false)).toEqual(false)
+          expect(array(isUnknown)(true)).toEqual(false)
+        })
+        it('validates numbers', () => {
+          expect(array(isUnknown)(NaN)).toEqual(false)
+          expect(array(isUnknown)(Infinity)).toEqual(false)
+          expect(array(isUnknown)(0)).toEqual(false)
+          expect(array(isUnknown)(1)).toEqual(false)
+          expect(array(isUnknown)(3.14159)).toEqual(false)
+        })
+        it('validates strings', () => {
+          expect(array(isUnknown)('')).toEqual(false)
+          expect(array(isUnknown)('hello')).toEqual(false)
+        })
+        it('validates symbols', () => {
+          expect(array(isUnknown)(Symbol())).toEqual(false)
+        })
+        it('validates objects', () => {
+          expect(array(isUnknown)({})).toEqual(false)
+        })
+        it('validates empty arrays', () => {
+          expect(array(isUnknown)([])).toEqual(true)
+        })
+        it('always validates empty arrays', () => {
+          expect(array(isUnknown)([])).toEqual(true)
+          expect(array(isString)([])).toEqual(true)
+          expect(array(isBoolean)([])).toEqual(true)
+          expect(array((data: unknown): data is unknown => false)([])).toEqual(
+            true,
+          )
+        })
+        it('expects every element to pass the validation', () => {
+          expect(array(union([isNumber]))([1, 2, , 3, 4])).toEqual(true)
+          expect(array(union([isNumber]))([1, 2, , 'a', 4])).toEqual(false)
+          expect(
+            array(union([isString, isNumber, isBoolean]))([1, 'a', false]),
+          ).toEqual(true)
         })
       })
     })

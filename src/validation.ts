@@ -1,4 +1,22 @@
-import { Validator, ValidatorGuardType } from './utils.ts'
+/*
+ * Utility Types
+ */
+
+/**
+ * A function that return a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
+ */
+export type Validator<T> = ((data: unknown) => data is T) & {
+  optional?: boolean
+}
+
+/**
+ * Extract the type in the [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
+ */
+export type PredicateType<
+  T extends (data: unknown, ...args: unknown[]) => data is unknown,
+> = T extends (data: unknown, ...args: unknown[]) => data is infer R
+  ? R
+  : unknown
 
 /*
  * Primitives
@@ -20,13 +38,15 @@ export const isString = (data: unknown): data is string =>
 export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
 
+/**
+ * Use to skip validation
+ * @param data
+ */
 export const isUnknown = (data: unknown): data is unknown => true
 
 /*
  * Data Structures
  */
-
-export const isArray = (data: unknown): data is unknown[] => Array.isArray(data)
 
 export const isObject = (data: unknown): data is object =>
   typeof data === 'object' && !isNull(data)
@@ -37,7 +57,7 @@ export const isObject = (data: unknown): data is object =>
  *
  */
 
-/**
+/*
  * "Constant" Types
  */
 
@@ -48,25 +68,25 @@ export const primitive =
   (data: unknown): data is T =>
     data === constant
 
-/**
+/*
  * Sum Types
  */
 
 export const union =
   <T extends Validator<unknown>[]>(validators: T) =>
-  (data: unknown): data is ValidatorGuardType<T[number]> =>
+  (data: unknown): data is PredicateType<T[number]> =>
     validators.some((validator) => validator(data))
 
 export const optional = <T>(is: Validator<T>) => union([isUndefined, is])
 
-/**
+/*
  * Product Types
  */
 
 export const tuple =
   <T extends [...Validator<unknown>[]] | []>(schema: T) =>
-  (data: unknown): data is { [K in keyof T]: ValidatorGuardType<T[K]> } =>
-    isArray(data) &&
+  (data: unknown): data is { [K in keyof T]: PredicateType<T[K]> } =>
+    Array.isArray(data) &&
     data.length === schema.length &&
     schema.every((validator, index) => validator(data[index]))
 
@@ -85,11 +105,11 @@ export const record =
   ): data is {
     [K in {
       [K in keyof T]-?: typeof isUndefined extends T[K] ? never : K
-    }[keyof T]]: ValidatorGuardType<T[K]>
+    }[keyof T]]: PredicateType<T[K]>
   } & {
     [K in {
       [K in keyof T]-?: typeof isUndefined extends T[K] ? K : never
-    }[keyof T]]?: ValidatorGuardType<T[K]>
+    }[keyof T]]?: PredicateType<T[K]>
   } =>
     isObject(data) &&
     Object.keys(schema).every(
@@ -102,6 +122,15 @@ export const dictionary =
   <T>(isType: Validator<T>) =>
   (data: unknown): data is Record<string, T> =>
     isObject(data) &&
-    !isArray(data) &&
+    !Array.isArray(data) &&
     Object.keys(data).every(isString) &&
     Object.values(data).every(isType)
+
+/*
+ * Recursive Types
+ */
+
+export const array =
+  <T>(is: Validator<T>) =>
+  (data: unknown): data is T[] =>
+    Array.isArray(data) && data.every(is)
