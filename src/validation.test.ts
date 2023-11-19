@@ -13,6 +13,7 @@ import {
   primitive,
   isSymbol,
   optional,
+  tuple,
 } from './validation'
 
 describe('validation', () => {
@@ -412,7 +413,28 @@ describe('validation', () => {
       })
     })
     describe('product types', () => {
-      describe('tuples', () => {})
+      describe('tuples', () => {
+        it('validates each element', () => {
+          expect(tuple([])([])).toEqual(true)
+          expect(tuple([isString])(['hello'])).toEqual(true)
+          expect(tuple([isString, isNumber])(['hello', 123])).toEqual(true)
+          expect(
+            tuple([isString, isNumber, isBoolean])(['hello', 123, false]),
+          ).toEqual(true)
+        })
+        it('does not allow additional elements', () => {
+          expect(tuple([])([1])).toEqual(false)
+          expect(tuple([isString])(['hello', 'hello again'])).toEqual(false)
+          expect(tuple([isString, isNumber])(['hello', 123, true])).toEqual(
+            false,
+          )
+        })
+        it('does not allow fewer elements', () => {
+          expect(tuple([isBoolean])([])).toEqual(false)
+          expect(tuple([isString, isString])(['hello'])).toEqual(false)
+          expect(tuple([isString, isNumber])([])).toEqual(false)
+        })
+      })
       describe('records', () => {
         it('validates empty records', () => {
           const isObj = record({})

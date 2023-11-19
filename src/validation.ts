@@ -64,9 +64,11 @@ export const optional = <T>(is: Validator<T>) => union([isUndefined, is])
  */
 
 export const tuple =
-  <T extends [...Validator<unknown>[]] | []>(tuple: T) =>
+  <T extends [...Validator<unknown>[]] | []>(schema: T) =>
   (data: unknown): data is { [K in keyof T]: ValidatorGuardType<T[K]> } =>
-    isArray(data) && tuple.every((validator, index) => validator(data[index])) // TODO real impl
+    isArray(data) &&
+    data.length === schema.length &&
+    schema.every((validator, index) => validator(data[index]))
 
 // NOTE: In TypeScript, it's not possible to remove the union with undefined from an optional property, so the optional
 //  types will be types as ?: undefined | ...
