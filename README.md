@@ -16,7 +16,7 @@ This library provides the means to build validation functions. A validation func
 export type Validator<T> = (data: unknown) => data is T
 ```
 
-There are a few built-in validation functions—one for each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive):
+There is one validation function for each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive):
 
 - `isNull`
 - `isUndefined`
@@ -26,7 +26,7 @@ There are a few built-in validation functions—one for each [JavaScript primiti
 - `isBigInt`
 - `isBigSymbol`
 
-The other structures in this library provides the mean to build custom validation functions. These functions are curried functions where the first argument is a configuration object and the second argument is a piece of data of `unknown` type.
+The other functions are meant to be composed and to build custom validation functions. These functions are higher order functions that accepts configuration object—kind of like a schema—and returns a new validation function:
 
 - `literal`—for [literal types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types).
 - `union`—for [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types).
@@ -68,12 +68,13 @@ const isApiResponse = object({
 })
 const parseMyRestApiResponse = parseJson(isApiResponse)
 
-export const fetchUsers = () => fetch('/path/to/my/endpoint')
+export const fetchUsers = () => fetch('https://api.test.com/v1/users')
   .then(res => res.json())
+  .catch(e => new Error('The request failed', e))
   .then(parseMyRestApiResponse)
 ```
 
-Sometimes, you may want to defer the validation of the parsed value until later. In these instances, use
+Sometimes, you may want to defer the validation of the parsed value until later. In these instances, use either of these functions:
 
 - `isUnknown`—always returns `true`, which means that the parsed value will be of type `unknown`.
 - `isJsonValue`—validates that the parsed value is of type `JsonValue`, which is a recursive type that describes any JSON-serializable data.
