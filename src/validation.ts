@@ -10,7 +10,7 @@ export type Validator<T> = (data: unknown) => data is T
 /**
  * Extract the type in the [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
  */
-export type PredicateType<
+export type Infer<
   T extends (data: unknown, ...args: unknown[]) => data is unknown,
 > = T extends (data: unknown, ...args: unknown[]) => data is infer R
   ? R
@@ -86,7 +86,7 @@ export const literal =
  */
 export const union =
   <T extends Validator<unknown>[]>(validators: T) =>
-  (data: unknown): data is PredicateType<T[number]> =>
+  (data: unknown): data is Infer<T[number]> =>
     validators.some((validator) => validator(data))
 
 /**
@@ -119,7 +119,7 @@ export const optionalNullable = <T>(validator: Validator<T>) =>
  */
 export const tuple =
   <T extends [...Validator<unknown>[]] | []>(validators: T) =>
-  (data: unknown): data is { [K in keyof T]: PredicateType<T[K]> } =>
+  (data: unknown): data is { [K in keyof T]: Infer<T[K]> } =>
     Array.isArray(data) &&
     data.length === validators.length &&
     validators.every((validator, index) => validator(data[index]))
@@ -132,18 +132,21 @@ export const tuple =
  * Validate structs; records that map known keys to a specific type.
  * @param schema maps keys to validation functions.
  */
+
 export const object =
-  <T extends Record<string, Validator<unknown>>>(schema: T) =>
+  <T extends Record<string, unknown>>(schema: {
+    [K in keyof T]: Validator<T[K]>
+  }) =>
   (
     data: unknown,
   ): data is {
     [K in {
-      [K in keyof T]-?: typeof isUndefined extends T[K] ? never : K
-    }[keyof T]]: PredicateType<T[K]>
+      [K in keyof T]-?: undefined extends T[K] ? never : K
+    }[keyof T]]: T[K]
   } & {
     [K in {
-      [K in keyof T]-?: typeof isUndefined extends T[K] ? K : never
-    }[keyof T]]?: PredicateType<T[K]>
+      [K in keyof T]-?: undefined extends T[K] ? K : never
+    }[keyof T]]?: T[K]
   } =>
     typeof data === 'object' &&
     data !== null &&

@@ -35,9 +35,30 @@ The other functions are meant to be composed and to build custom validation func
 - `record`—for [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type).
 - `array`—for [arrays](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays).
 
-By composing these higher order functions, you can model most of what programmers typically deal with. Of course, if you have in mind a particular data structure that this library does not support out-of-the-box—for example, trees—you're free to define your own `Validator` function, which will interoperate with the standard library.
+By composing these higher order functions, you can model most of what programmers typically deal with.
 
-See examples in the next section.
+```ts
+const isUsers = array(object({
+  id: isNumber,
+  name: isString,
+  address: optional(object({
+    country: isString,
+    city: isString,
+    streetAddress: isString,
+    zipCode: isNumber,
+  }))
+}))
+```
+
+To infer the type, use the `Infer` utility type:
+
+```ts
+type Users = Infer<typeof isUsers>
+```
+
+Of course, if you have in mind a particular data structure that this library does not support out-of-the-box—for example, trees—you're free to define your own `Validator` function, which will interoperate with the standard library.
+
+See more examples in the next section.
 
 ### JSON Parsing
 

@@ -510,8 +510,8 @@ describe('validation', () => {
           )
         })
         it('expects every element to pass the validation', () => {
-          expect(array(union([isNumber]))([1, 2, , 3, 4])).toEqual(true)
-          expect(array(union([isNumber]))([1, 2, , 'a', 4])).toEqual(false)
+          expect(array(union([isNumber]))([1, 2, 3, 4])).toEqual(true)
+          expect(array(union([isNumber]))([1, 2, 3, 'a', 4])).toEqual(false)
           expect(
             array(union([isString, isNumber, isBoolean]))([1, 'a', false]),
           ).toEqual(true)
