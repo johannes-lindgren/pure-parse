@@ -4,16 +4,18 @@ import {
   isBoolean,
   isNull,
   isNumber,
-  dictionary,
+  record,
   isString,
   isUndefined,
-  record,
+  object,
   union,
-  primitive,
+  literal,
   isSymbol,
   optional,
   tuple,
   isUnknown,
+  nullable,
+  optionalNullable,
 } from './validation'
 
 describe('validation', () => {
@@ -218,6 +220,9 @@ describe('validation', () => {
       })
     })
 
+    // TODO
+    describe.todo('isBigInt', () => {})
+
     describe('isSymbol', () => {
       it('validates null', () => {
         expect(isSymbol(null)).toEqual(false)
@@ -260,28 +265,28 @@ describe('validation', () => {
     describe('literal types', () => {
       describe('primitive', () => {
         it('matches null', () => {
-          expect(primitive(null)(null)).toEqual(true)
+          expect(literal(null)(null)).toEqual(true)
         })
         it('matches undefined', () => {
-          expect(primitive(undefined)(undefined)).toEqual(true)
+          expect(literal(undefined)(undefined)).toEqual(true)
         })
         it('matches strings', () => {
-          expect(primitive('')('')).toEqual(true)
-          expect(primitive('a')('a')).toEqual(true)
-          expect(primitive('abc')('123')).toEqual(false)
+          expect(literal('')('')).toEqual(true)
+          expect(literal('a')('a')).toEqual(true)
+          expect(literal('abc')('123')).toEqual(false)
         })
         it('matches numbers', () => {
-          expect(primitive(-1)(-1)).toEqual(true)
-          expect(primitive(0)(0)).toEqual(true)
-          expect(primitive(1)(1)).toEqual(true)
+          expect(literal(-1)(-1)).toEqual(true)
+          expect(literal(0)(0)).toEqual(true)
+          expect(literal(1)(1)).toEqual(true)
 
-          expect(primitive(123)('123')).toEqual(false)
+          expect(literal(123)('123')).toEqual(false)
         })
         it('matches booleans', () => {
-          expect(primitive(true)(true)).toEqual(true)
-          expect(primitive(false)(false)).toEqual(true)
-          expect(primitive(true)(false)).toEqual(false)
-          expect(primitive(false)(true)).toEqual(false)
+          expect(literal(true)(true)).toEqual(true)
+          expect(literal(false)(false)).toEqual(true)
+          expect(literal(true)(false)).toEqual(false)
+          expect(literal(false)(true)).toEqual(false)
         })
       })
     })
@@ -316,6 +321,9 @@ describe('validation', () => {
         it('matches undefined', () => {
           expect(optional(isString)(undefined)).toEqual(true)
         })
+        it('mismatches undefined', () => {
+          expect(optional(isString)(null)).toEqual(false)
+        })
         it('matches the guard type of the validator argument', () => {
           expect(optional(isBoolean)(true)).toEqual(true)
           expect(optional(isNumber)(123)).toEqual(true)
@@ -325,6 +333,42 @@ describe('validation', () => {
           expect(optional(isBoolean)(123)).toEqual(false)
           expect(optional(isNumber)('hello')).toEqual(false)
           expect(optional(isString)(true)).toEqual(false)
+        })
+      })
+      describe('optional', () => {
+        it('matches undefined', () => {
+          expect(nullable(isString)(undefined)).toEqual(false)
+        })
+        it('mismatches undefined', () => {
+          expect(nullable(isString)(null)).toEqual(true)
+        })
+        it('matches the guard type of the validator argument', () => {
+          expect(nullable(isBoolean)(true)).toEqual(true)
+          expect(nullable(isNumber)(123)).toEqual(true)
+          expect(nullable(isString)('hello')).toEqual(true)
+        })
+        it('only matches the guard type of the validator argument', () => {
+          expect(nullable(isBoolean)(123)).toEqual(false)
+          expect(nullable(isNumber)('hello')).toEqual(false)
+          expect(nullable(isString)(true)).toEqual(false)
+        })
+      })
+      describe('optional', () => {
+        it('matches undefined', () => {
+          expect(optionalNullable(isString)(undefined)).toEqual(true)
+        })
+        it('mismatches undefined', () => {
+          expect(optionalNullable(isString)(null)).toEqual(true)
+        })
+        it('matches the guard type of the validator argument', () => {
+          expect(optionalNullable(isBoolean)(true)).toEqual(true)
+          expect(optionalNullable(isNumber)(123)).toEqual(true)
+          expect(optionalNullable(isString)('hello')).toEqual(true)
+        })
+        it('only matches the guard type of the validator argument', () => {
+          expect(optionalNullable(isBoolean)(123)).toEqual(false)
+          expect(optionalNullable(isNumber)('hello')).toEqual(false)
+          expect(optionalNullable(isString)(true)).toEqual(false)
         })
       })
     })
@@ -353,23 +397,23 @@ describe('validation', () => {
       })
       describe('records', () => {
         it('validates null', () => {
-          const isObj = record({})
+          const isObj = object({})
           expect(isObj(null)).toEqual(false)
         })
         it('validates undefined', () => {
-          const isObj = record({})
+          const isObj = object({})
           expect(isObj(undefined)).toEqual(false)
         })
         it('validates empty records', () => {
-          const isObj = record({})
+          const isObj = object({})
           expect(isObj({})).toEqual(true)
         })
         it('allows unknown properties', () => {
-          const isObj = record({})
+          const isObj = object({})
           expect(isObj({ a: 'unexpected!' })).toEqual(true)
         })
         it('validates required properties', () => {
-          const isObj = record({
+          const isObj = object({
             a: isString,
           })
           expect(
@@ -381,7 +425,7 @@ describe('validation', () => {
           expect(isObj({ a: undefined })).toEqual(false)
         })
         it('validates optional properties', () => {
-          const isObj = record({
+          const isObj = object({
             a: optional(isString),
           })
           expect(
@@ -395,31 +439,29 @@ describe('validation', () => {
       })
       describe('dictionaries', () => {
         it('validates null', () => {
-          expect(dictionary(isString)(null)).toEqual(false)
+          expect(record(isString)(null)).toEqual(false)
         })
         it('validates undefined', () => {
-          expect(dictionary(isString)(undefined)).toEqual(false)
+          expect(record(isString)(undefined)).toEqual(false)
         })
         it('validates empty records', () => {
-          expect(dictionary(isString)({})).toEqual(true)
+          expect(record(isString)({})).toEqual(true)
         })
         it('invalidates empty arrays', () => {
-          expect(dictionary(isString)([])).toEqual(false)
+          expect(record(isString)([])).toEqual(false)
         })
         it('validates records where the type of the keys match', () => {
-          expect(dictionary(isString)({ a: 'hello', b: 'hello2' })).toEqual(
-            true,
-          )
-          expect(dictionary(isNumber)({ a: 1, b: 1 })).toEqual(true)
-          expect(dictionary(isBoolean)({ a: true, b: false })).toEqual(true)
+          expect(record(isString)({ a: 'hello', b: 'hello2' })).toEqual(true)
+          expect(record(isNumber)({ a: 1, b: 1 })).toEqual(true)
+          expect(record(isBoolean)({ a: true, b: false })).toEqual(true)
         })
         it('invalidates records where the type of any key does not match', () => {
-          expect(dictionary(isString)({ a: 'hello', b: 1 })).toEqual(false)
-          expect(dictionary(isNumber)({ a: 'hello', b: 1 })).toEqual(false)
-          expect(dictionary(isBoolean)({ a: 'hello', b: true })).toEqual(false)
+          expect(record(isString)({ a: 'hello', b: 1 })).toEqual(false)
+          expect(record(isNumber)({ a: 'hello', b: 1 })).toEqual(false)
+          expect(record(isBoolean)({ a: 'hello', b: true })).toEqual(false)
         })
         it('invalidates arrays', () => {
-          expect(dictionary(isString)([])).toEqual(false)
+          expect(record(isString)([])).toEqual(false)
         })
       })
     })

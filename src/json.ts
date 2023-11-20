@@ -1,6 +1,6 @@
 import {
   array,
-  dictionary,
+  record,
   isBoolean,
   isNull,
   isNumber,
@@ -9,6 +9,9 @@ import {
   Validator,
 } from './validation.ts'
 
+/**
+ * A value that represent any JSON-serializable data
+ */
 export type JsonValue =
   | null
   | boolean
@@ -23,7 +26,7 @@ export const isJsonValue = (data: unknown): data is JsonValue =>
     isBoolean,
     isNumber,
     isString,
-    dictionary(isJsonValue),
+    record(isJsonValue),
     array(isJsonValue),
   ])(data)
 
@@ -32,18 +35,10 @@ export const isJsonValue = (data: unknown): data is JsonValue =>
  * @param is - a validation function
  */
 export const parseJson =
-  <T>(is?: Validator<T>) =>
-  (
-    text: string,
-  ): undefined extends typeof is ? JsonValue | Error : T | Error => {
+  <T>(is: Validator<T>) =>
+  (text: string): T | Error => {
     try {
-      // It's normally unsafe to cast the type like this, but in this instance, we know that JSON.parse asserts
-      //  that the returned value is of our type `Json`. We save some computation time by skipping the validation with
-      //  isJson
-      const data = JSON.parse(text) as JsonValue
-      if (!is) {
-        return data
-      }
+      const data = JSON.parse(text)
       return is(data) ? data : new Error('Validation failed')
     } catch (e) {
       return e instanceof Error ? e : new Error(`Unknown error: ${e}`)

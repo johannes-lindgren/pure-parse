@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { isJsonValue, parseJson } from './json.ts'
-import { isNumber, isString, record } from './validation.ts'
+import { isNumber, isString, isUnknown, object } from './validation.ts'
 
 describe('json', () => {
   describe('validation', () => {
@@ -45,14 +45,11 @@ describe('json', () => {
     })
   })
   describe('parseJson', () => {
-    it('can be called without arguments', () => {
-      expect(parseJson()(JSON.stringify({ a: 1 }))).toEqual({ a: 1 })
-    })
     it('does not throw errors', () => {
-      expect(() => parseJson()('not a json!')).not.toThrow()
+      expect(() => parseJson(isUnknown)('not a json!')).not.toThrow()
     })
     it('returns an error if the parsing failed', () => {
-      expect(parseJson()('not a json!')).toBeInstanceOf(Error)
+      expect(parseJson(isUnknown)('not a json!')).toBeInstanceOf(Error)
     })
     it('returns an error if the validation failed', () => {
       expect(parseJson(isString)('{}')).toBeInstanceOf(Error)
@@ -61,7 +58,7 @@ describe('json', () => {
       expect(parseJson(isString)(JSON.stringify('abc'))).toEqual('abc')
       expect(parseJson(isNumber)(JSON.stringify(123))).toEqual(123)
       expect(
-        parseJson(record({ a: isNumber }))(JSON.stringify({ a: 1 })),
+        parseJson(object({ a: isNumber }))(JSON.stringify({ a: 1 })),
       ).toEqual({ a: 1 })
     })
   })

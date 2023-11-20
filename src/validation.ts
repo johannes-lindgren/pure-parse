@@ -5,9 +5,7 @@
 /**
  * A function that return a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
  */
-export type Validator<T> = ((data: unknown) => data is T) & {
-  optional?: boolean
-}
+export type Validator<T> = (data: unknown) => data is T
 
 /**
  * Extract the type in the [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
@@ -17,6 +15,12 @@ export type PredicateType<
 > = T extends (data: unknown, ...args: unknown[]) => data is infer R
   ? R
   : unknown
+
+/**
+ * Use to skip validation, as it returns true for any input.
+ * @param data
+ */
+export const isUnknown = (data: unknown): data is unknown => true
 
 /*
  * Primitives
@@ -35,14 +39,11 @@ export const isNumber = (data: unknown): data is number =>
 export const isString = (data: unknown): data is string =>
   typeof data === 'string'
 
+export const isBigInt = (data: unknown): data is bigint =>
+  typeof data === 'bigint'
+
 export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
-
-/**
- * Use to skip validation
- * @param data
- */
-export const isUnknown = (data: unknown): data is unknown => true
 
 /*
  *
@@ -54,10 +55,24 @@ export const isUnknown = (data: unknown): data is unknown => true
  * "Constant" Types
  */
 
-export const primitive =
-  <const T extends null | undefined | boolean | number | string | symbol>(
-    constant: T,
-  ) =>
+/**
+ * A JavaScript primitive
+ */
+export type Primitive =
+  | null
+  | undefined
+  | boolean
+  | number
+  | string
+  | bigint
+  | symbol
+
+/**
+ *
+ * @param constant compared against `data` with the `===` operator.
+ */
+export const literal =
+  <const T extends Primitive>(constant: T) =>
   (data: unknown): data is T =>
     data === constant
 
@@ -65,33 +80,59 @@ export const primitive =
  * Sum Types
  */
 
+/**
+ *
+ * @param validators any of these validator functions must match the data.
+ */
 export const union =
   <T extends Validator<unknown>[]>(validators: T) =>
   (data: unknown): data is PredicateType<T[number]> =>
     validators.some((validator) => validator(data))
 
-export const optional = <T>(is: Validator<T>) => union([isUndefined, is])
+/**
+ * Create a union with `undefined`. Convenient when creating optional properties in objects. Alias for union([isUndefined, validator]).
+ * @param validator
+ */
+export const optional = <T>(validator: Validator<T>) =>
+  union([isUndefined, validator])
+
+/**
+ * Create a union with `undefined`. Convenient when creating nullable properties in objects. Alias for union([isNull, validator]).
+ * @param validator
+ */
+export const nullable = <T>(validator: Validator<T>) =>
+  union([isNull, validator])
+
+/**
+ * Create a union with `undefined`. Convenient when creating optional nullable properties in objects. Alias for union([isUndefined, isNull, validator]).
+ * @param validator
+ */
+export const optionalNullable = <T>(validator: Validator<T>) =>
+  union([isUndefined, isNull, validator])
 
 /*
  * Product Types
  */
 
+/**
+ * @param validators an array of validators. Each validator validates the corresponding element in the data tuple.
+ */
 export const tuple =
-  <T extends [...Validator<unknown>[]] | []>(schema: T) =>
+  <T extends [...Validator<unknown>[]] | []>(validators: T) =>
   (data: unknown): data is { [K in keyof T]: PredicateType<T[K]> } =>
     Array.isArray(data) &&
-    data.length === schema.length &&
-    schema.every((validator, index) => validator(data[index]))
+    data.length === validators.length &&
+    validators.every((validator, index) => validator(data[index]))
 
 // NOTE: In TypeScript, it's not possible to remove the union with undefined from an optional property, so the optional
 //  types will be types as ?: undefined | ...
 // NOTE: The type below is complex. It could be made shorter by defining utility types. But these utility types end up
 //  in the final type signature of the type guard (which we don't want) and therefore I am inlining.
 /**
- *
- * @param schema
+ * Validate structs; records that map known keys to a specific type.
+ * @param schema maps keys to validation functions.
  */
-export const record =
+export const object =
   <T extends Record<string, Validator<unknown>>>(schema: T) =>
   (
     data: unknown,
@@ -112,20 +153,27 @@ export const record =
         schema[key]?.((data as Record<string, unknown>)[key]),
     )
 
-export const dictionary =
-  <T>(isType: Validator<T>) =>
+/**
+ * Validate `Record`; dictionaries that map strings to another specific type.
+ * @param validateValue validates every value in the map
+ */
+export const record =
+  <T>(validateValue: Validator<T>) =>
   (data: unknown): data is Record<string, T> =>
     typeof data === 'object' &&
     data !== null &&
     !Array.isArray(data) &&
     Object.keys(data).every(isString) &&
-    Object.values(data).every(isType)
+    Object.values(data).every(validateValue)
 
 /*
  * Recursive Types
  */
 
+/**
+ * @param validateItem validates every item in the array
+ */
 export const array =
-  <T>(is: Validator<T>) =>
+  <T>(validateItem: Validator<T>) =>
   (data: unknown): data is T[] =>
-    Array.isArray(data) && data.every(is)
+    Array.isArray(data) && data.every(validateItem)
