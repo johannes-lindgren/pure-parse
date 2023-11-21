@@ -16,6 +16,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "check:types": "tsc",
     "format": "prettier . --write"
   },
   "devDependencies": {

@@ -1,6 +1,10 @@
-# pure-parse
-
-Minimalistic validation library with 100% type inference.
+<div align="center">
+  <h1 align="center"><code>pure-parse</code></h1>
+  <p align="center">
+    Minimalistic validation library with 100% type inference.
+  </p>
+</div>
+<br/>
 
 - Strongly typed
 - 100% type inference
@@ -19,7 +23,10 @@ Are you wary of adding external dependencies? Since there are so few lines of co
 
 - Lightweight (less than 1 kB compressed)
 
-By @johannes-lindgren
+<br/>
+<div align="center">
+  <em>By <a href="https://twitter.com/colinhacks">@johannes-lindgren</a></em>
+</div>
 
 ## Documentation
 
@@ -244,4 +251,7 @@ Example with trees:
 
 ```ts
 // TODO
+type File<T> = { tag: 'file', data: T }
+type FileTree<T> = { tag: 'folder', data: FileTree[] }
+const tree = <T>(validator: Validator<T>) => (data: unknown): data is FileTree<T> => false
 ```
