@@ -2,13 +2,24 @@
 
 Minimalistic validation library with 100% type inference.
 
-- Strongly typed—100% type inference
-- Lightweight—less than 1 kB compressed
-- Robust—no functions throws errors
-- Tested—every function is thoroughly tested
-- Isomorphic—runs on the client and the server
-- Composable—build re-usable building blocks
-- Extendable—simple API for seamless integration 
+- Strongly typed
+- 100% type inference
+
+Since this library is thoroughly tested and does not rely on any external dependencies, I anticipate that maintenance will be a breeze.
+
+- Robust—built with functional programming principles
+- Typed & Tested
+
+Since the goal of this library is to be _minimalistic_—yet _extendible_ and _composable_—it will not require any new features to be added on.
+
+- Composable
+- Extendable
+
+Are you wary of adding external dependencies? Since there are so few lines of code, you can easily fork this repository, audit it, and take over ownership.
+
+- Lightweight (less than 1 kB compressed)
+
+By @johannes-lindgren
 
 ## Documentation
 
