@@ -15,13 +15,13 @@ jobs:
       - name: Install
         run: npm install
       - name: Check Code Formatting
-        run: npm run prettier packages/field-plugin --check
+        run: npm run check:formatting
       - name: Check Types
         run: npm run check:types
-#        No linters for this repo
-#      - name: Lint
-#        run: |
-#          npm run lint
+      #        No linters for this repo
+      #      - name: Lint
+      #        run: |
+      #          npm run lint
       - name: Test
         run: npm run test
       - name: Build
