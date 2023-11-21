@@ -252,7 +252,6 @@ If you have in mind a particular data structure that this library does not suppo
 Example with trees:
 
 ```ts
-
 export type Leaf<T> = { tag: 'leaf'; data: T }
 export type Tree<T> = {
   tag: 'tree'
@@ -260,26 +259,25 @@ export type Tree<T> = {
 }
 export const leaf =
   <T>(validator: Validator<T>) =>
-    (data: unknown): data is Leaf<T> =>
-      object({
-        tag: literal('leaf'),
-        data: validator,
-      })(data)
+  (data: unknown): data is Leaf<T> =>
+    object({
+      tag: literal('leaf'),
+      data: validator,
+    })(data)
 
 export const tree =
   <T>(validator: Validator<T>) =>
-    (data: unknown): data is Tree<T> =>
-      union([
-        leaf(validator),
-        object({
-          tag: literal('tree'),
-          data: array(union([leaf(validator), tree(validator)])),
-        }),
-      ])(data)
+  (data: unknown): data is Tree<T> =>
+    union([
+      leaf(validator),
+      object({
+        tag: literal('tree'),
+        data: array(union([leaf(validator), tree(validator)])),
+      }),
+    ])(data)
 ```
 
 which will validate the following data:
-
 
 ```ts
 const myTree: Tree = {
