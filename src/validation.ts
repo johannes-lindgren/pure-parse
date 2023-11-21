@@ -130,9 +130,16 @@ export const tuple =
 //  in the final type signature of the type guard (which we don't want) and therefore I am inlining.
 /**
  * Validate structs; records that map known keys to a specific type.
+ *
+ * ```ts
+ * const isUser = object({
+ *   id: isNumber,
+ *   uid: isString,
+ *   active: isBoolean,
+ * })
+ * ```
  * @param schema maps keys to validation functions.
  */
-
 export const object =
   <T extends Record<string, unknown>>(schema: {
     [K in keyof T]: Validator<T[K]>
