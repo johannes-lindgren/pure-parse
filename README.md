@@ -1,6 +1,10 @@
-# pure-parse
-
-Minimalistic validation library with 100% type inference.
+<div align="center">
+  <h1 align="center"><code>pure-parse</code></h1>
+  <p align="center">
+    Minimalistic validation library with 100% type inference.
+  </p>
+</div>
+<br/>
 
 - Strongly typed
 - 100% type inference
@@ -19,12 +23,15 @@ Are you wary of adding external dependencies? Since there are so few lines of co
 
 - Lightweight (less than 1 kB compressed)
 
-By @johannes-lindgren
+<br/>
+<div align="center">
+  <em>By <a href="https://twitter.com/colinhacks">@johannes-lindgren</a></em>
+</div>
 
 ## Documentation
 
 `pure-parse` provides the means to build _validation functions_, which is are functions that accepts one `unknown` argument and returns a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
- 
+
 ```ts
 export type Validator<T> = (data: unknown) => data is T
 ```
@@ -51,18 +58,20 @@ The other category of functions are used to construct new, customized validation
 By composing these higher order functions, you end up with a schema-like syntax that models your data:
 
 ```ts
-const isUsers = array(object({
-  id: isNumber,
-  name: isString,
-  address: optional(
-    object({
-      country: isString,
-      city: isString,
-      streetAddress: isString,
-      zipCode: isNumber,
-    })
-  )
-}))
+const isUsers = array(
+  object({
+    id: isNumber,
+    name: isString,
+    address: optional(
+      object({
+        country: isString,
+        city: isString,
+        streetAddress: isString,
+        zipCode: isNumber,
+      }),
+    ),
+  }),
+)
 ```
 
 To infer the type, use the `Infer` utility type:
@@ -79,7 +88,7 @@ A typical JavaScript programs need to parse some JSON data. Therefore, this libr
 with `parseJson`:
 
 ```ts
-const data = parseJson(object({id: isNumber}))('{ "a": 1 }')
+const data = parseJson(object({ id: isNumber }))('{ "a": 1 }')
 if (data instanceof Error) {
   // the parsing failed
 } else {
@@ -104,10 +113,11 @@ const isApiResponse = object({
 })
 const parseMyRestApiResponse = parseJson(isApiResponse)
 
-export const fetchUsers = () => fetch('https://api.test.com/v1/users')
-  .then(res => res.json())
-  .catch(e => new Error('The request failed', e))
-  .then(parseMyRestApiResponse)
+export const fetchUsers = () =>
+  fetch('https://api.test.com/v1/users')
+    .then((res) => res.json())
+    .catch((e) => new Error('The request failed', e))
+    .then(parseMyRestApiResponse)
 ```
 
 ## Comparison to other validation libraries
@@ -129,25 +139,22 @@ const transformUser = (user: Infer<typeof User>) => ({
 })
 const parseUser = (json: string) => {
   const user = parseJson(isUser)(json)
-  if(user instanceof Error){
+  if (user instanceof Error) {
     return user
   }
   return userWithStringId(user)
 }
 ```
 
-
 This library is small, which makes it easy to audit and maintain. It also means that it does not contain every feature under the sun—some of which may be desirable, but others that are not. This library focuses on providing some foundational building blocks that you can compose to validate most of your data structures. If you reach for a validation function that is not in the library, you are able to easily construct it yourself (with `Validator<T>`) and seamlessly integrate it with the core functionality.
 
-| Library                                  | Unpacked Size   |
-|------------------------------------------|-----------------|
-| pure-parse                  | \> 2 kB         |
-| [Zod](https://www.npmjs.com/package/zod) | 533 kB          |
-| [Joi](https://www.npmjs.com/package/joi) | 531 kB          |
-
+| Library                                  | Unpacked Size |
+| ---------------------------------------- | ------------- |
+| pure-parse                               | \> 2 kB       |
+| [Zod](https://www.npmjs.com/package/zod) | 533 kB        |
+| [Joi](https://www.npmjs.com/package/joi) | 531 kB        |
 
 ## Examples
-
 
 ### Union of literal types
 
@@ -159,7 +166,7 @@ const isColor = union([literal('red'), literal('green'), literal('blue')])
 ### Objects
 
 ```ts
-/* { 
+/* {
  *  id: number,
  *  name: string,
  *  skills: string[],
@@ -173,20 +180,22 @@ const isUser = object({
   name: isString,
   skills: array(isString),
   parentIds: tuple([isNumber, isNumber]),
-  movieRatings: record(isNumber)
+  movieRatings: record(isNumber),
 })
 ```
 
 ### Optional and Nullable Properties
 
-Use `optional`, `nullable`, and `optionalNullable` to model optional and nullable properties 
+Use `optional`, `nullable`, and `optionalNullable` to model optional and nullable properties
 
 ```ts
 // { id: number, name?: string }
-const isUsers = array(object({
-  id: isNumber,
-  name: optional(isString),
-}))
+const isUsers = array(
+  object({
+    id: isNumber,
+    name: optional(isString),
+  }),
+)
 ```
 
 ### Discriminated unions
@@ -199,7 +208,7 @@ const isUsers = array(object({
  */
 const isState = union([
   object({
-    tag: literal('loading')
+    tag: literal('loading'),
   }),
   object({
     tag: literal('error'),
@@ -222,7 +231,7 @@ functions:
   JSON-serializable data.
 
 ```ts
-/* { 
+/* {
  *  id: number,
  *  title: string,
  *  body: string,
@@ -244,4 +253,10 @@ Example with trees:
 
 ```ts
 // TODO
+type File<T> = { tag: 'file'; data: T }
+type FileTree<T> = { tag: 'folder'; data: FileTree[] }
+const tree =
+  <T>(validator: Validator<T>) =>
+  (data: unknown): data is FileTree<T> =>
+    false
 ```
