@@ -6,7 +6,6 @@ on:
 
 jobs:
   publish-npm:
-    if: startsWith(github.event.release.name, '@storyblok/mui')
     name: Publish NPM
     runs-on: ubuntu-latest
     steps:
