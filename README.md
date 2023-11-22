@@ -4,6 +4,12 @@
     Minimalistic validation library with 100% type inference.
   </p>
 </div>
+
+
+<div align="center">
+[![Tests](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml/badge.svg)](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml)
+</div>
+
 <br/>
 
 - Lightweight—0.7 kB minified + zipped
