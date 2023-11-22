@@ -148,8 +148,9 @@ This library is small, which makes it easy to audit and maintain. It also means 
 | Library                                  | Unpacked Size |
 | ---------------------------------------- | ------------- |
 | pure-parse                               | \> 2 kB       |
-| [Zod](https://www.npmjs.com/package/zod) | 533 kB        |
-| [Joi](https://www.npmjs.com/package/joi) | 531 kB        |
+| [Zod](https://www.npmjs.com/package/zod) | 21 kB         |
+| [Yup](https://www.npmjs.com/package/yup) | 60 kB         |
+| [Joi](https://www.npmjs.com/package/joi) | 236 kB        |
 
 ## Examples
 
@@ -164,13 +165,13 @@ const isColor = union([literal('red'), literal('green'), literal('blue')])
 
 ```ts
 /* {
- *  id: number,
- *  name: string,
- *  skills: string[],
- *  parentIds: [number, number],
- *  customData: JsonValue,
- *  movieRatings: Record<string, number>,
- * }
+    id: number,
+    name: string,
+    skills: string[],
+    parentIds: [number, number],
+    customData: JsonValue,
+    movieRatings: Record<string, number>,
+   }
  */
 const isUser = object({
   id: isNumber,
@@ -199,9 +200,9 @@ const isUsers = array(
 
 ```ts
 /*
- *   { tag: 'loading' }
- * | { tag: 'error', error: string }
- * | { tag: 'loaded', message: string }
+   { tag: 'loading' }
+  | { tag: 'error', error: string }
+  | { tag: 'loaded', message: string }
  */
 const isState = union([
   object({
@@ -229,11 +230,11 @@ functions:
 
 ```ts
 /* {
- *  id: number,
- *  title: string,
- *  body: string,
- *  customMetaData: JsonValue,
- * }
+    id: number,
+    title: string,
+    body: string,
+    customMetaData: JsonValue,
+   }
  */
 const isArticle = object({
   id: isNumber,
