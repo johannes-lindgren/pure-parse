@@ -5,19 +5,10 @@
   </p>
 </div>
 
-
 <p align="center">
-
 [![Tests](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml/badge.svg)](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml)
-
-<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-
 <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/badge/licence-MIT-green" alt="License"></a>
-
-<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-
 <a href="https://twitter.com/colinhacks" rel="nofollow"><img src="https://img.shields.io/badge/created%20by-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
-
 </p>
 
 <br/>
