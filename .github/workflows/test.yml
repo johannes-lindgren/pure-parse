@@ -1,4 +1,4 @@
-name: Code Inspection
+name: Test
 on: ['push']
 jobs:
   build:
