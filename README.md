@@ -145,12 +145,12 @@ const parseUser = (json: string) => {
 
 This library is small, which makes it easy to audit and maintain. It also means that it does not contain every feature under the sun—some of which may be desirable, but others that are not. This library focuses on providing foundational building blocks that you can compose to validate most of your data structures. If you reach for a validation function that is not in the library, you are able to easily construct it yourself (with `Validator<T>`) and seamlessly integrate it with the core functionality.
 
-| Library                                  | Unpacked Size |
-| ---------------------------------------- | ------------- |
-| pure-parse                               | \> 2 kB       |
-| [Zod](https://www.npmjs.com/package/zod) | 21 kB         |
-| [Yup](https://www.npmjs.com/package/yup) | 60 kB         |
-| [Joi](https://www.npmjs.com/package/joi) | 236 kB        |
+| Library                                  | Minified + Zipped |
+| ---------------------------------------- | ----------------- |
+| pure-parse                               | 0.7 kB            |
+| [Zod](https://www.npmjs.com/package/zod) | 21 kB             |
+| [Yup](https://www.npmjs.com/package/yup) | 60 kB             |
+| [Joi](https://www.npmjs.com/package/joi) | 236 kB            |
 
 ## Examples
 
