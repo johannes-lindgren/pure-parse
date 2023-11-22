@@ -7,7 +7,7 @@
 
 
 <div align="center">
-[![Tests](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml/badge.svg)](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml)
+[![Code Inspection](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml/badge.svg)](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml)
 </div>
 
 <br/>
