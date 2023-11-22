@@ -6,7 +6,7 @@
 </div>
 
 <p align="center">
-[![Tests](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml/badge.svg)](https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml) 
+<a href="https://github.com/johannes-lindgren/pure-parse/actions?query=branch%3Amain"><img src="https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-inspection.yml/badge.svg?event=push&branch=master" alt="CI Status" /></a>
 <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/badge/licence-MIT-green" alt="License"></a>
 <a href="https://twitter.com/colinhacks" rel="nofollow"><img src="https://img.shields.io/badge/created%20by-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
 </p>
