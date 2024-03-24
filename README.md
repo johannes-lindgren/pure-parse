@@ -13,11 +13,29 @@
 
 <br/>
 
-- Lightweight—0.7 kB minified + zipped
-- 100% type inference—declare your validator function and infer the type automagically
+- Lightweight—0.7 kB (minified + zipped)
+- 100% type inference—you don't _need_ to declare types explicitly because the library infers them for you:
+  ```ts
+  const isUser = object({
+    id: isNumber,
+    name: isString,
+  })
+  type User = Infer<typeof isUser>
+  ```
+- Explicit type annotation—if you want to declare types explicitly, you can annotate the validation functions; rather than inferring the types:
+  ```ts
+  type User = {
+    id: number
+    name: string
+  }
+  const isUser = object<User>({
+    id: isNumber,
+    name: isString,
+  })
+  ```
 - Robust—built on top of functional programming principles
-- Typed & Tested—no errors, no edge cases.
-- Composable & Extendable—don't get locked in with another vendor
+- Tested—both the runtime code and the type system are thoroughly tested.
+- Composable & Extendable—you won't lock yourself into a specific schema language; you can easily extend the library with your own validation functions or migrate to another library if you so desire.
 
 Are you wary of adding external dependencies to your projects? Since this project is so small, you can simply copy the source code and audit it yourself.
 
@@ -77,6 +95,35 @@ To infer the type from a validator function, use the `Infer` utility type:
 ```ts
 type Users = Infer<typeof isUsers>
 ```
+
+If you rather declare your type explicitly, annotate the validation functions with a type parameter:
+
+```ts
+type User = {
+  id: number
+  name: string
+  address?: {
+    country: string
+    city: string
+    streetAddress: string
+    zipCode: number
+  }
+}
+const isUser = object<User>({
+  id: isNumber,
+  name: isString,
+  address: optional(
+    object({
+      country: isString,
+      city: isString,
+      streetAddress: isString,
+      zipCode: isNumber,
+    }),
+  ),
+})
+```
+
+If the type predicate in `isUser` does not match `User`, you will get a type error. This is a powerful feature that ensures that the validation function is always in sync with the type it is validating.
 
 See more examples below.
 

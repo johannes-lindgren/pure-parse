@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, test } from 'vitest'
 import {
   array,
   isBoolean,
@@ -16,7 +16,15 @@ import {
   isUnknown,
   nullable,
   optionalNullable,
+  Validator,
+  Infer,
 } from './validation'
+
+export type Equals<T1, T2> = T1 extends T2
+  ? T2 extends T1
+    ? true
+    : false
+  : false
 
 describe('validation', () => {
   describe('primitives', () => {
@@ -263,6 +271,40 @@ describe('validation', () => {
 
   describe('algebraic data types', () => {
     describe('literal types', () => {
+      describe('type checking', () => {
+        describe('type inference', () => {
+          it('works with literals', () => {
+            const symb = Symbol()
+            literal(symb) satisfies Validator<typeof symb>
+            literal('red') satisfies Validator<'red'>
+            // @ts-expect-error
+            literal('red') satisfies Validator<'green'>
+            literal(1) satisfies Validator<1>
+            // @ts-expect-error
+            literal(1) satisfies Validator<2>
+          })
+          it('forbids non-literals', () => {
+            // @ts-expect-error
+            literal([])
+            // @ts-expect-error
+            literal({})
+          })
+        })
+        describe('explicit generic type annotation', () => {
+          it('works with literals', () => {
+            literal<'red'>('red')
+            // @ts-expect-error
+            literal<'green'>('red')
+
+            literal<1>(1)
+            // @ts-expect-error
+            literal<1>(2)
+
+            // @ts-expect-error
+            literal<'1'>(1)
+          })
+        })
+      })
       describe('primitive', () => {
         it('matches null', () => {
           expect(literal(null)(null)).toEqual(true)
@@ -292,6 +334,78 @@ describe('validation', () => {
     })
     describe('sum types', () => {
       describe('unions', () => {
+        describe('type checking', () => {
+          it('returns a validator', () => {
+            union([
+              literal('red'),
+              literal('green'),
+              literal('blue'),
+            ]) satisfies Validator<'red' | 'green' | 'blue'>
+            union([isString, isUndefined]) satisfies Validator<
+              string | undefined
+            >
+            union([isString, isNumber]) satisfies Validator<string | number>
+
+            union([
+              literal('red'),
+              literal('green'),
+              literal('blue'),
+              // @ts-expect-error
+            ]) satisfies Validator<'a' | 'b' | 'c'>
+            union([
+              literal('red'),
+              literal('green'),
+              literal('blue'),
+              // @ts-expect-error
+            ]) satisfies Validator<'red'>
+            // @ts-expect-error
+            union([isString, isUndefined]) satisfies Validator<string>
+          })
+          describe('explicit generic type annotation', () => {
+            it('works with literals', () => {
+              union<['red', 'green', 'blue']>([
+                literal('red'),
+                literal('green'),
+                literal('blue'),
+              ])
+              union<['red', 'green', 'blue']>([
+                // @ts-expect-error
+                literal('a'),
+                // @ts-expect-error
+                literal('b'),
+                // @ts-expect-error
+                literal('c'),
+              ])
+            })
+            it('requires a validator of each type', () => {
+              union<[string, undefined]>([isString, isUndefined])
+              // @ts-expect-error
+              union<[string, undefined]>([isUndefined])
+              // @ts-expect-error
+              union<[string, undefined]>([isString])
+              // @ts-expect-error
+              union<[string, undefined]>([isString] as (
+                | Validator<string>
+                | Validator<undefined>
+              )[])
+            })
+            it('allows nested validators', () => {
+              union<[string, number, undefined | null]>([
+                isString,
+                isNumber,
+                union([isUndefined, isNull]),
+              ])
+            })
+            it('handles primitive types', () => {
+              union<[string, undefined]>([isString, isUndefined])
+              union<[string, number]>([isString, isNumber])
+              // @ts-expect-error
+              union<[string, undefined]>(union([isString]))
+              // @ts-expect-error
+              union<string>(union([isString, isUndefined]))
+            })
+          })
+        })
         it('does not match anything when the array is empty', () => {
           const isUnion = union([])
           expect(isUnion('a')).toEqual(false)
@@ -335,7 +449,7 @@ describe('validation', () => {
           expect(optional(isString)(true)).toEqual(false)
         })
       })
-      describe('optional', () => {
+      describe('nullable', () => {
         it('matches undefined', () => {
           expect(nullable(isString)(undefined)).toEqual(false)
         })
@@ -353,7 +467,7 @@ describe('validation', () => {
           expect(nullable(isString)(true)).toEqual(false)
         })
       })
-      describe('optional', () => {
+      describe('optionalNullable', () => {
         it('matches undefined', () => {
           expect(optionalNullable(isString)(undefined)).toEqual(true)
         })
@@ -374,6 +488,35 @@ describe('validation', () => {
     })
     describe('product types', () => {
       describe('tuples', () => {
+        describe('type checking', () => {
+          it('returns a validator', () => {
+            tuple([]) satisfies Validator<[]>
+            tuple([isString]) satisfies Validator<[string]>
+            tuple([isString, isNumber]) satisfies Validator<[string, number]>
+            tuple([isNumber, isNumber, isNumber]) satisfies Validator<
+              [number, number, number]
+            >
+
+            // @ts-expect-error
+            tuple([isNumber]) satisfies Validator<[number, number]>
+            // @ts-expect-error
+            tuple([isString, isString]) satisfies Validator<[number, number]>
+            // @ts-expect-error
+            tuple([isNumber, isNumber]) satisfies Validator<[string, string]>
+          })
+          test('explicit generic type annotation', () => {
+            tuple<[]>([])
+            tuple<[string]>([isString])
+            tuple<[string, number]>([isString, isNumber])
+            tuple<[number, number, number]>([isNumber, isNumber, isNumber])
+            // @ts-expect-error
+            tuple<[number, number]>([isNumber])
+            // @ts-expect-error
+            tuple<[number, number]>([isString, isString])
+            // @ts-expect-error
+            tuple<[string, string]>([isNumber, isNumber])
+          })
+        })
         it('validates each element', () => {
           expect(tuple([])([])).toEqual(true)
           expect(tuple([isString])(['hello'])).toEqual(true)
@@ -395,7 +538,103 @@ describe('validation', () => {
           expect(tuple([isString, isNumber])([])).toEqual(false)
         })
       })
-      describe('records', () => {
+      describe('objects', () => {
+        describe('type checking', () => {
+          it('returns a validator', () => {
+            object({ a: isString }) satisfies Validator<{ a: string }>
+            object({ a: isNumber }) satisfies Validator<{ a: number }>
+            object({
+              a: object({
+                b: isNumber,
+              }),
+            }) satisfies Validator<{ a: { b: number } }>
+
+            // @ts-expect-error
+            object({ a: isString }) satisfies Validator<{ a: number }>
+            // @ts-expect-error
+            object({ a: isNumber }) satisfies Validator<{ a: string }>
+            // @ts-expect-error
+            object({ a: isNumber }) satisfies Validator<{ x: number }>
+
+            object({
+              a: object({ b: isNumber }),
+              // @ts-expect-error
+            }) satisfies Validator<{ a: { b: string } }>
+
+            object({
+              b: object({
+                b: isNumber,
+              }),
+              // @ts-expect-error
+            }) satisfies Validator<{ x: { y: number } }>
+          })
+          describe('explicit generic type annotation', () => {
+            it('works with complex objects', () => {
+              type User1 = {
+                id: number
+                name: string
+                address?: {
+                  country: string
+                  city: string
+                  streetAddress: string
+                  zipCode: number
+                }
+              }
+              object<User1>({
+                id: isNumber,
+                name: isString,
+                address: optional(
+                  object({
+                    country: isString,
+                    city: isString,
+                    streetAddress: isString,
+                    zipCode: isNumber,
+                  }),
+                ),
+              })
+
+              type User2 = {
+                // Changed the type of id to string to check erros
+                id: string
+                name: string
+                address?: {
+                  country: string
+                  city: string
+                  streetAddress: string
+                  zipCode: number
+                }
+              }
+
+              object<User2>({
+                // @ts-expect-error
+                id: isNumber,
+                name: isString,
+                address: optional(
+                  object({
+                    country: isString,
+                    city: isString,
+                    streetAddress: isString,
+                    zipCode: isNumber,
+                  }),
+                ),
+              })
+            })
+          })
+          test('explicit generic type annotation', () => {
+            object<{ a: string }>({ a: isString })
+            object<{ a: number }>({ a: isNumber })
+            object<{ a: { b: string } }>({ a: object({ b: isString }) })
+
+            // @ts-expect-error
+            object<{ a: number }>({ a: isString })
+            // @ts-expect-error
+            object<{ a: string }>({ a: isNumber })
+            // @ts-expect-error
+            object<{ a: { b: string } }>({ a: object({ b: isNumber }) })
+            // @ts-expect-error
+            object<{ a: { b: string } }>({ x: object({ y: isNumber }) })
+          })
+        })
         it('validates null', () => {
           const isObj = object({})
           expect(isObj(null)).toEqual(false)
@@ -438,6 +677,22 @@ describe('validation', () => {
         })
       })
       describe('dictionaries', () => {
+        describe('type checking', () => {
+          it('returns a validator', () => {
+            record(isString) satisfies Validator<Record<string, string>>
+            record(isNumber) satisfies Validator<Record<string, number>>
+            // @ts-expect-error
+            record(isString) satisfies Validator<number[]>
+          })
+          test('explicit generic type annotation', () => {
+            record<Record<string, string>>(isString)
+            record<Record<string, number[]>>(array(isNumber))
+            // @ts-expect-error
+            record<Record<string, string>>(isNumber)
+            // @ts-expect-error
+            record<Record<string, number[]>>(array(isString))
+          })
+        })
         it('validates null', () => {
           expect(record(isString)(null)).toEqual(false)
         })
@@ -467,6 +722,21 @@ describe('validation', () => {
     })
     describe('recursive types', () => {
       describe('isArray', () => {
+        describe('type checking', () => {
+          it('returns a validator', () => {
+            array(isString) satisfies Validator<string[]>
+            // @ts-expect-error
+            array(isString) satisfies Validator<number[]>
+          })
+          test('explicit generic type annotation', () => {
+            // @ts-expect-error
+            array<Array<number>>(union([isString, isNumber]))
+            // @ts-expect-error
+            array<string[]>(isNumber)
+            // @ts-expect-error
+            array<string[][]>(array(isNumber))
+          })
+        })
         it('validates null', () => {
           expect(array(isUnknown)(null)).toEqual(false)
         })
@@ -517,6 +787,24 @@ describe('validation', () => {
           ).toEqual(true)
         })
       })
+    })
+  })
+  describe('Infer', () => {
+    it('infers the type', () => {
+      const isUser = object({
+        id: isNumber,
+        uid: isString,
+        active: isBoolean,
+      })
+      type User = Infer<typeof isUser>
+      const assertion1: Equals<
+        User,
+        { id: number; uid: string; active: boolean }
+      > = true
+      const assertion2: Equals<
+        User,
+        { id: string; uid: string; active: boolean }
+      > = false
     })
   })
 })

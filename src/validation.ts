@@ -3,7 +3,7 @@
  */
 
 /**
- * A function that return a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
+ * A function that return a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.
  */
 export type Validator<T> = (data: unknown) => data is T
 
@@ -67,12 +67,16 @@ export type Primitive =
   | bigint
   | symbol
 
+/*
+ * Higher order functions
+ */
+
 /**
  *
  * @param constant compared against `data` with the `===` operator.
  */
 export const literal =
-  <const T extends Primitive>(constant: T) =>
+  <const T extends Primitive>(constant: T): Validator<T> =>
   (data: unknown): data is T =>
     data === constant
 
@@ -81,12 +85,23 @@ export const literal =
  */
 
 /**
- *
+ * Note that the type parameter is an array of validators; it's not a union type.
+ * This is because TypeScript doesn't allow you to convert unions to tuples, but it does allow you to convert tuples to unions.
+ * Therefore, when you state the type parameter explicitly, provide an array to represent the union:
+ * ```ts
+ * const isStringOrNumber = union<[string, number]>([isString, isNumber])
+ * ```
  * @param validators any of these validator functions must match the data.
  */
 export const union =
-  <T extends Validator<unknown>[]>(validators: T) =>
-  (data: unknown): data is Infer<T[number]> =>
+  <T extends [...unknown[]]>(
+    validators: [
+      ...{
+        [K in keyof T]: Validator<T[K]>
+      },
+    ],
+  ) =>
+  (data: unknown): data is T[number] =>
     validators.some((validator) => validator(data))
 
 /**
@@ -118,8 +133,14 @@ export const optionalNullable = <T>(validator: Validator<T>) =>
  * @param validators an array of validators. Each validator validates the corresponding element in the data tuple.
  */
 export const tuple =
-  <T extends [...Validator<unknown>[]] | []>(validators: T) =>
-  (data: unknown): data is { [K in keyof T]: Infer<T[K]> } =>
+  <T extends [...unknown[]]>(
+    validators: [
+      ...{
+        [K in keyof T]: Validator<T[K]>
+      },
+    ],
+  ): Validator<T> =>
+  (data: unknown): data is T =>
     Array.isArray(data) &&
     data.length === validators.length &&
     validators.every((validator, index) => validator(data[index]))
@@ -168,8 +189,10 @@ export const object =
  * @param validateValue validates every value in the map
  */
 export const record =
-  <T>(validateValue: Validator<T>) =>
-  (data: unknown): data is Record<string, T> =>
+  <T extends Record<string, unknown>>(
+    validateValue: Validator<T[string]>,
+  ): Validator<T> =>
+  (data: unknown): data is T =>
     typeof data === 'object' &&
     data !== null &&
     !Array.isArray(data) &&
@@ -184,6 +207,6 @@ export const record =
  * @param validateItem validates every item in the array
  */
 export const array =
-  <T>(validateItem: Validator<T>) =>
-  (data: unknown): data is T[] =>
+  <T extends unknown[]>(validateItem: Validator<T[number]>): Validator<T> =>
+  (data: unknown): data is T =>
     Array.isArray(data) && data.every(validateItem)
