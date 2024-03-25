@@ -1,6 +1,6 @@
 import {
   array,
-  record,
+  partialRecord,
   isBoolean,
   isNull,
   isNumber,
@@ -21,14 +21,14 @@ export type JsonValue =
   | JsonValue[]
 
 export const isJsonValue = (data: unknown): data is JsonValue =>
-  union([
+  union(
     isNull,
     isBoolean,
     isNumber,
     isString,
-    record(isJsonValue),
+    partialRecord(isString, isJsonValue),
     array(isJsonValue),
-  ])(data)
+  )(data)
 
 /**
  * This function will not throw an error.
