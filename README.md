@@ -1,47 +1,55 @@
 <div align="center">
   <h1 align="center"><code>pure-parse</code></h1>
   <p align="center">
-    Minimalistic validation library with 100% type inference.
+    Minimalistic, schema-free validation library with type inference and explicit type declarations.
   </p>
 </div>
 
 <p align="center">
 <a href="https://github.com/johannes-lindgren/pure-parse/actions?query=branch%3Amain"><img src="https://github.com/johannes-lindgren/pure-parse/actions/workflows/test.yml/badge.svg?event=push&branch=main" alt="CI Status for Tests" /></a>
 <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/badge/licence-MIT-green" alt="License"></a>
-<a href="https://twitter.com/colinhacks" rel="nofollow"><img src="https://img.shields.io/badge/created%20by-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
+<a href="https://github.com/johannes-lindgren" rel="nofollow"><img src="https://img.shields.io/badge/created%20by-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
 </p>
 
 <br/>
 
-- Lightweight—0.7 kB (minified + zipped)
-- 100% type inference—you don't _need_ to declare types explicitly because the library infers them for you:
-  ```ts
-  const isUser = object({
-    id: isNumber,
-    name: isString,
-  })
-  type User = Infer<typeof isUser>
-  ```
-- Explicit type annotation—if you want to declare types explicitly, you can annotate the validation functions; rather than inferring the types:
-  ```ts
-  type User = {
-    id: number
-    name: string
-  }
-  const isUser = object<User>({
-    id: isNumber,
-    name: isString,
-  })
-  ```
-- Robust—built on top of functional programming principles
-- Tested—both the runtime code and the type system are thoroughly tested.
-- Composable & Extendable—you won't lock yourself into a specific schema language; you can easily extend the library with your own validation functions or migrate to another library if you so desire.
+Why does the world need yet another validation library? Because this library lets you choose whether to declare your types explicitly or having them inferred.
+
+**Infer types**:
+
+```ts
+const isUser = object({
+  id: isNumber,
+  name: isString,
+})
+type User = Infer<typeof isUser>
+```
+
+**Declare types explicitly**:
+
+```ts
+type User = {
+  id: number
+  name: string
+}
+const isUser = object<User>({
+  id: isNumber,
+  name: isString,
+})
+```
+
+Furthermore, this library is designed to be:
+
+- Lightweight—0.7 kB minified + zipped
+- Robust—built on top of functional programming principles, while having thorough tests for both the executable code and the type system.
+- Composable & Extendable—easily extend the library with your own validation functions.
+- No vendor lock-in—this library uses plain TypeScript and JavaScript languages features and does not introduce any library-specific constructs.
 
 Are you wary of adding external dependencies to your projects? Since this project is so small, you can simply copy the source code and audit it yourself.
 
 <br/>
 <div align="center">
-  <em>By <a href="https://twitter.com/colinhacks">@johannes-lindgren</a></em>
+  <em>By <a href="https://github.com/johannes-lindgren">@johannes-lindgren</a></em>
 </div>
 
 ## Documentation
@@ -52,7 +60,9 @@ Are you wary of adding external dependencies to your projects? Since this projec
 export type Validator<T> = (data: unknown) => data is T
 ```
 
-Each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) has a corresponding validation function:
+With a type predicate, TypeScript is able to narrow the type of argument _if the function returns `true`_.
+
+In [pure-parse](https://www.npmjs.com/package/pure-parse), each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) has a corresponding validation function:
 
 - `isNull`
 - `isUndefined`
@@ -64,11 +74,12 @@ Each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Pr
 
 Then there is a second category of higher order functions that construct new, custom validation functions:
 
-- `literal`—for [literal types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types), e.g. `"left"`.
-- `union`—for [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types), e.g. `"left" | "right"`.
+- `literal`—for [literal types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types), and unions between literals; e.g. `"left"` or `"left" | "right"`.
+- `union`—for [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types), e.g. `string | number`.
 - `tuple`—for [tuple types](https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types), e.g. `[number, number]`.
-- `object`—for [object types](https://www.typescriptlang.org/docs/handbook/2/objects.html), e.g. `{ id: string }`
-- `record`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type), e.g. `Record<string, number>`
+- `object`—for [object types](https://www.typescriptlang.org/docs/handbook/2/objects.html), e.g. `{ id: number, name?: string }`
+- `record`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) with a finite amount of keys; e.g. `Record<'left' | 'right' | 'top' | 'bottom', number>`
+- `partialRecord`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) where not all values are defined; e.g. `Partial<Record<string, number>>`
 - `array`—for [arrays](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays), e.g. `string[]`
 
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
@@ -90,13 +101,17 @@ const isUsers = array(
 )
 ```
 
+See more examples below.
+
+### Inferring and Declaring Types
+
 To infer the type from a validator function, use the `Infer` utility type:
 
 ```ts
 type Users = Infer<typeof isUsers>
 ```
 
-If you rather declare your type explicitly, annotate the validation functions with a type parameter:
+If you'd rather declare your type explicitly, annotate the validation functions with a type parameter:
 
 ```ts
 type User = {
@@ -123,9 +138,16 @@ const isUser = object<User>({
 })
 ```
 
-If the type predicate in `isUser` does not match `User`, you will get a type error. This is a powerful feature that ensures that the validation function is always in sync with the type it is validating.
+If the type predicate in the validation function (`isUser`) does not match the type argument (`User`), you will get a type error. This powerful feature ensures that the inferred type is in sync with the type it is validating.
 
-See more examples below.
+Note that when explicitly declaring union types, provide a tuple of the union members as type argument:
+
+```ts
+const isId = union<['string', 'number']>(isString, isNumber)
+const isColor = literal<['red', 'green', 'blue']>('red', 'green', 'blue')
+```
+
+Due to a limitation of TypeScript, you can't' write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
 
 ### JSON Parsing
 
@@ -164,94 +186,176 @@ export const fetchUsers = () =>
     .then(parseMyRestApiResponse)
 ```
 
-## Comparison to other validation libraries
+### Primitives
 
-Unlike other validation libraries—such as [Zod](https://www.npmjs.com/package/zod)
-or [Joi](https://www.npmjs.com/package/joi)—there is no concept of a schema; instead, users deal exclusively with validation
-functions.
-
-Unlike [Joi](https://www.npmjs.com/package/joi), `pure-parse` and [Zod](https://www.npmjs.com/package/zod) are able to infer the types of the parsed data. But Zod gives the user the means to [transform](https://zod.dev/?id=transform) the data that is being validated. So while Zod does infer the type of the _result_ data, it does not give you the type of the _input_ data. Sometimes, it is important to know the original shape of the data, for example when writing back the parsed data to the source. With `pure-parse`, this problem does not exist as the type of the input always equals the same as the output. If the user wants to transform the data, they are encouraged to pipe the parsed input data to a transformation function, for example:
+Primitive types represent [primitive values](https://developer.mozilla.org/en-US/docs/Glossary/Primitive), which are immutable and have no properties:
 
 ```ts
-const isUser = object({
-  id: isNumber,
-  name: isString,
-})
-const transformUser = (user: Infer<typeof User>) => ({
-  ...user,
-  id: user.id.toString(),
-})
-const parseUser = (json: string) => {
-  const user = parseJson(isUser)(json)
-  if (user instanceof Error) {
-    return user
-  }
-  return userWithStringId(user)
-}
+isString('hello') // -> true
+isNumber(42) // -> true
+isBoolean(true) // -> true
+isNull(null) // -> true
+isUndefined(undefined) // -> true
+isBigInt(42n) // -> true
+isSymbol(Symbol()) // -> true
 ```
 
-This library is small, which makes it easy to audit and maintain. It also means that it does not contain every feature under the sun—some of which may be desirable, but others that are not. This library focuses on providing foundational building blocks that you can compose to validate most of your data structures. If you reach for a validation function that is not in the library, you are able to easily construct it yourself (with `Validator<T>`) and seamlessly integrate it with the core functionality.
+### Literals
 
-| Library                                  | Minified + Zipped |
-| ---------------------------------------- | ----------------- |
-| pure-parse                               | 0.7 kB            |
-| [Zod](https://www.npmjs.com/package/zod) | 21 kB             |
-| [Yup](https://www.npmjs.com/package/yup) | 60 kB             |
-| [Joi](https://www.npmjs.com/package/joi) | 236 kB            |
-
-## Examples
-
-### Union of literal types
+Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values. Use the `literal()` function to create a validation function for a literal type:
 
 ```ts
-// 'red' | 'green' | 'blue'
-const isColor = union([literal('red'), literal('green'), literal('blue')])
+const isRed = literal('red')
+const isOne = literal(1)
+```
+
+`literal()` also lets you define unions of literals:
+
+```ts
+const isDirection = literal('north', 'south', 'east', 'west')
+isDirection('north') // -> true
+
+const isDigit = literal(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+isDigit(5) // -> true
+```
+
+### Unions
+
+Unions types—or sum types—represent values that can be one of several types. Use the `union()` function to create a validation function for a union type:
+
+```ts
+const isStringOrNumber = union(isString, isNumber)
+isStringOrNumber('hello') // -> true
+isStringOrNumber(123) // -> true
+```
+
+Since it's very common to create unions with `null` and `undefined`, there are three helper functions for validating optional and nullable types:
+
+- `optional`—for unions with `undefined`
+- `nullable`—for unions with `null`
+- `optionalNullable`—for unions with `undefined | null`
+
+```ts
+const isOptionalString = nullable(isString)
+isOptionalString('hello') // -> true
+isOptionalString(undefined) // -> true
+
+const isNullableString = optional(isString)
+isNullableString('hello') // -> true
+isNullableString(null) // -> true
+
+const isOptionalNullableString = optionalNullable(isString)
+isOptionalNullableString('hello') // -> true
+isOptionalNullableString(undefined) // -> true
+isOptionalNullableString(null) // -> true
+```
+
+### Tuples
+
+Tuples are arrays of fixed length, where each element has a specific type. Use the `tuple()` function to create a validation function for a tuple type:
+
+```ts
+import { tuple } from './validation'
+import { isTest } from 'std-env'
+
+const isCoordinate = tuple([isNumber, isNumber])
+isCoordinate([42, 34]) // -> true
+
+const isTransparentColor = tuple([isString, isNumber])
+isTransparentColor(['#FF0000', 0.5]) // -> true
 ```
 
 ### Objects
 
+Validate objects with the `object()` function. The function takes an object with keys and corresponding validation functions:
+
 ```ts
-/* {
-    id: number,
-    name: string,
-    skills: string[],
-    parentIds: [number, number],
-    customData: JsonValue,
-    movieRatings: Record<string, number>,
-   }
- */
 const isUser = object({
   id: isNumber,
   name: isString,
-  skills: array(isString),
-  parentIds: tuple([isNumber, isNumber]),
-  movieRatings: record(isNumber),
+})
+isUser({ id: 42, name: 'Alice' }) // -> true
+```
+
+You can nest objects:
+
+```ts
+const isUser = object({
+  id: isNumber,
+  name: isString,
+  address: object({
+    country: isString,
+    city: isString,
+    streetAddress: isString,
+    zipCode: isNumber,
+  }),
 })
 ```
 
-### Optional and Nullable Properties
-
-Use `optional`, `nullable`, and `optionalNullable` to model optional and nullable properties
+You can declare optional properties:
 
 ```ts
-// { id: number, name?: string }
-const isUsers = array(
-  object({
-    id: isNumber,
-    name: optional(isString),
-  }),
-)
+import { optional } from './validation'
+
+const isUser = object({
+  id: isNumber,
+  name: optional(isString),
+})
+isUser({ id: 42 }) // -> true
 ```
 
-### Discriminated unions
+### Records
+
+Records are objects that map string keys to values. Call `record()` with a list of all keys and a validation function for the values:
 
 ```ts
-/*
-   { tag: 'loading' }
-  | { tag: 'error', error: string }
-  | { tag: 'loaded', message: string }
- */
-const isState = union([
+const isPadding = record(['left', 'right', 'top', 'bottom'], isNumber)
+isPadding({ left: 10, right: 20, top: 0, bottom: 0 }) // -> true
+```
+
+Note that for each key, there must exist a corresponding value, so that when you index a validated record, you are certain to retrieve a result:
+
+```ts
+if (isPadding(data)) {
+  console.log(data.left + 10) // -> number
+}
+isPadding({ left: 10, right: 20 }) // -> false
+```
+
+### Partial Records
+
+To validate a record where the values might not exist for every key—for example, `Record<string, ?>`—use the `partialRecord()` function:
+
+```ts
+const isWordbook = partialRecord(isString, isString)
+isWordbook({
+  hello: 'used to express a greeting',
+  goodbye: 'farewell (a conventional expression used at parting)',
+}) // -> true
+
+const isPadding = partialRecord(
+  literal('left', 'right', 'top', 'bottom'),
+  isNumber,
+)
+isPadding({ left: 10, right: 20 }) // -> true
+```
+
+### Arrays
+
+Arrays are ordered lists of elements of the same type. Use the `array()` function to create a validation function for an array type:
+
+```ts
+const isBase = literal('A', 'T', 'C', 'G')
+const isDna = array(isBase)
+isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
+```
+
+### Tagged/Discriminated Unions
+
+Validate discriminated unions with unions of objects with a common tag property:
+
+```ts
+const isState = union(
   object({
     tag: literal('loading'),
   }),
@@ -263,38 +367,42 @@ const isState = union([
     tag: literal('loaded'),
     message: isString,
   }),
-])
+)
+isState({ tag: 'loading' }) // -> true
+isState({ tag: 'error', error: 'Failed to load' }) // -> true
+isState({ tag: 'loaded', message: 'Data loaded' }) // -> true
 ```
 
-### Unknown data
+### Unknown Data
 
 Sometimes, you may want to defer the validation of the parsed value until later. In these instances, use either of these
 functions:
 
 - `isUnknown`—always returns `true`, which means that the parsed value will be of type `unknown`.
-- `isJsonValue`—validates that the parsed value is of type `JsonValue`, which is a recursive type that describes any
+- `isJsonValue`—validates that the parsed value is of type `JsonValue`, which is a type that describes any
   JSON-serializable data.
 
 ```ts
 /* {
     id: number,
-    title: string,
-    body: string,
     customMetaData: JsonValue,
    }
  */
 const isArticle = object({
   id: isNumber,
-  title: isString,
-  body: isJsonValue,
+  customMetaData: isJsonValue,
 })
+isArticle({
+  id: 42,
+  customMetaData: {
+    foo: 'bar',
+  },
+}) // -> true
 ```
 
-### Extending
+### Custom Validator Functions
 
-It is trivial to extend the functionality of `pure-parse` as there is no special interface for extensions. All you need to do is to define your own `Validator` function.
-
-Here's a working example with generic trees:
+It is trivial to extend the functionality of `pure-parse`: all you need to do is to define your own function with a type predicate. For convenience, use the `Validator<T>` generic type. Here's a working example with generic trees:
 
 ```ts
 export type Leaf<T> = { tag: 'leaf'; data: T }
@@ -313,13 +421,13 @@ export const leaf =
 export const tree =
   <T>(validator: Validator<T>) =>
   (data: unknown): data is Tree<T> =>
-    union([
+    union(
       leaf(validator),
       object({
         tag: literal('tree'),
-        data: array(union([leaf(validator), tree(validator)])),
+        data: array(union(leaf(validator), tree(validator))),
       }),
-    ])(data)
+    )(data)
 ```
 
 which will validate (and infer the of) the following data:
@@ -346,3 +454,62 @@ const myTree: Tree = {
 
 const isTree = tree(isString)
 ```
+
+## Comparison to other validation libraries
+
+What sets `pure-parse` apart from other validation libraries is the freedom it gives to the user to choose between type inference and explicit type declarations.
+
+### Type Inference _and_ Explicit Type Declarations
+
+Unlike [Joi](https://www.npmjs.com/package/joi), [pure-parse](https://www.npmjs.com/package/pure-parse)—like [Zod](https://www.npmjs.com/package/zod)—is able to infer the type:
+
+```ts
+const isUser = object({
+  id: isNumber,
+  name: isString,
+})
+type User = Infer<typeof isUser>
+```
+
+But unlike Zod, [pure-parse](https://www.npmjs.com/package/pure-parse)—like [Zod](https://www.npmjs.com/package/zod) _also_ allows you the options to declare your types explicitly:
+
+```ts
+type User = {
+  id: number
+  name: string
+}
+const isUser = object<User>({
+  id: isNumber,
+  name: isString,
+})
+```
+
+If the validation function does not match the type, you will get a type error. Inferred types often consists of a complex expressions, which can be hard to read. By declaring the types explicitly, you can make the code more readable and maintainable. Explicit types also serve as documentation for the data structure, and a source of truth
+
+### Schema-free and no vendor lock-in
+
+Unlike other validation libraries—such as [Zod](https://www.npmjs.com/package/zod)
+and [Joi](https://www.npmjs.com/package/joi)—[pure-parse](https://www.npmjs.com/package/pure-parse)—[pure-parse](https://www.npmjs.com/package/pure-parse) has no concept of a schema: instead, users deal exclusively with [type predicates](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates), which is a TypeScript language feature. This means that the library does introduce any library-specific constructs into your codebase, which prevents vendor lock-in.
+
+### Lightweight
+
+[pure-parse](https://www.npmjs.com/package/pure-parse)—like [Zod](https://www.npmjs.com/package/zod) library is tiny, which makes it easy to audit and maintain. By having a small size (and by being tree-shakable) [pure-parse](https://www.npmjs.com/package/pure-parse) ensures that the final footprint on the application bundle size is minimal.
+
+| Library                                                | Minified + Zipped |
+| ------------------------------------------------------ | ----------------- |
+| [pure-parse](https://www.npmjs.com/package/pure-parse) | 0.8 kB            |
+| [Zod](https://www.npmjs.com/package/zod)               | 21 kB             |
+| [Yup](https://www.npmjs.com/package/yup)               | 60 kB             |
+| [Joi](https://www.npmjs.com/package/joi)               | 236 kB            |
+
+Due to the small size, by design, the library does _not_ contain every feature under the sun. This library focuses on providing foundational building blocks that you can compose to validate most of your data structures. If you reach for a validation function that is not in the library, you are able to easily construct it yourself (with `Validator<T>`) and seamlessly integrate it with the core functionality.
+
+Note that even though other libraries might be much larger, the final contribution to the bundle size will depend on whether the library is tree-shakeable and how many features of the library your application uses.
+
+### No built-in transformations
+
+Zod gives the user the means to [transform](https://zod.dev/?id=transform) the data that is being validated. So while Zod does infer the type of the _result_ data, it does not infer the type of the _input_ data. Sometimes, it is important to know the original shape of the data; for example, when writing back the parsed data to the source with a Restful API. With `pure-parse`, this problem does not exist as the type of the input always equals the same as the output. If the user wants to transform the data, they are encouraged to pipe the parsed input data to a transformation function.
+
+### Error messages
+
+Unlike many validation libraries, [pure-parse](https://www.npmjs.com/package/pure-parse) does not give any details of why a validation did not fail. The return type of a validation is always a type predicate

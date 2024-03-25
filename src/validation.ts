@@ -73,12 +73,14 @@ export type Primitive =
 
 /**
  *
- * @param constant compared against `data` with the `===` operator.
+ * @param constants compared against `data` with the `===` operator.
  */
 export const literal =
-  <const T extends Primitive>(constant: T): Validator<T> =>
-  (data: unknown): data is T =>
-    data === constant
+  <const T extends readonly [...Primitive[]]>(
+    ...constants: T
+  ): Validator<T[number]> =>
+  (data: unknown): data is T[number] =>
+    constants.some((constant) => constant === data)
 
 /*
  * Sum Types
@@ -94,12 +96,10 @@ export const literal =
  * @param validators any of these validator functions must match the data.
  */
 export const union =
-  <T extends [...unknown[]]>(
-    validators: [
-      ...{
-        [K in keyof T]: Validator<T[K]>
-      },
-    ],
+  <T extends readonly [...unknown[]]>(
+    ...validators: {
+      [K in keyof T]: Validator<T[K]>
+    }
   ) =>
   (data: unknown): data is T[number] =>
     validators.some((validator) => validator(data))
@@ -109,21 +109,20 @@ export const union =
  * @param validator
  */
 export const optional = <T>(validator: Validator<T>) =>
-  union([isUndefined, validator])
+  union(isUndefined, validator)
 
 /**
  * Create a union with `undefined`. Convenient when creating nullable properties in objects. Alias for union([isNull, validator]).
  * @param validator
  */
-export const nullable = <T>(validator: Validator<T>) =>
-  union([isNull, validator])
+export const nullable = <T>(validator: Validator<T>) => union(isNull, validator)
 
 /**
  * Create a union with `undefined`. Convenient when creating optional nullable properties in objects. Alias for union([isUndefined, isNull, validator]).
  * @param validator
  */
 export const optionalNullable = <T>(validator: Validator<T>) =>
-  union([isUndefined, isNull, validator])
+  union(isUndefined, isNull, validator)
 
 /*
  * Product Types
@@ -133,7 +132,7 @@ export const optionalNullable = <T>(validator: Validator<T>) =>
  * @param validators an array of validators. Each validator validates the corresponding element in the data tuple.
  */
 export const tuple =
-  <T extends [...unknown[]]>(
+  <T extends readonly [...unknown[]]>(
     validators: [
       ...{
         [K in keyof T]: Validator<T[K]>
@@ -185,18 +184,43 @@ export const object =
     )
 
 /**
- * Validate `Record`; dictionaries that map strings to another specific type.
- * @param validateValue validates every value in the map
+ * Validate `Record<?, ?>`; objects that definitely map strings to another specific type.
+ * @param keys a list of every possible key
+ * @param validateValue validates every value
  */
 export const record =
-  <T extends Record<string, unknown>>(
-    validateValue: Validator<T[string]>,
-  ): Validator<T> =>
-  (data: unknown): data is T =>
+  <Keys extends readonly [...string[]], Value>(
+    keys: Keys,
+    validateValue: Validator<Value>,
+  ): Validator<Record<Keys[number], Value>> =>
+  (data: unknown): data is Record<Keys[number], Value> =>
     typeof data === 'object' &&
     data !== null &&
     !Array.isArray(data) &&
-    Object.keys(data).every(isString) &&
+    // No extra keys
+    Object.keys(data).every((key) => keys.includes(key)) &&
+    // Every value is valid
+    Object.values(data).every(validateValue) &&
+    // Either: a) undefined is a valid value, or b) every key is present
+    (validateValue(undefined) || keys.every((key) => key in data))
+
+/**
+ * Validate `Partial<Record<?, ?>>`; objects that optionally map strings to another specific type.
+ * @param validKey validates every key
+ * @param validateValue validates every value
+ */
+export const partialRecord =
+  <Key extends string, Value>(
+    validKey: Validator<Key>,
+    validateValue: Validator<Value>,
+  ): Validator<Partial<Record<Key, Value>>> =>
+  (data: unknown): data is Partial<Record<Key, Value>> =>
+    typeof data === 'object' &&
+    data !== null &&
+    !Array.isArray(data) &&
+    // No extra keys
+    Object.keys(data).every(validKey) &&
+    // Every value is valid
     Object.values(data).every(validateValue)
 
 /*
