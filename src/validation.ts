@@ -12,9 +12,7 @@ export type Validator<T> = (data: unknown) => data is T
  */
 export type Infer<
   T extends (data: unknown, ...args: unknown[]) => data is unknown,
-> = T extends (data: unknown, ...args: unknown[]) => data is infer R
-  ? R
-  : unknown
+> = T extends (data: unknown, ...args: unknown[]) => data is infer R ? R : never
 
 /**
  * Use to skip validation, as it returns true for any input.
@@ -228,9 +226,29 @@ export const partialRecord =
  */
 
 /**
+ * Validate arrays
  * @param validateItem validates every item in the array
+ * @return a validator function that validates arrays
  */
 export const array =
-  <T extends unknown[]>(validateItem: Validator<T[number]>): Validator<T> =>
-  (data: unknown): data is T =>
+  <T>(validateItem: Validator<T>): Validator<T[]> =>
+  (data: unknown): data is T[] =>
     Array.isArray(data) && data.every(validateItem)
+
+/**
+ * Validate non-empty arrays
+ * @param validateItem validates every item in the array
+ * @return a validator function that validates non-empty arrays
+ */
+export const nonEmptyArray =
+  <T>(validateItem: Validator<T>): Validator<[T, ...T[]]> =>
+  (data: unknown): data is [T, ...T[]] =>
+    Array.isArray(data) && data.length !== 0 && data.every(validateItem)
+
+/**
+ * Use this when the data that you want to validate is already a known array
+ * @param data an array
+ * @return `true` if data has at least one element
+ */
+export const isNonEmptyArray = <T>(data: T[]): data is [T, ...T[]] =>
+  data.length !== 0

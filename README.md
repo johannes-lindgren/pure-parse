@@ -74,13 +74,14 @@ In [pure-parse](https://www.npmjs.com/package/pure-parse), each [JavaScript prim
 
 Then there is a second category of higher order functions that construct new, custom validation functions:
 
-- `literal`—for [literal types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types), and unions between literals; e.g. `"left"` or `"left" | "right"`.
-- `union`—for [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types), e.g. `string | number`.
-- `tuple`—for [tuple types](https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types), e.g. `[number, number]`.
-- `object`—for [object types](https://www.typescriptlang.org/docs/handbook/2/objects.html), e.g. `{ id: number, name?: string }`
-- `record`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) with a finite amount of keys; e.g. `Record<'left' | 'right' | 'top' | 'bottom', number>`
-- `partialRecord`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) where not all values are defined; e.g. `Partial<Record<string, number>>`
+- `literal`—for [literal types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types), and unions between literals; for example, `"left"` or `"left" | "right"`.
+- `union`—for [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types); for example, `string | number`.
+- `tuple`—for [tuple types](https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types); for example, `[number, number]`.
+- `object`—for [object types](https://www.typescriptlang.org/docs/handbook/2/objects.html); for example, `{ id: number, name?: string }`
+- `record`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) with a finite amount of keys; for example, `Record<'left' | 'right' | 'top' | 'bottom', number>`
+- `partialRecord`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) where not all values are defined; for example, `Partial<Record<string, number>>`
 - `array`—for [arrays](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays), e.g. `string[]`
+- `nonEmptyArrays`—for arrays with at least one item; for example `[string, ...string[]]`
 
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
 
@@ -139,15 +140,6 @@ const isUser = object<User>({
 ```
 
 If the type predicate in the validation function (`isUser`) does not match the type argument (`User`), you will get a type error. This powerful feature ensures that the inferred type is in sync with the type it is validating.
-
-Note that when explicitly declaring union types, provide a tuple of the union members as type argument:
-
-```ts
-const isId = union<['string', 'number']>(isString, isNumber)
-const isColor = literal<['red', 'green', 'blue']>('red', 'green', 'blue')
-```
-
-Due to a limitation of TypeScript, you can't' write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
 
 ### JSON Parsing
 
@@ -350,6 +342,27 @@ const isDna = array(isBase)
 isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
 ```
 
+Sometimes, it's useful to know whether an array has at least one element. Use the `nonEmptyArray()` function to create a validation function for an array with at least one element:
+
+```ts
+import { nonEmptyArray } from './validation'
+
+const isToggleState = nonEmptyArray(literal('on', 'off', 'indeterminate'))
+```
+
+Both of these functions check every element in the array. If you already have an array of validated data, and you want to find out wether it is non-empty, you can use the `nonEmptyArray` function:
+
+```ts
+import { isNonEmptyArray } from './validation'
+;(names: string[]) => {
+  if (isNonEmptyArray(names)) {
+    console.log(names[0]) // -> string
+  }
+}
+```
+
+While JavaScript lets you do `names.length !== 0`, that would not let TypeScript understand that the array is non-empty.
+
 ### Tagged/Discriminated Unions
 
 Validate discriminated unions with unions of objects with a common tag property:
@@ -513,3 +526,35 @@ Zod gives the user the means to [transform](https://zod.dev/?id=transform) the d
 ### Error messages
 
 Unlike many validation libraries, [pure-parse](https://www.npmjs.com/package/pure-parse) does not give any details of why a validation did not fail. The return type of a validation is always a type predicate
+
+## Exceptions to explicit type annotation
+
+Generally, the functions are annotated with the same type that they are validating for; for example:
+
+```ts
+isObject<{ id: number }>({ id: isNumber })
+```
+
+However, there are some exceptions to this rule due to some limitations of TypeScript.
+
+### Union types
+
+When explicitly declaring union types, provide a tuple of the union members as type argument:
+
+```ts
+const isId = union<['string', 'number']>(isString, isNumber)
+const isColor = literal<['red', 'green', 'blue']>('red', 'green', 'blue')
+```
+
+Due to a limitation of TypeScript, you can't' write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
+
+### Arrays
+
+When explicitly declaring array types, provide type of the item in the array type argument:
+
+```ts
+// Validator<number[]>
+const isNumberArray = array<number>(isNumber)
+// Validator<[T, ...T[]][]>
+const isNonEmptyNumberArray = nonEmptyArray<number>(isNumber)
+```
