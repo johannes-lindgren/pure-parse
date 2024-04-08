@@ -251,6 +251,15 @@ isOptionalNullableString(undefined) // -> true
 isOptionalNullableString(null) // -> true
 ```
 
+When explicitly declaring union types, provide a tuple of the union members as type argument:
+
+```ts
+const isId = union<['string', 'number']>(isString, isNumber)
+const isColor = literal<['red', 'green', 'blue']>('red', 'green', 'blue')
+```
+
+Due to a limitation of TypeScript, you can't' write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
+
 ### Tuples
 
 Tuples are arrays of fixed length, where each element has a specific type. Use the `tuple()` function to create a validation function for a tuple type:
@@ -303,6 +312,19 @@ const isUser = object({
   name: optional(isString),
 })
 isUser({ id: 42 }) // -> true
+```
+
+You can explicitly declare the type of the object and annotate the validation function with the type as a type parameter:
+
+```ts
+type User = {
+  id: number
+  name?: string
+}
+const isUser = object<User>({
+  id: isNumber,
+  name: optional(isString),
+})
 ```
 
 ### Records
@@ -368,6 +390,15 @@ import { isNonEmptyArray } from './validation'
     console.log(names[0]) // -> string
   }
 }
+```
+
+When explicitly declaring array types, provide type of the item in the array type argument:
+
+```ts
+// Validator<number[]>
+const isNumberArray = array<number>(isNumber)
+// Validator<[T, ...T[]][]>
+const isNonEmptyNumberArray = nonEmptyArray<number>(isNumber)
 ```
 
 ### Tagged/Discriminated Unions
@@ -533,36 +564,3 @@ Zod gives the user the means to [transform](https://zod.dev/?id=transform) the d
 ### Error messages
 
 Unlike many validation libraries, [pure-parse](https://www.npmjs.com/package/pure-parse) does not give any details of why a validation did not fail. The return type of a validation is always a type predicate
-
-
-## Exceptions to explicit type annotation
-
-Generally, the functions are annotated with the same type that they are validating for; for example:
-
-```ts
-isObject<{ id: number }>({ id: isNumber })
-```
-
-However, there are some exceptions to this rule due to some limitations of TypeScript.
-
-### Union types
-
-When explicitly declaring union types, provide a tuple of the union members as type argument:
-
-```ts
-const isId = union<['string', 'number']>(isString, isNumber)
-const isColor = literal<['red', 'green', 'blue']>('red', 'green', 'blue')
-```
-
-Due to a limitation of TypeScript, you can't' write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
-
-### Arrays
-
-When explicitly declaring array types, provide type of the item in the array type argument:
-
-```ts
-// Validator<number[]>
-const isNumberArray = array<number>(isNumber)
-// Validator<[T, ...T[]][]>
-const isNonEmptyNumberArray = nonEmptyArray<number>(isNumber)
-```
