@@ -81,6 +81,7 @@ Then there is a second category of higher order functions that construct new, cu
 - `record`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) with a finite amount of keys; e.g. `Record<'left' | 'right' | 'top' | 'bottom', number>`
 - `partialRecord`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) where not all values are defined; e.g. `Partial<Record<string, number>>`
 - `array`—for [arrays](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays), e.g. `string[]`
+- `nonEmptyArrays`—for arrays with at least one item; for example `[string, ...string[]]`
 
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
 
@@ -250,6 +251,15 @@ isOptionalNullableString(undefined) // -> true
 isOptionalNullableString(null) // -> true
 ```
 
+When explicitly declaring union types, provide a tuple of the union members as type argument:
+
+```ts
+const isId = union<['string', 'number']>(isString, isNumber)
+const isColor = literal<['red', 'green', 'blue']>('red', 'green', 'blue')
+```
+
+Due to a limitation of TypeScript, you can't' write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
+
 ### Tuples
 
 Tuples are arrays of fixed length, where each element has a specific type. Use the `tuple()` function to create a validation function for a tuple type:
@@ -304,6 +314,19 @@ const isUser = object({
 isUser({ id: 42 }) // -> true
 ```
 
+You can explicitly declare the type of the object and annotate the validation function with the type as a type parameter:
+
+```ts
+type User = {
+  id: number
+  name?: string
+}
+const isUser = object<User>({
+  id: isNumber,
+  name: optional(isString),
+})
+```
+
 ### Records
 
 Records are objects that map string keys to values. Call `record()` with a list of all keys and a validation function for the values:
@@ -348,6 +371,34 @@ Arrays are ordered lists of elements of the same type. Use the `array()` functio
 const isBase = literal('A', 'T', 'C', 'G')
 const isDna = array(isBase)
 isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
+```
+
+Sometimes, it's useful to know whether an array has at least one element. Use the `nonEmptyArray()` function to create a validation function for an array with at least one element:
+
+```ts
+import { nonEmptyArray } from './validation'
+
+const isToggleState = nonEmptyArray(literal('on', 'off', 'indeterminate'))
+```
+
+Both of these functions check every element in the array. If you already have an array of validated data, and you want to find out wether it is non-empty, you can use the `nonEmptyArray` function:
+
+```ts
+import { isNonEmptyArray } from './validation'
+;(names: string[]) => {
+  if (isNonEmptyArray(names)) {
+    console.log(names[0]) // -> string
+  }
+}
+```
+
+When explicitly declaring array types, provide type of the item in the array type argument:
+
+```ts
+// Validator<number[]>
+const isNumberArray = array<number>(isNumber)
+// Validator<[T, ...T[]][]>
+const isNonEmptyNumberArray = nonEmptyArray<number>(isNumber)
 ```
 
 ### Tagged/Discriminated Unions
