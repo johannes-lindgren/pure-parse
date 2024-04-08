@@ -1096,4 +1096,22 @@ describe('validation', () => {
       > = false
     })
   })
+  describe('Infer', () => {
+    it('infers the type', () => {
+      const isUser = object({
+        id: isNumber,
+        uid: isString,
+        active: isBoolean,
+      })
+      type User = Infer<typeof isUser>
+      const assertion1: Equals<
+        User,
+        { id: number; uid: string; active: boolean }
+      > = true
+      const assertion2: Equals<
+        User,
+        { id: string; uid: string; active: boolean }
+      > = false
+    })
+  })
 })
