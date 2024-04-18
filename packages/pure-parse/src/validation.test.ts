@@ -624,6 +624,24 @@ describe('validation', () => {
                 // string is more narrow than string | undefined, which means that if the validation passes for string, it satisfies User2
                 name: isString,
               })
+              object<User2>({
+                id: isNumber,
+                // undefined is more narrow than string | undefined, which means that if the validation passes for undefined, it satisfies User2
+                name: isUndefined,
+              })
+              // @ts-expect-error
+              object<User2>({
+                id: isNumber,
+                // If we don't check the property, we have no type information on the field (it's unknown).
+                //  Therefore, the fact that it's optional should not mean that we can skip validation
+                // name: isString,
+              })
+              object<User2>({
+                id: isNumber,
+                // Similarly to above; the property must have a corresponding validation function
+                // @ts-expect-error
+                name: undefined,
+              })
             })
             it('works with complex objects', () => {
               type User1 = {
