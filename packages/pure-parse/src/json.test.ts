@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { isJsonValue, parseJson } from './json.ts'
-import { isNumber, isString, isUnknown, object } from './validation.ts'
+import { isJsonValue, parseJson } from './json'
+import { isNumber, isString, isUnknown, object } from './validation'
 
 describe('json', () => {
   describe('validation', () => {

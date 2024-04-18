@@ -13,7 +13,7 @@
 
 <br/>
 
-Why does the world need yet another validation library? Because this library lets you choose whether to declare your types explicitly or having them inferred.
+This minimalistic validation library lets you choose whether to declare your types explicitly or having them inferred.
 
 **Infer types**:
 

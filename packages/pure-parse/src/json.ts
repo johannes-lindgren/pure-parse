@@ -7,7 +7,7 @@ import {
   isString,
   union,
   Validator,
-} from './validation.ts'
+} from './validation'
 
 /**
  * A value that represent any JSON-serializable data

@@ -27,3 +27,5 @@ jobs:
         run: npm run test --workspace=pure-parse
       - name: Build
         run: npm run build --workspace=pure-parse
+      - name: Test Build Output
+        run: npm run build --workspace=test-app

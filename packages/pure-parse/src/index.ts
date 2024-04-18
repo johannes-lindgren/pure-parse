@@ -1,2 +1,2 @@
-export * from './validation.ts'
-export * from './json.ts'
+export * from './validation'
+export * from './json'

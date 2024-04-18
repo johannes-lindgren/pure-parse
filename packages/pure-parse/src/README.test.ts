@@ -6,7 +6,7 @@ import {
   object,
   union,
   Validator,
-} from './validation.ts'
+} from './validation'
 
 describe('README examples', () => {
   describe('Tree', () => {
