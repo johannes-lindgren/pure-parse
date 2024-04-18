@@ -159,9 +159,11 @@ export const tuple =
  * @param schema maps keys to validation functions.
  */
 export const object =
-  <T extends Record<string, unknown>>(schema: {
-    [K in keyof T]: Validator<T[K]>
-  }) =>
+  <T extends Record<string, unknown>>(
+    schema: Required<{
+      [K in keyof T]: Validator<T[K]>
+    }>,
+  ) =>
   (
     data: unknown,
   ): data is {
