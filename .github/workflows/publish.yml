@@ -20,6 +20,8 @@ jobs:
         run: npm install --workspace=pure-parse
       - name: Build
         run: npm run build --workspace=pure-parse
+      - name: Copy README into the workspace
+        run: cp README.md packages/field-plugin/
       - name: Publish to NPM
         run: npm publish --access public --workspace=pure-parse
         env:
