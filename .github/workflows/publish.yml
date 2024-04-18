@@ -17,10 +17,12 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
       - name: Install
-        run: npm install
+        run: npm install --workspace=pure-parse
       - name: Build
-        run: npm run build
+        run: npm run build --workspace=pure-parse
+      - name: Copy README into the workspace
+        run: cp README.md packages/pure-parse/
       - name: Publish to NPM
-        run: npm publish --access public
+        run: npm publish --access public --workspace=pure-parse
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

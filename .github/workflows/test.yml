@@ -10,19 +10,22 @@ jobs:
       - name: Set up node
         uses: actions/setup-node@v3
         with:
-          node-version: 18.16.0
+          node-version: 18
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
       - name: Install
         run: npm install
       - name: Check Code Formatting
-        run: npm run check:formatting
+        run: npm run check:formatting --workspace=pure-parse
       - name: Check Types
-        run: npm run check:types
+        run: npm run check:types --workspace=pure-parse
       #        No linters for this repo
       #      - name: Lint
       #        run: |
       #          npm run lint
       - name: Test
-        run: npm run test
+        run: npm run test --workspace=pure-parse
       - name: Build
-        run: npm run build
+        run: npm run build --workspace=pure-parse
+      - name: Test Build Output
+        run: npm run build --workspace=test-app
