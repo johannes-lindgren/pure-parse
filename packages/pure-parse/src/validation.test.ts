@@ -21,6 +21,7 @@ import {
   record,
   nonEmptyArray,
   isNonEmptyArray,
+  undefineable,
 } from './validation'
 
 export type Equals<T1, T2> = T1 extends T2
@@ -464,14 +465,13 @@ describe('validation', () => {
             data: T
           }
 
-          const isTreeGraphRootNode = <T>(
+          const isTreeNode = <T>(
             isData: (data: unknown) => data is T,
           ): Validator<TreeNode<T>> =>
             object({
               // In v0.0.0-beta.3, this caused a problem with optional properties.
-              // Because data can be undefined, it caused problems with the earlier
-              // implementation of the type inferrence which treated optional properties
-              // and undefinable properties identically
+              // Because data can be undefined, it got interpreted as an optional property, which clashed with the
+              // definition of `TreeNode` which declares it as required.
               data: isData,
             })
         })
@@ -492,6 +492,14 @@ describe('validation', () => {
           expect(optional(isBoolean)(123)).toEqual(false)
           expect(optional(isNumber)('hello')).toEqual(false)
           expect(optional(isString)(true)).toEqual(false)
+        })
+        it('represent optional properties', () => {
+          const isObj = object({
+            a: optional(isString),
+          })
+          expect(isObj({ a: 'hello' })).toEqual(true)
+          expect(isObj({ a: undefined })).toEqual(true)
+          expect(isObj({})).toEqual(true)
         })
       })
       describe('nullable', () => {
@@ -528,6 +536,51 @@ describe('validation', () => {
           expect(optionalNullable(isBoolean)(123)).toEqual(false)
           expect(optionalNullable(isNumber)('hello')).toEqual(false)
           expect(optionalNullable(isString)(true)).toEqual(false)
+        })
+        it('represent optional properties', () => {
+          const isObj = object({
+            a: optionalNullable(isString),
+          })
+          expect(isObj({ a: 'hello' })).toEqual(true)
+          expect(isObj({ a: undefined })).toEqual(true)
+          expect(isObj({ a: null })).toEqual(true)
+          expect(isObj({})).toEqual(true)
+        })
+      })
+      describe('nullable', () => {
+        it('mismatches undefined', () => {
+          expect(nullable(isString)(undefined)).toEqual(false)
+        })
+        it('matches null', () => {
+          expect(nullable(isString)(null)).toEqual(true)
+        })
+        it('matches the guard type of the validator argument', () => {
+          expect(nullable(isBoolean)(true)).toEqual(true)
+          expect(nullable(isNumber)(123)).toEqual(true)
+          expect(nullable(isString)('hello')).toEqual(true)
+        })
+        it('only matches the guard type of the validator argument', () => {
+          expect(nullable(isBoolean)(123)).toEqual(false)
+          expect(nullable(isNumber)('hello')).toEqual(false)
+          expect(nullable(isString)(true)).toEqual(false)
+        })
+      })
+      describe('undefinable', () => {
+        it('matches undefined', () => {
+          expect(undefineable(isString)(undefined)).toEqual(true)
+        })
+        it('mismatches null', () => {
+          expect(undefineable(isString)(null)).toEqual(false)
+        })
+        it('matches the guard type of the validator argument', () => {
+          expect(undefineable(isBoolean)(true)).toEqual(true)
+          expect(undefineable(isNumber)(123)).toEqual(true)
+          expect(undefineable(isString)('hello')).toEqual(true)
+        })
+        it('only matches the guard type of the validator argument', () => {
+          expect(undefineable(isBoolean)(123)).toEqual(false)
+          expect(undefineable(isNumber)('hello')).toEqual(false)
+          expect(undefineable(isString)(true)).toEqual(false)
         })
       })
     })

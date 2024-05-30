@@ -115,7 +115,7 @@ type OptionalValidator<T> = { [optionalSymbol]: true } & ((
 ) => data is typeof optionalSymbol)
 
 /**
- * Create a union with `undefined`. Convenient when creating optional properties in objects. Alias for union([isUndefined, validator]).
+ * Represent an optional property, which is different from a required property that can be `undefined`.
  * @param validator
  */
 export const optional = <T>(validator: Validator<T>): OptionalValidator<T> =>
@@ -129,17 +129,24 @@ export const optional = <T>(validator: Validator<T>): OptionalValidator<T> =>
   }) as OptionalValidator<T>
 
 /**
- * Create a union with `undefined`. Convenient when creating nullable properties in objects. Alias for union([isNull, validator]).
+ * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for optional(union(isNull, validator)).
+ * @param validator
+ */
+export const optionalNullable = <T>(validator: Validator<T>) =>
+  optional(union(isNull, validator))
+
+/**
+ * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for union(isNull, validator).
  * @param validator
  */
 export const nullable = <T>(validator: Validator<T>) => union(isNull, validator)
 
 /**
- * Create a union with `undefined`. Convenient when creating optional nullable properties in objects. Alias for union([isUndefined, isNull, validator]).
+ * Create a union with `undefined`, which is different from optional properties. Alias for union(isUndefined, validator).
  * @param validator
  */
-export const optionalNullable = <T>(validator: Validator<T>) =>
-  union(isUndefined, isNull, validator)
+export const undefineable = <T>(validator: Validator<T>) =>
+  union(isUndefined, validator)
 
 /*
  * Product Types
