@@ -72,7 +72,7 @@ In [pure-parse](https://www.npmjs.com/package/pure-parse), each [JavaScript prim
 - `isBigInt`
 - `isSymbol`
 
-Then there is a second category of higher order functions that construct new, custom validation functions:
+There is a second category of higher order functions that construct new, custom validation functions:
 
 - `literal`—for [literal types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types), and unions between literals; e.g. `"left"` or `"left" | "right"`.
 - `union`—for [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types), e.g. `string | number`.
@@ -83,12 +83,20 @@ Then there is a second category of higher order functions that construct new, cu
 - `array`—for [arrays](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays), e.g. `string[]`
 - `nonEmptyArrays`—for arrays with at least one item; for example `[string, ...string[]]`
 
+The third category is convenience functions for dealing with `null`, `undefined`, and optional properties:
+
+- `optional`–for optional properties
+- `optionalNullable`–for optional nullable properties
+- `nullable`–for unions with `null`
+- `undefineable`–for unions with `undefined`. If this is used for a property on an object, the property is still required.
+
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
 
 ```ts
 const isUsers = array(
   object({
     id: isNumber,
+    parentId: nullable(isNumber),
     name: isString,
     address: optional(
       object({
@@ -230,25 +238,19 @@ isStringOrNumber('hello') // -> true
 isStringOrNumber(123) // -> true
 ```
 
-Since it's very common to create unions with `null` and `undefined`, there are three helper functions for validating optional and nullable types:
+Since it's very common to create unions with `null` and `undefined`, there are two helper functions for validating optional and nullable types:
 
-- `optional`—for unions with `undefined`
+- `undefineable`—for unions with `undefined`
 - `nullable`—for unions with `null`
-- `optionalNullable`—for unions with `undefined | null`
 
 ```ts
-const isOptionalString = nullable(isString)
+const isUndefineableString = undefineable(isString)
 isOptionalString('hello') // -> true
 isOptionalString(undefined) // -> true
 
 const isNullableString = optional(isString)
 isNullableString('hello') // -> true
 isNullableString(null) // -> true
-
-const isOptionalNullableString = optionalNullable(isString)
-isOptionalNullableString('hello') // -> true
-isOptionalNullableString(undefined) // -> true
-isOptionalNullableString(null) // -> true
 ```
 
 When explicitly declaring union types, provide a tuple of the union members as type argument:
@@ -306,12 +308,31 @@ You can declare optional properties:
 
 ```ts
 import { optional } from './validation'
+import { optionalNullable } from 'pure-parse'
 
 const isUser = object({
   id: isNumber,
   name: optional(isString),
+  age: optionalNullable(isString),
 })
 isUser({ id: 42 }) // -> true
+isUser({ id: 42, name: undefined, age: undefined }) // -> true
+isUser({ id: 42, age: null }) // -> true
+```
+
+Note that optional properties are different from unions with `undefined`:
+
+```ts
+import { optional } from './validation'
+import { optionalNullable } from 'pure-parse'
+
+const isUser = object({
+  name: optional(isString),
+  age: union(isUndefined, isString),
+})
+isUser({ age: undefined }) // -> true: name is optional and can be omitted
+isUser({}) // -> false: age is not optional and must be present
+isUser({ name: undefined, age: undefined }) // -> true: TypeScript allows undefined values to be assigned to optional properties
 ```
 
 You can explicitly declare the type of the object and annotate the validation function with the type as a type parameter:
@@ -548,10 +569,12 @@ and [Joi](https://www.npmjs.com/package/joi)—[pure-parse](https://www.npmjs.co
 
 | Library                                                | Minified + Zipped |
 | ------------------------------------------------------ | ----------------- |
-| [pure-parse](https://www.npmjs.com/package/pure-parse) | 0.8 kB            |
+| [pure-parse](https://www.npmjs.com/package/pure-parse) | 1.0 kB            |
 | [Zod](https://www.npmjs.com/package/zod)               | 21 kB             |
 | [Yup](https://www.npmjs.com/package/yup)               | 60 kB             |
 | [Joi](https://www.npmjs.com/package/joi)               | 236 kB            |
+
+Note that the other libraries contain more features and are tree-shakeable, so your bundle size may not be the full size if you don't use all the features.
 
 Due to the small size, by design, the library does _not_ contain every feature under the sun. This library focuses on providing foundational building blocks that you can compose to validate most of your data structures. If you reach for a validation function that is not in the library, you are able to easily construct it yourself (with `Validator<T>`) and seamlessly integrate it with the core functionality.
 
