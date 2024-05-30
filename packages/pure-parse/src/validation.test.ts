@@ -458,6 +458,24 @@ describe('validation', () => {
           expect(isUnion(undefined)).toEqual(false)
         })
       })
+      describe('generic property validators', () => {
+        it('allows for generic, higher-order validation function', () => {
+          type TreeNode<T> = {
+            data: T
+          }
+
+          const isTreeGraphRootNode = <T>(
+            isData: (data: unknown) => data is T,
+          ): Validator<TreeNode<T>> =>
+            object({
+              // In v0.0.0-beta.3, this caused a problem with optional properties.
+              // Because data can be undefined, it caused problems with the earlier
+              // implementation of the type inferrence which treated optional properties
+              // and undefinable properties identically
+              data: isData,
+            })
+        })
+      })
       describe('optional', () => {
         it('matches undefined', () => {
           expect(optional(isString)(undefined)).toEqual(true)
@@ -613,10 +631,11 @@ describe('validation', () => {
 
               type User2 = {
                 id: number
-                name?: string
+                name: string | undefined
               }
               object<User2>({
                 id: isNumber,
+                // @ts-expect-error - name can be undefined, but it is not optional
                 name: optional(isString),
               })
               object<User2>({
@@ -641,6 +660,28 @@ describe('validation', () => {
                 // Similarly to above; the property must have a corresponding validation function
                 // @ts-expect-error
                 name: undefined,
+              })
+
+              type User3 = {
+                id: number
+                // This one is optional, not a union with undefined
+                name?: string
+              }
+              object<User3>({
+                id: isNumber,
+                // Similarly to above; the property must have a corresponding validation function
+                // @ts-expect-error
+                name: undefined,
+              })
+              object<User3>({
+                id: isNumber,
+                // @ts-expect-error - requires optional function
+                name: union(isUndefined, isString),
+              })
+              object<User3>({
+                id: isNumber,
+                // As expected; requires the optional function
+                name: optional(isString),
               })
             })
             it('works with complex objects', () => {
@@ -748,6 +789,18 @@ describe('validation', () => {
           expect(isObj({})).toEqual(true)
           expect(isObj({ a: undefined })).toEqual(true)
         })
+        it('differentiates between undefined and missing properties', () => {
+          const isOptionalObj = object({
+            a: optional(isString),
+          })
+          expect(isOptionalObj({})).toEqual(true)
+          expect(isOptionalObj({ a: undefined })).toEqual(true)
+          const isUnionObj = object({
+            a: union(isString, isUndefined),
+          })
+          expect(isUnionObj({})).toEqual(false)
+          expect(isUnionObj({ a: undefined })).toEqual(true)
+        })
       })
       describe('partial records', () => {
         describe('type checking', () => {
@@ -817,6 +870,13 @@ describe('validation', () => {
           expect(
             partialRecord(isString, isBoolean)({ a: 'hello', b: true }),
           ).toEqual(false)
+        })
+        test('extra properties in the schema', () => {
+          const isObj = object({
+            a: isNumber,
+            // @ts-expect-error - all properties must be validator functions
+            b: 123,
+          })
         })
         describe('keys', () => {
           it('allows keys to be of type string', () => {

@@ -103,11 +103,30 @@ export const union =
     validators.some((validator) => validator(data))
 
 /**
+ * Used to respresent optional validators at runtime and compile-time in two different ways
+ */
+const optionalSymbol = Symbol('optional')
+
+/**
+ * Special validator to check optional values
+ */
+type OptionalValidator<T> = { [optionalSymbol]: true } & ((
+  data: unknown,
+) => data is typeof optionalSymbol)
+
+/**
  * Create a union with `undefined`. Convenient when creating optional properties in objects. Alias for union([isUndefined, validator]).
  * @param validator
  */
-export const optional = <T>(validator: Validator<T>) =>
-  union(isUndefined, validator)
+export const optional = <T>(validator: Validator<T>): OptionalValidator<T> =>
+  /*
+   * This function uses two tricks:
+   *  1. { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
+   *  2. The return type is a symbol so that it in generic conditional expressions, it does not overlap with Validator.
+   */
+  Object.assign(union(isUndefined, validator), {
+    [optionalSymbol]: true,
+  }) as OptionalValidator<T>
 
 /**
  * Create a union with `undefined`. Convenient when creating nullable properties in objects. Alias for union([isNull, validator]).
@@ -142,10 +161,6 @@ export const tuple =
     data.length === validators.length &&
     validators.every((validator, index) => validator(data[index]))
 
-// NOTE: In TypeScript, it's not possible to remove the union with undefined from an optional property, so the optional
-//  types will be types as ?: undefined | ...
-// NOTE: The type below is complex. It could be made shorter by defining utility types. But these utility types end up
-//  in the final type signature of the type guard (which we don't want) and therefore I am inlining.
 /**
  * Validate structs; records that map known keys to a specific type.
  *
@@ -159,29 +174,39 @@ export const tuple =
  * @param schema maps keys to validation functions.
  */
 export const object =
-  <T extends Record<string, unknown>>(
-    schema: Required<{
-      [K in keyof T]: Validator<T[K]>
-    }>,
-  ) =>
+  <T extends Record<string, unknown>>(schema: {
+    [K in keyof T]-?: {} extends Pick<T, K>
+      ? OptionalValidator<T[K]>
+      : Validator<T[K]>
+  }) =>
   (
     data: unknown,
-  ): data is {
-    [K in {
-      [K in keyof T]-?: undefined extends T[K] ? never : K
-    }[keyof T]]: T[K]
-  } & {
-    [K in {
-      [K in keyof T]-?: undefined extends T[K] ? K : never
-    }[keyof T]]?: T[K]
-  } =>
+  ): data is Required<Pick<T, RequiredKeys<T>>> &
+    Partial<Pick<T, OptionalKeys<T>>> =>
     typeof data === 'object' &&
     data !== null &&
-    Object.keys(schema).every(
-      (key) =>
-        // We have force TypeScript to consider `data` as a record, otherwise it won't allow us to index `data` with a string (TS7053).
-        schema[key]?.((data as Record<string, unknown>)[key]),
-    )
+    Object.keys(schema).every((key) => {
+      const validator = schema[key]
+      if (validator === undefined) {
+        // TODO this shouldn't happen, as the type ensures that all properties are validators
+        return false
+      }
+      if (!(key in data)) {
+        // If the key is not present, the validator must represent an optional property
+        return optionalSymbol in validator
+      }
+      // @ts-ignore - we check that the key is present on the line above
+      const value = data[key]
+
+      return validator(value)
+    })
+
+type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
+}[keyof T]
+type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
+}[keyof T]
 
 /**
  * Validate `Record<?, ?>`; objects that definitely map strings to another specific type.
