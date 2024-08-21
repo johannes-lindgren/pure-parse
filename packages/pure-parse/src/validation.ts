@@ -43,6 +43,9 @@ export const isBigInt = (data: unknown): data is bigint =>
 export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
 
+// TODO unit tests
+export const isFunction = (data: unknown): data is Function => typeof data === 'function'
+
 /*
  *
  * Algebraic Data Types
@@ -110,7 +113,7 @@ const optionalSymbol = Symbol('optional')
 /**
  * Special validator to check optional values
  */
-type OptionalValidator<T> = { [optionalSymbol]: true } & ((
+export type OptionalValidator<T> = { [optionalSymbol]: true } & ((
   data: unknown,
 ) => data is typeof optionalSymbol)
 
@@ -208,10 +211,10 @@ export const object =
       return validator(value)
     })
 
-type RequiredKeys<T> = {
+export type RequiredKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K
 }[keyof T]
-type OptionalKeys<T> = {
+export type OptionalKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? K : never
 }[keyof T]
 
