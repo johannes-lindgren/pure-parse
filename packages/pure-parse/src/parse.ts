@@ -147,9 +147,9 @@ const optionalSymbol = Symbol('optional parser')
 /**
  * Special validator to check optional values
  */
-export type OptionalParser<T> = { [optionalSymbol]: true } & ((
-  data: unknown,
-) => ParseResult<T>)
+export type OptionalParser<T> = {
+  [optionalSymbol]: true
+} & ((data: unknown) => typeof optionalSymbol)
 
 /**
  * Represent an optional property, which is different from a required property that can be `undefined`.
@@ -182,10 +182,11 @@ const areAllSuccessesObject = <T>(
  * Validate structs; records that map known keys to a specific type.
  *
  * ```ts
- * const isUser = object({
- *   id: isNumber,
- *   uid: isString,
- *   active: isBoolean,
+ * const parseUser = object({
+ *   id: parseNumber,
+ *   uid: parseString,
+ *   active: parseBoolean,
+ *   name: optional(parseString),
  * })
  * ```
  * @param schema maps keys to validation functions.

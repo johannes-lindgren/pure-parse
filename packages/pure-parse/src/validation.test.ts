@@ -16,6 +16,7 @@ import {
   object,
   optional,
   optionalNullable,
+  OptionalValidator,
   partialRecord,
   record,
   tuple,
@@ -472,6 +473,16 @@ describe('validation', () => {
         })
       })
       describe('optional', () => {
+        describe('OptionalValidator', () => {
+          test('that Validator and OptionalValidator are mutually exclusive', () => {
+            const a1: Validator<string> extends OptionalValidator<string>
+              ? true
+              : false = false
+            const a2: OptionalValidator<string> extends Validator<string>
+              ? true
+              : false = false
+          })
+        })
         it('matches undefined', () => {
           expect(optional(isString)(undefined)).toEqual(true)
         })

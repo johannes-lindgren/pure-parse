@@ -9,6 +9,8 @@ import {
   parseString,
   optional,
   Infer,
+  Parser,
+  OptionalParser,
 } from './parse'
 import { type Equals } from './Equals.test'
 
@@ -154,6 +156,14 @@ describe('parsing', () => {
         value: { id: 1, name: 'Alice', email: defaultEmail },
       })
     })
+    describe('optional', () => {
+      describe('OptionalParser', () => {
+        const a1: Parser<string> extends OptionalParser<string> ? true : false =
+          false
+        const a2: OptionalParser<string> extends Parser<string> ? true : false =
+          false
+      })
+    })
     describe('type inference', () => {
       test('required properties', () => {
         type User = {
@@ -182,6 +192,10 @@ describe('parsing', () => {
           email: '',
         }
         const a2: InferredUser = {
+          id: 123,
+          email: undefined,
+        }
+        const a3: InferredUser = {
           id: 123,
         }
       })
@@ -216,11 +230,6 @@ describe('parsing', () => {
         const parseUser1 = object<User>({
           id: parseNumber,
           email: optional(parseString),
-        })
-        const parseUser2 = object<User>({
-          id: parseNumber,
-          // strings are assignable to optional strings
-          email: parseString,
         })
         const parseUser3 = object<User>(
           // @ts-expect-error -- email parser must be present
