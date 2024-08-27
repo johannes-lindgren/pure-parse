@@ -1,34 +1,29 @@
-import { describe, it, expect, test } from 'vitest'
+import { describe, expect, it, test } from 'vitest'
 import {
   array,
+  Infer,
   isBoolean,
+  isNonEmptyArray,
   isNull,
   isNumber,
-  partialRecord,
   isString,
-  isUndefined,
-  object,
-  union,
-  literal,
   isSymbol,
-  optional,
-  tuple,
+  isUndefined,
   isUnknown,
-  nullable,
-  optionalNullable,
-  Validator,
-  Infer,
-  record,
+  literal,
   nonEmptyArray,
-  isNonEmptyArray,
+  nullable,
+  object,
+  optional,
+  optionalNullable,
+  partialRecord,
+  record,
+  tuple,
   undefineable,
+  union,
+  Validator,
 } from './validation'
-
-export type Equals<T1, T2> = T1 extends T2
-  ? T2 extends T1
-    ? true
-    : false
-  : false
+import { Equals } from './Equals.test'
 
 describe('validation', () => {
   describe('primitives', () => {

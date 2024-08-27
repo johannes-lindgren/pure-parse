@@ -44,7 +44,10 @@ export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
 
 // TODO unit tests
-export const isFunction = (data: unknown): data is Function => typeof data === 'function'
+export const isFunction = (data: unknown): data is Function =>
+  typeof data === 'function'
+export const isObject = (data: unknown): data is object =>
+  typeof data === 'object' && data !== null
 
 /*
  *
@@ -106,7 +109,7 @@ export const union =
     validators.some((validator) => validator(data))
 
 /**
- * Used to respresent optional validators at runtime and compile-time in two different ways
+ * Used to represent optional validators at runtime and compile-time in two different ways
  */
 const optionalSymbol = Symbol('optional')
 
@@ -171,6 +174,13 @@ export const tuple =
     data.length === validators.length &&
     validators.every((validator, index) => validator(data[index]))
 
+export type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
+}[keyof T]
+export type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
+}[keyof T]
+
 /**
  * Validate structs; records that map known keys to a specific type.
  *
@@ -210,13 +220,6 @@ export const object =
 
       return validator(value)
     })
-
-export type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
-}[keyof T]
-export type OptionalKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
-}[keyof T]
 
 /**
  * Validate `Record<?, ?>`; objects that definitely map strings to another specific type.
