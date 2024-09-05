@@ -507,6 +507,33 @@ describe('validation', () => {
           expect(isObj({ a: undefined })).toEqual(true)
           expect(isObj({})).toEqual(true)
         })
+        // TODO can we make this work for optional properties?
+        test.todo('type inference', () => {
+          const isObj = object({
+            id: isNumber,
+            name: optional(isString),
+          })
+          type User = {
+            id: number
+            name?: string
+          }
+          type InferredUser = Infer<typeof isObj>
+          // @ts-expect-error -- TODO make this work
+          const t1: Equals<User, InferredUser> = true
+          const t2: InferredUser = {
+            id: 0,
+            name: 'Johannes',
+          }
+          // @ts-expect-error -- TODO make this work
+          const t3: InferredUser = {
+            id: 0,
+          }
+          // @ts-expect-error -- TODO make this work
+          const t4: InferredUser = {
+            id: 0,
+            name: undefined,
+          }
+        })
       })
       describe('nullable', () => {
         it('matches undefined', () => {
@@ -1213,24 +1240,6 @@ describe('validation', () => {
           })
         })
       })
-    })
-  })
-  describe('Infer', () => {
-    it('infers the type', () => {
-      const isUser = object({
-        id: isNumber,
-        uid: isString,
-        active: isBoolean,
-      })
-      type User = Infer<typeof isUser>
-      const assertion1: Equals<
-        User,
-        { id: number; uid: string; active: boolean }
-      > = true
-      const assertion2: Equals<
-        User,
-        { id: string; uid: string; active: boolean }
-      > = false
     })
   })
   describe('Infer', () => {

@@ -2,6 +2,8 @@
  * Utility Types
  */
 
+import { hasKey } from './utils'
+
 /**
  * A function that return a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.
  */
@@ -211,11 +213,10 @@ export const object =
         // TODO this shouldn't happen, as the type ensures that all properties are validators
         return false
       }
-      if (!(key in data)) {
+      if (!hasKey(data, key)) {
         // If the key is not present, the validator must represent an optional property
         return optionalSymbol in validator
       }
-      // @ts-ignore - we check that the key is present on the line above
       const value = data[key]
 
       return validator(value)

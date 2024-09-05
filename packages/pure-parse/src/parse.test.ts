@@ -9,21 +9,33 @@ import {
   parseString,
   optional,
   Infer,
-  Parser,
-  OptionalParser,
+  successFallback,
+  success,
+  failure,
 } from './parse'
 import { type Equals } from './Equals.test'
 
 describe('parsing', () => {
+  describe('fallback', () => {
+    test.todo('on success')
+    test.todo('on validation failure')
+    test.todo('on fallback')
+    test.todo('on optional properties')
+  })
   describe('literals', () => {
     it('todo', () => {
       const parseLiteral = literal('a')
-      expect(parseLiteral('a')).toEqual({ tag: 'success', value: 'a' })
+      expect(parseLiteral('a')).toEqual({
+        tag: 'success',
+        isSuccess: true,
+        value: 'a',
+      })
     })
     test('with fallback', () => {
       const parseLiteral = fallback(literal('#FF0000'), '#00FF00')
       expect(parseLiteral('#XXYYZZ')).toEqual({
-        tag: 'success',
+        tag: 'success-fallback',
+        isSuccess: true,
         value: '#00FF00',
       })
     })
@@ -31,9 +43,21 @@ describe('parsing', () => {
   describe('unions', () => {
     it('todo', () => {
       const color = union(literal('red'), literal('green'), literal('blue'))
-      expect(color('red')).toEqual({ tag: 'success', value: 'red' })
-      expect(color('green')).toEqual({ tag: 'success', value: 'green' })
-      expect(color('blue')).toEqual({ tag: 'success', value: 'blue' })
+      expect(color('red')).toEqual({
+        tag: 'success',
+        isSuccess: true,
+        value: 'red',
+      })
+      expect(color('green')).toEqual({
+        tag: 'success',
+        isSuccess: true,
+        value: 'green',
+      })
+      expect(color('blue')).toEqual({
+        tag: 'success',
+        isSuccess: true,
+        value: 'blue',
+      })
       expect(color('yellow')).toHaveProperty('tag', 'failure')
     })
   })
@@ -42,6 +66,7 @@ describe('parsing', () => {
       const parseArr = array(literal('a'))
       expect(parseArr(['a', 'a'])).toEqual({
         tag: 'success',
+        isSuccess: true,
         value: ['a', 'a'],
       })
       expect(parseArr(['a', 'b'])).toHaveProperty('tag', 'failure')
@@ -50,133 +75,151 @@ describe('parsing', () => {
       const parseArr = array(fallback(literal('#FF0000'), '#00FF00'))
       expect(parseArr(['#FF0000', '#FF0000'])).toEqual({
         tag: 'success',
+        isSuccess: true,
         value: ['#FF0000', '#FF0000'],
       })
       expect(parseArr(['#FF0000', '#XXYYZZ'])).toEqual({
         tag: 'success',
+        isSuccess: true,
         value: ['#FF0000', '#00FF00'],
       })
       expect(parseArr(['#XXYYZZ', '#XXYYZZ'])).toEqual({
         tag: 'success',
+        isSuccess: true,
         value: ['#00FF00', '#00FF00'],
       })
       expect(parseArr(['#FF0000', '#XXYYZZ', '#FF0000', '#XXYYZZ'])).toEqual({
         tag: 'success',
+        isSuccess: true,
         value: ['#FF0000', '#00FF00', '#FF0000', '#00FF00'],
       })
     })
+    test('that the result type is infallible', () => {
+      const res = fallback(parseString, '')(123)
+      const a1: typeof res = success('')
+      const a2: typeof res = successFallback('')
+      // @ts-expect-error -- fallback result is infallible
+      const a3: typeof res = failure('')
+    })
   })
   describe('objects', () => {
-    test('required properties', () => {
-      const parseUser = object({
-        id: parseNumber,
-        name: parseString,
-      })
-      expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
-        'tag',
-        'success',
-      )
-      expect(parseUser({ id: 1 })).toHaveProperty('tag', 'failure')
-      expect(parseUser({ name: 'Alice' })).toHaveProperty('tag', 'failure')
-      expect(parseUser({})).toHaveProperty('tag', 'failure')
-    })
-    test('optional properties', () => {
-      const parseUser = object({
-        id: parseNumber,
-        name: parseString,
-        email: optional(parseString),
-      })
-      expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
-        'tag',
-        'success',
-      )
-      expect(
-        parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
-      ).toHaveProperty('tag', 'success')
-      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toHaveProperty(
-        'tag',
-        'failure',
-      )
-      expect(parseUser({ id: 1 })).toHaveProperty('tag', 'failure')
-      expect(parseUser({ name: 'Alice' })).toHaveProperty('tag', 'failure')
-      expect(parseUser({})).toHaveProperty('tag', 'failure')
-    })
-    test('with fallback', () => {
-      const defaultEmail = 'default@test.com'
-      const parseUser = object({
-        id: parseNumber,
-        name: parseString,
-        email: fallback(parseString, defaultEmail),
-      })
-
-      // The property can be a string -> Success
-      expect(
-        parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
-      ).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: 'alice@test.com' },
-      })
-
-      // number fails -> Falls back
-      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: defaultEmail },
-      })
-
-      // The property is required -> Fails
-      expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
-        'tag',
-        'failure',
-      )
-    })
-    test('with optional fallback', () => {
-      const defaultEmail = 'default@test.com'
-      const parseUser = object({
-        id: parseNumber,
-        name: parseString,
-        email: optional(fallback(parseString, defaultEmail)),
-      })
-      // The email can be a omitted -> Success
-      expect(parseUser({ id: 1, name: 'Alice' })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice' },
-      })
-
-      // The email can be a string -> Success
-      expect(
-        parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
-      ).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: 'alice@test.com' },
-      })
-
-      // The email can't be a number -> falls back
-      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: defaultEmail },
-      })
-    })
-    describe('optional', () => {
-      describe('OptionalParser', () => {
-        const a1: Parser<string> extends OptionalParser<string> ? true : false =
-          false
-        const a2: OptionalParser<string> extends Parser<string> ? true : false =
-          false
-      })
-    })
-    describe('type inference', () => {
-      test('required properties', () => {
-        type User = {
-          id: number
-          name: string
-        }
+    describe('required properties', () => {
+      test('parsing', () => {
         const parseUser = object({
           id: parseNumber,
           name: parseString,
         })
-        const T1: Equals<Infer<typeof parseUser>, User> = true
+        expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
+          'tag',
+          'success',
+        )
+        expect(parseUser({ id: 1 })).toHaveProperty('tag', 'failure')
+        expect(parseUser({ name: 'Alice' })).toHaveProperty('tag', 'failure')
+        expect(parseUser({})).toHaveProperty('tag', 'failure')
       })
-      test('optional properties', () => {
+      describe('type annotation', () => {
+        type User = {
+          id: number
+          name: string
+        }
+        it('has a required parser', () => {
+          const parseUser1 = object<User>({
+            id: parseNumber,
+            name: parseString,
+          })
+        })
+        it('does not have an optional parser', () => {
+          const parseUser2 = object<User>({
+            id: parseNumber,
+            // @ts-expect-error -- required prop name must not be optional
+            name: optional(parseString),
+          })
+        })
+        it('must have a parser', () => {
+          const parseUser3 = object<User>(
+            // @ts-expect-error -- required prop name must not be omitted
+            {
+              id: parseNumber,
+            },
+          )
+        })
+      })
+      test('type inference', () => {
+        type User = {
+          id: number
+          email: string
+        }
+        const parseUser = object({
+          id: parseNumber,
+          email: parseString,
+        })
+        type InferredUser = Infer<typeof parseUser>
+        const T1: Equals<InferredUser, User> = true
+        const a1: InferredUser = {
+          id: 123,
+          email: '',
+        }
+        const a2: InferredUser = {
+          id: 123,
+          // @ts-expect-error -- wrong type of property
+          email: undefined,
+        }
+        // @ts-expect-error -- property is required
+        const a3: InferredUser = {
+          id: 123,
+        }
+      })
+    })
+    describe('optional properties', () => {
+      test('parsing', () => {
+        const parseUser = object({
+          id: parseNumber,
+          name: parseString,
+          email: optional(parseString),
+        })
+        expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
+          'tag',
+          'success',
+        )
+        expect(
+          parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
+        ).toHaveProperty('tag', 'success')
+        expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toHaveProperty(
+          'tag',
+          'failure',
+        )
+        expect(parseUser({ id: 1 })).toHaveProperty('tag', 'failure')
+        expect(parseUser({ name: 'Alice' })).toHaveProperty('tag', 'failure')
+        expect(parseUser({})).toHaveProperty('tag', 'failure')
+      })
+      describe('type annotation', () => {
+        type User = {
+          id: number
+          email?: string
+        }
+        it('has an optional parser', () => {
+          const parseUser1 = object<User>({
+            id: parseNumber,
+            email: optional(parseString),
+          })
+        })
+        it('can not have a required parser', () => {
+          const parseUser1 = object<User>({
+            id: parseNumber,
+            // @ts-expect-error -- parser must be optional
+            email: parseString,
+          })
+        })
+        it('does have a parser', () => {
+          const parseUser3 = object<User>(
+            // @ts-expect-error -- email parser must be present even though the property is optional
+            {
+              id: parseNumber,
+            },
+          )
+        })
+      })
+      test('type inference', () => {
         type User = {
           id: number
           email?: string
@@ -186,7 +229,7 @@ describe('parsing', () => {
           email: optional(parseString),
         })
         type InferredUser = Infer<typeof parseUser>
-        const T1: Equals<Infer<typeof parseUser>, User> = true
+        const T1: Equals<InferredUser, User> = true
         const a1: InferredUser = {
           id: 123,
           email: '',
@@ -200,42 +243,66 @@ describe('parsing', () => {
         }
       })
     })
-    describe('type annotation', () => {
-      test('required properties', () => {
-        type User = {
-          id: number
-          name: string
-        }
-        const parseUser1 = object<User>({
+
+    describe('fallback', () => {
+      test('optional fallback', () => {
+        const defaultEmail = 'default@test.com'
+        const parseUser = object({
           id: parseNumber,
           name: parseString,
+          email: optional(fallback(parseString, defaultEmail)),
         })
-        const parseUser2 = object<User>({
-          id: parseNumber,
-          // @ts-expect-error -- name must not be optional
-          name: optional(parseString),
+        // The email can be a omitted -> Success
+        expect(parseUser({ id: 1, name: 'Alice' })).toEqual({
+          tag: 'success',
+          isSuccess: true,
+          value: { id: 1, name: 'Alice' },
         })
-        const parseUser3 = object<User>(
-          // @ts-expect-error -- name must not be omitted
-          {
-            id: parseNumber,
-          },
-        )
+
+        // The email can be a string -> Success
+        expect(
+          parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
+        ).toEqual({
+          tag: 'success',
+          isSuccess: true,
+          value: { id: 1, name: 'Alice', email: 'alice@test.com' },
+        })
+
+        // The email can't be a number -> falls back
+        expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
+          tag: 'success',
+          isSuccess: true,
+          value: { id: 1, name: 'Alice', email: defaultEmail },
+        })
       })
-      test('optional properties', () => {
-        type User = {
-          id: number
-          email?: string
-        }
-        const parseUser1 = object<User>({
+      test('required fallback', () => {
+        const defaultEmail = 'default@test.com'
+        const parseUser = object({
           id: parseNumber,
-          email: optional(parseString),
+          name: parseString,
+          email: fallback(parseString, defaultEmail),
         })
-        const parseUser3 = object<User>(
-          // @ts-expect-error -- email parser must be present
-          {
-            id: parseNumber,
-          },
+
+        // The property can be a string -> Success
+        expect(
+          parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
+        ).toEqual({
+          tag: 'success',
+          isSuccess: true,
+          value: { id: 1, name: 'Alice', email: 'alice@test.com' },
+        })
+
+        // number fails -> Falls back
+        expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
+          tag: 'success',
+          isSuccess: true,
+          value: { id: 1, name: 'Alice', email: defaultEmail },
+        })
+
+        // The property is required -> Fails
+        expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
+          'tag',
+          'failure',
         )
       })
     })
