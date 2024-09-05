@@ -19,6 +19,7 @@ import { hasKey } from './utils'
  */
 export type ParseSuccess<T> = {
   tag: 'success'
+  // TODO remove isSuccess
   isSuccess: true
   value: T
 }
@@ -200,14 +201,14 @@ export const literal = <const T extends readonly [...Primitive[]]>(
 export const union =
   <T extends readonly [...unknown[]]>(
     ...parsers: {
-      [K in keyof T]: Parser<T[K]>
+      [K in keyof T]: RequiredParser<T[K]>
     }
   ) =>
   (data: unknown): ParseSuccess<T[number]> | ParseFailure => {
     for (const parser of parsers) {
       const result = parser(data)
-      if (result.isSuccess) {
-        return result
+      if (result.tag !== 'failure') {
+        return success(result.value)
       }
     }
     return failure('No parser in the union matched')
@@ -218,27 +219,36 @@ export const union =
  */
 const optionalSymbol = Symbol('optional parser')
 
-export type RequiredParser<T> = (data: unknown) => ParseResult<T>
-// export type RequiredParser<T> = {
-//   [optionalSymbol]: never
-// } & ((data: unknown) => Exclude<
-//   ParseResult<T>,
-//   {
-//     tag: 'success-prop-absent'
-//   }
-// >)
+export type RequiredParser<T> = (
+  data: unknown,
+) => ParseSuccess<T> | ParseFailure | ParseSuccessFallback<T>
+
+// TODO merge with above
+export type RequiredParserTmp<T> = (data: unknown) =>
+  | ParseSuccess<T>
+  // TODO this should not be possible for required properties
+  | ParseSuccessPropAbsent
+  | ParseFailure
+  | ParseSuccessFallback<T>
+
 /**
  * Special validator to check optional values
  */
 export type OptionalParser<T> = {
   [optionalSymbol]: true
-} & ((data: unknown) => ParseSuccess<T> | ParseSuccessPropAbsent | ParseFailure)
+} & ((
+  data: unknown,
+) =>
+  | ParseSuccess<T>
+  | ParseSuccessPropAbsent
+  | ParseFailure
+  | ParseSuccessFallback<T>)
 
 /**
  * Represent an optional property, which is different from a required property that can be `undefined`.
  * @param parser
  */
-export const optional = <T>(parser: Parser<T>): OptionalParser<T> =>
+export const optional = <T>(parser: RequiredParser<T>): OptionalParser<T> =>
   /*
    * This function uses two tricks:
    *  1. { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
@@ -278,7 +288,7 @@ export const object =
   <T extends Record<string, unknown>>(schema: {
     [K in keyof T]-?: {} extends Pick<T, K>
       ? OptionalParser<T[K]>
-      : RequiredParser<T[K]>
+      : RequiredParserTmp<T[K]>
   }) =>
   (
     data: unknown,

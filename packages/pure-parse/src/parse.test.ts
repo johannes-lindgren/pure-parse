@@ -21,6 +21,7 @@ describe('parsing', () => {
     test.todo('on validation failure')
     test.todo('on fallback')
     test.todo('on optional properties')
+    test.todo('fallback on fallback')
   })
   describe('literals', () => {
     it('todo', () => {
@@ -217,6 +218,13 @@ describe('parsing', () => {
               id: parseNumber,
             },
           )
+        })
+      })
+      test('optional optional properties', () => {
+        const parseUser = object({
+          id: parseNumber,
+          // @ts-expect-error -- can't wrap an optional with another optional
+          email: optional(optional(parseString)),
         })
       })
       test('type inference', () => {
