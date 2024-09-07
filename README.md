@@ -38,6 +38,10 @@ const isUser = object<User>({
 })
 ```
 
+This lets TypeScript validate the schema:
+
+![ide-demo.gif](ide-demo.gif)
+
 Furthermore, this library is designed to be:
 
 - Lightweight—0.7 kB minified + zipped

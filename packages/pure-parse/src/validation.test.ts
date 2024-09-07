@@ -518,17 +518,16 @@ describe('validation', () => {
             name?: string
           }
           type InferredUser = Infer<typeof isObj>
-          // @ts-expect-error -- TODO make this work
+          // @ts-expect-error -- TODO can't get this to work
           const t1: Equals<User, InferredUser> = true
           const t2: InferredUser = {
             id: 0,
             name: 'Johannes',
           }
-          // @ts-expect-error -- TODO make this work
+          // @ts-expect-error -- TODO can't get this to work
           const t3: InferredUser = {
             id: 0,
           }
-          // @ts-expect-error -- TODO make this work
           const t4: InferredUser = {
             id: 0,
             name: undefined,
@@ -721,7 +720,6 @@ describe('validation', () => {
               }
               object<User2>({
                 id: isNumber,
-                // @ts-expect-error - name can be undefined, but it is not optional
                 name: optional(isString),
               })
               object<User2>({

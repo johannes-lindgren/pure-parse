@@ -120,7 +120,7 @@ const optionalSymbol = Symbol('optional')
  */
 export type OptionalValidator<T> = { [optionalSymbol]: true } & ((
   data: unknown,
-) => data is typeof optionalSymbol)
+) => data is T | undefined)
 
 /**
  * Represent an optional property, which is different from a required property that can be `undefined`.
@@ -128,9 +128,7 @@ export type OptionalValidator<T> = { [optionalSymbol]: true } & ((
  */
 export const optional = <T>(validator: Validator<T>): OptionalValidator<T> =>
   /*
-   * This function uses two tricks:
-   *  1. { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
-   *  2. The return type is a symbol so that it in generic conditional expressions, it does not overlap with Validator.
+   * { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
    */
   Object.assign(union(isUndefined, validator), {
     [optionalSymbol]: true,

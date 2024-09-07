@@ -223,14 +223,6 @@ export type RequiredParser<T> = (
   data: unknown,
 ) => ParseSuccess<T> | ParseFailure | ParseSuccessFallback<T>
 
-// TODO merge with above
-export type RequiredParserTmp<T> = (data: unknown) =>
-  | ParseSuccess<T>
-  // TODO this should not be possible for required properties
-  | ParseSuccessPropAbsent
-  | ParseFailure
-  | ParseSuccessFallback<T>
-
 /**
  * Special validator to check optional values
  */
@@ -248,15 +240,23 @@ export type OptionalParser<T> = {
  * Represent an optional property, which is different from a required property that can be `undefined`.
  * @param parser
  */
-export const optional = <T>(parser: RequiredParser<T>): OptionalParser<T> =>
+export const optional = <T>(
+  parser: RequiredParser<T>,
+): OptionalParser<T | undefined> =>
   /*
-   * This function uses two tricks:
-   *  1. { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
-   *  2. The return type is a symbol so that it in generic conditional expressions, it does not overlap with Validator.
+   * { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
    */
   Object.assign(union(parseUndefined, parser), {
     [optionalSymbol]: true,
   }) as unknown as OptionalParser<T>
+
+export const nullable = <T>(
+  parser: RequiredParser<T>,
+): RequiredParser<T | null> => union(parseNull, parser)
+
+export const undefineable = <T>(
+  parser: RequiredParser<T>,
+): RequiredParser<T | undefined> => union(parseUndefined, parser)
 
 /*
  * Product types
@@ -286,9 +286,10 @@ const wasPropPresent = <T>(
  */
 export const object =
   <T extends Record<string, unknown>>(schema: {
+    // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
     [K in keyof T]-?: {} extends Pick<T, K>
       ? OptionalParser<T[K]>
-      : RequiredParserTmp<T[K]>
+      : RequiredParser<T[K]>
   }) =>
   (
     data: unknown,
