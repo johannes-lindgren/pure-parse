@@ -56,12 +56,10 @@ export type ParseResult<T> =
   | ParseSuccessFallback<T>
   | ParseSuccessPropAbsent
 
-export type RequiredParseResult<T> = Exclude<
-  ParseResult<ParseResult<T>>,
-  {
-    tag: 'success-prop-absent'
-  }
->
+export type RequiredParseResult<T> =
+  | ParseSuccess<T>
+  | ParseFailure
+  | ParseSuccessFallback<T>
 
 export type OptionalParseResult<T> = ParseResult<T>
 
@@ -219,9 +217,7 @@ export const union =
  */
 const optionalSymbol = Symbol('optional parser')
 
-export type RequiredParser<T> = (
-  data: unknown,
-) => ParseSuccess<T> | ParseFailure | ParseSuccessFallback<T>
+export type RequiredParser<T> = (data: unknown) => RequiredParseResult<T>
 
 /**
  * Special validator to check optional values
@@ -293,7 +289,7 @@ export const object =
   }) =>
   (
     data: unknown,
-  ): ParseResult<
+  ): RequiredParseResult<
     Required<Pick<T, RequiredKeys<T>>> & Partial<Pick<T, OptionalKeys<T>>>
   > => {
     if (!isObject(data)) {
@@ -347,7 +343,7 @@ const areAllSuccesses = <T>(
  * @return a validator function that validates arrays
  */
 export const array =
-  <T>(parseItem: Parser<T>): Parser<T[]> =>
+  <T>(parseItem: RequiredParser<T>): RequiredParser<T[]> =>
   (data: unknown) => {
     if (!Array.isArray(data)) {
       return failure('Not an array')

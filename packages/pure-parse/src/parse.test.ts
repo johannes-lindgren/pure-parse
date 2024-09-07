@@ -336,6 +336,9 @@ describe('parsing', () => {
     })
   })
   test('with a larger, realistic example', () => {
+    /*
+     * Type aliases
+     */
     type StringContent = {
       tag: 'string'
       value: string
@@ -353,16 +356,9 @@ describe('parsing', () => {
       description?: string
       content: Content[]
     }
-    const data: unknown = {
-      title: 'My document',
-      content: [
-        { tag: 'string', value: 'day 1' },
-        { tag: 'string', value: 'day 2' },
-        // Note that this has a type mismatch error
-        { tag: 'string', value: 3 },
-        { tag: 'number', value: 4 },
-      ],
-    }
+    /*
+     * Parsers
+     */
     const parseStringContent = object<StringContent>({
       tag: literal('string'),
       value: parseString,
@@ -383,6 +379,31 @@ describe('parsing', () => {
       title: parseString,
       description: optional(parseString),
       content: array(fallback(parseContent, { tag: 'unknown' })),
+    })
+    /*
+     * Tests
+     */
+    const data = {
+      title: 'My document',
+      content: [
+        { tag: 'string', value: 'day 1' },
+        // Note that this has a type mismatch error
+        { tag: 'string', value: 2 },
+        { tag: 'number', value: 3 },
+      ],
+    }
+    expect(parseDocument(data)).toEqual({
+      tag: 'success',
+      isSuccess: true,
+      value: {
+        title: data.title,
+        content: [
+          { tag: 'string', value: 'day 1' },
+          // Fallback in place
+          { tag: 'unknown' },
+          { tag: 'number', value: 3 },
+        ],
+      },
     })
   })
 })
