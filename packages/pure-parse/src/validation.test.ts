@@ -22,13 +22,9 @@ import {
   nonEmptyArray,
   isNonEmptyArray,
   undefineable,
+  OptionalValidator,
 } from './validation'
-
-export type Equals<T1, T2> = T1 extends T2
-  ? T2 extends T1
-    ? true
-    : false
-  : false
+import { Equals } from './internals'
 
 describe('validation', () => {
   describe('primitives', () => {
@@ -477,6 +473,14 @@ describe('validation', () => {
         })
       })
       describe('optional', () => {
+        describe('OptionalValidator', () => {
+          test('that Validator and OptionalValidator are mutually exclusive', () => {
+            const a1: Equals<
+              Validator<string>,
+              OptionalValidator<string>
+            > = false
+          })
+        })
         it('matches undefined', () => {
           expect(optional(isString)(undefined)).toEqual(true)
         })
@@ -500,6 +504,31 @@ describe('validation', () => {
           expect(isObj({ a: 'hello' })).toEqual(true)
           expect(isObj({ a: undefined })).toEqual(true)
           expect(isObj({})).toEqual(true)
+        })
+        test('type inference', () => {
+          const isObj = object({
+            id: isNumber,
+            name: optional(isString),
+          })
+          type User = {
+            id: number
+            name?: string
+          }
+          type InferredUser = Infer<typeof isObj>
+          // @ts-expect-error -- TODO can't get this to work
+          const t1: Equals<User, InferredUser> = true
+          const t2: InferredUser = {
+            id: 0,
+            name: 'Johannes',
+          }
+          // @ts-expect-error -- TODO can't get this to work
+          const t3: InferredUser = {
+            id: 0,
+          }
+          const t4: InferredUser = {
+            id: 0,
+            name: undefined,
+          }
         })
       })
       describe('nullable', () => {
@@ -682,56 +711,61 @@ describe('validation', () => {
                 name: optional(isString),
               })
 
-              type User2 = {
+              type UserUndefinable = {
                 id: number
                 name: string | undefined
               }
-              object<User2>({
+              object<UserUndefinable>({
+                id: isNumber,
+                // required property, union of string and undefined
+                name: undefineable(isString),
+              })
+              object<UserUndefinable>({
                 id: isNumber,
                 // @ts-expect-error - name can be undefined, but it is not optional
                 name: optional(isString),
               })
-              object<User2>({
+              object<UserUndefinable>({
                 id: isNumber,
                 // string is more narrow than string | undefined, which means that if the validation passes for string, it satisfies User2
                 name: isString,
               })
-              object<User2>({
+              object<UserUndefinable>({
                 id: isNumber,
                 // undefined is more narrow than string | undefined, which means that if the validation passes for undefined, it satisfies User2
                 name: isUndefined,
               })
               // @ts-expect-error
-              object<User2>({
+              object<UserUndefinable>({
                 id: isNumber,
                 // If we don't check the property, we have no type information on the field (it's unknown).
                 //  Therefore, the fact that it's optional should not mean that we can skip validation
                 // name: isString,
               })
-              object<User2>({
+              object<UserUndefinable>({
                 id: isNumber,
                 // Similarly to above; the property must have a corresponding validation function
                 // @ts-expect-error
                 name: undefined,
               })
 
-              type User3 = {
+              type UserOptional = {
                 id: number
                 // This one is optional, not a union with undefined
                 name?: string
               }
-              object<User3>({
+              object<UserOptional>({
                 id: isNumber,
                 // Similarly to above; the property must have a corresponding validation function
                 // @ts-expect-error
                 name: undefined,
               })
-              object<User3>({
+              object<UserOptional>({
                 id: isNumber,
                 // @ts-expect-error - requires optional function
                 name: union(isUndefined, isString),
               })
-              object<User3>({
+              object<UserOptional>({
                 id: isNumber,
                 // As expected; requires the optional function
                 name: optional(isString),
@@ -829,6 +863,18 @@ describe('validation', () => {
           ).toEqual(true)
           expect(isObj({})).toEqual(false)
           expect(isObj({ a: undefined })).toEqual(false)
+        })
+        test('that undefinable properties are required', () => {
+          const isObj = object({
+            a: undefineable(isString),
+          })
+          expect(
+            isObj({
+              a: 'hello',
+            }),
+          ).toEqual(true)
+          expect(isObj({})).toEqual(false)
+          expect(isObj({ a: undefined })).toEqual(true)
         })
         it('validates optional properties', () => {
           const isObj = object({
@@ -1207,24 +1253,6 @@ describe('validation', () => {
           })
         })
       })
-    })
-  })
-  describe('Infer', () => {
-    it('infers the type', () => {
-      const isUser = object({
-        id: isNumber,
-        uid: isString,
-        active: isBoolean,
-      })
-      type User = Infer<typeof isUser>
-      const assertion1: Equals<
-        User,
-        { id: number; uid: string; active: boolean }
-      > = true
-      const assertion2: Equals<
-        User,
-        { id: string; uid: string; active: boolean }
-      > = false
     })
   })
   describe('Infer', () => {

@@ -2,6 +2,8 @@
  * Utility Types
  */
 
+import { hasKey } from './internals'
+
 /**
  * A function that return a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.
  */
@@ -42,6 +44,17 @@ export const isBigInt = (data: unknown): data is bigint =>
 
 export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
+
+// TODO unit tests
+export const isFunction = (data: unknown): data is Function =>
+  typeof data === 'function'
+
+// TODO unit tests
+export const isObject = (data: unknown): data is object =>
+  typeof data === 'object' && data !== null
+
+// TODO unit tests
+export const isArray: (data: unknown) => data is unknown[] = Array.isArray
 
 /*
  *
@@ -103,16 +116,16 @@ export const union =
     validators.some((validator) => validator(data))
 
 /**
- * Used to respresent optional validators at runtime and compile-time in two different ways
+ * Used to represent optional validators at runtime and compile-time in two different ways
  */
 const optionalSymbol = Symbol('optional')
 
 /**
  * Special validator to check optional values
  */
-type OptionalValidator<T> = { [optionalSymbol]: true } & ((
+export type OptionalValidator<T> = { [optionalSymbol]: true } & ((
   data: unknown,
-) => data is typeof optionalSymbol)
+) => data is typeof optionalSymbol | T | undefined)
 
 /**
  * Represent an optional property, which is different from a required property that can be `undefined`.
@@ -120,9 +133,7 @@ type OptionalValidator<T> = { [optionalSymbol]: true } & ((
  */
 export const optional = <T>(validator: Validator<T>): OptionalValidator<T> =>
   /*
-   * This function uses two tricks:
-   *  1. { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
-   *  2. The return type is a symbol so that it in generic conditional expressions, it does not overlap with Validator.
+   * { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
    */
   Object.assign(union(isUndefined, validator), {
     [optionalSymbol]: true,
@@ -168,6 +179,13 @@ export const tuple =
     data.length === validators.length &&
     validators.every((validator, index) => validator(data[index]))
 
+export type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
+}[keyof T]
+export type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
+}[keyof T]
+
 /**
  * Validate structs; records that map known keys to a specific type.
  *
@@ -198,22 +216,14 @@ export const object =
         // TODO this shouldn't happen, as the type ensures that all properties are validators
         return false
       }
-      if (!(key in data)) {
+      if (!hasKey(data, key)) {
         // If the key is not present, the validator must represent an optional property
         return optionalSymbol in validator
       }
-      // @ts-ignore - we check that the key is present on the line above
       const value = data[key]
 
       return validator(value)
     })
-
-type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
-}[keyof T]
-type OptionalKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
-}[keyof T]
 
 /**
  * Validate `Record<?, ?>`; objects that definitely map strings to another specific type.
