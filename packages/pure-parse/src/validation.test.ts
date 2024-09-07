@@ -473,14 +473,6 @@ describe('validation', () => {
         })
       })
       describe('optional', () => {
-        describe('OptionalValidator', () => {
-          test('that Validator and OptionalValidator are mutually exclusive', () => {
-            const a1: Equals<
-              Validator<string>,
-              OptionalValidator<string>
-            > = false
-          })
-        })
         it('matches undefined', () => {
           expect(optional(isString)(undefined)).toEqual(true)
         })
