@@ -89,10 +89,10 @@ There is a second category of higher order functions that construct new, custom 
 
 The third category is convenience functions for dealing with `null`, `undefined`, and optional properties:
 
-- `optional`–for optional properties
+- `optional`–for optional properties. This function is special; only validator functions constructed with `optional` can describe optional properties.
 - `optionalNullable`–for optional nullable properties
 - `nullable`–for unions with `null`
-- `undefineable`–for unions with `undefined`. If this is used for a property on an object, the property is still required.
+- `undefineable`–for unions with `undefined`. If this is used for a property on an object, the property is required–not optional–but can be set to `undefined`.
 
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
 
@@ -116,13 +116,17 @@ const isUsers = array(
 
 See more examples below.
 
-### Inferring and Declaring Types
+### Inferring Types
 
 To infer the type from a validator function, use the `Infer` utility type:
 
 ```ts
 type Users = Infer<typeof isUsers>
 ```
+
+⚠️ Note: optional properties will be inferred as required–but undefinable–properties. (This is either due to limitations of TypeScript or the skill of the author.) At runtime, the property is still optional; it's just the inferred type that has a slight discrepancy. For most use cases, this is not a problem to worry about. If you are adamant on being correct, consider declaring the type instead of inferring it (see the following section). Future version of this library might provide a solution.
+
+### Declaring Types
 
 If you'd rather declare your type explicitly, annotate the validation functions with a type parameter:
 

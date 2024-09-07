@@ -1,11 +1,10 @@
+import { hasKey, OptionalKeys, RequiredKeys } from './internals'
 /*
  * Utility Types
  */
 
-import { hasKey } from './utils'
-
 /**
- * A function that return a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.
+ * A function that returns a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.
  */
 export type Validator<T> = (data: unknown) => data is T
 
@@ -17,7 +16,7 @@ export type Infer<
 > = T extends (data: unknown, ...args: unknown[]) => data is infer R ? R : never
 
 /**
- * Use to skip validation, as it returns true for any input.
+ * Returns true for any input. Use to skip validation.
  * @param data
  */
 export const isUnknown = (data: unknown): data is unknown => true
@@ -27,6 +26,7 @@ export const isUnknown = (data: unknown): data is unknown => true
  */
 
 export const isNull = (data: unknown): data is null => data === null
+
 export const isUndefined = (data: unknown): data is undefined =>
   typeof data === 'undefined'
 
@@ -44,12 +44,6 @@ export const isBigInt = (data: unknown): data is bigint =>
 
 export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
-
-// TODO unit tests
-export const isFunction = (data: unknown): data is Function =>
-  typeof data === 'function'
-export const isObject = (data: unknown): data is object =>
-  typeof data === 'object' && data !== null
 
 /*
  *
@@ -120,7 +114,7 @@ const optionalSymbol = Symbol('optional')
  */
 export type OptionalValidator<T> = { [optionalSymbol]: true } & ((
   data: unknown,
-) => data is T | undefined)
+) => data is typeof optionalSymbol | T | undefined)
 
 /**
  * Represent an optional property, which is different from a required property that can be `undefined`.
@@ -173,13 +167,6 @@ export const tuple =
     Array.isArray(data) &&
     data.length === validators.length &&
     validators.every((validator, index) => validator(data[index]))
-
-export type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
-}[keyof T]
-export type OptionalKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
-}[keyof T]
 
 /**
  * Validate structs; records that map known keys to a specific type.
