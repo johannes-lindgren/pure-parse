@@ -268,7 +268,11 @@ describe('validation', () => {
       })
     })
   })
-
+  describe('reference types', () => {
+    describe('objects', () => {})
+    describe('arrays', () => {})
+    describe('functions', () => {})
+  })
   describe('algebraic data types', () => {
     describe('literal types', () => {
       describe('type checking', () => {
