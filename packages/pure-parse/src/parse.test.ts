@@ -225,7 +225,7 @@ describe('parsing', () => {
         it('can not have a required parser', () => {
           const parseUser1 = object<User>({
             id: parseNumber,
-            // @ts-expect-error -- parser must be optional
+            // a required string is a subset of optional string
             email: parseString,
           })
         })

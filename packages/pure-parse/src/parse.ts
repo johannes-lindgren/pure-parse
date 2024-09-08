@@ -7,9 +7,7 @@ import {
   isString,
   isSymbol,
   isUndefined,
-  OptionalKeys,
   Primitive,
-  RequiredKeys,
 } from './validation'
 import * as V from './validation'
 import { hasKey } from './utils'
@@ -87,6 +85,16 @@ export const failure = (error: string): ParseFailure => ({
 })
 
 export type Parser<T> = (data: unknown) => ParseResult<T>
+
+export type RequiredParser<T> = (data: unknown) => RequiredParseResult<T>
+
+/**
+ * Special validator to check optional values
+ */
+export type OptionalParser<T> = {
+  [optionalSymbol]?: true
+} & ((data: unknown) => OptionalParseResult<T | undefined>)
+
 export type InfallibleParser<T> = (
   data: unknown,
 ) => ParseSuccess<T> | ParseSuccessFallback<T>
@@ -217,28 +225,11 @@ export const union =
  */
 const optionalSymbol = Symbol('optional parser')
 
-export type RequiredParser<T> = (data: unknown) => RequiredParseResult<T>
-
-/**
- * Special validator to check optional values
- */
-export type OptionalParser<T> = {
-  [optionalSymbol]: true
-} & ((
-  data: unknown,
-) =>
-  | ParseSuccess<T>
-  | ParseSuccessPropAbsent
-  | ParseFailure
-  | ParseSuccessFallback<T>)
-
 /**
  * Represent an optional property, which is different from a required property that can be `undefined`.
  * @param parser
  */
-export const optional = <T>(
-  parser: RequiredParser<T>,
-): OptionalParser<T | undefined> =>
+export const optional = <T>(parser: RequiredParser<T>): OptionalParser<T> =>
   /*
    * { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
    */
@@ -287,11 +278,7 @@ export const object =
       ? OptionalParser<T[K]>
       : RequiredParser<T[K]>
   }) =>
-  (
-    data: unknown,
-  ): RequiredParseResult<
-    Required<Pick<T, RequiredKeys<T>>> & Partial<Pick<T, OptionalKeys<T>>>
-  > => {
+  (data: unknown): RequiredParseResult<T> => {
     if (!isObject(data)) {
       return failure('Not an object')
     }
@@ -320,9 +307,7 @@ export const object =
           .filter(wasPropPresent)
           .map(([key, result]) => [key, result.value]),
       ),
-    ) as ParseResult<
-      Required<Pick<T, RequiredKeys<T>>> & Partial<Pick<T, OptionalKeys<T>>>
-    >
+    ) as RequiredParseResult<T>
   }
 
 /*
