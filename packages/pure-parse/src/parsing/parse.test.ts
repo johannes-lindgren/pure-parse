@@ -14,7 +14,7 @@ import {
   failure,
   nullable,
 } from './parse'
-import { type Equals } from './Equals.test'
+import { type Equals } from '../internals'
 
 describe('parsing', () => {
   describe('fallback', () => {
@@ -200,6 +200,7 @@ describe('parsing', () => {
       test('parsing', () => {
         const parseUser = object({
           id: parseNumber,
+          // @ts-expect-error -- TODO make it possible to infer the type from optional parser
           email: optional(parseString),
         })
         expect(parseUser({ id: 1 })).toHaveProperty('tag', 'success')
@@ -258,6 +259,7 @@ describe('parsing', () => {
         }
         const parseUser = object({
           id: parseNumber,
+          // @ts-expect-error -- TODO make it possible to infer the type from optional parser
           email: optional(parseString),
         })
         type InferredUser = Infer<typeof parseUser>
@@ -284,6 +286,7 @@ describe('parsing', () => {
         const parseUser = object({
           id: parseNumber,
           name: parseString,
+          // @ts-expect-error -- TODO make it possible to infer the type from optional parser
           email: optional(fallback(parseString, defaultEmail)),
         })
         // The email can be a omitted -> Success
@@ -412,4 +415,5 @@ describe('parsing', () => {
       })
     })
   })
+  describe.todo('recursive types')
 })
