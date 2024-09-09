@@ -180,7 +180,10 @@ describe('parsing', () => {
           id: parseNumber,
           email: nullable(parseString),
         })
-        expect(parseUser({ id: 1 })).toHaveProperty('tag', 'success')
+        expect(parseUser({ id: 1, email: null })).toHaveProperty(
+          'tag',
+          'success',
+        )
         expect(parseUser({ id: 1, email: 'alice@test.com' })).toHaveProperty(
           'tag',
           'success',
@@ -200,6 +203,10 @@ describe('parsing', () => {
           email: optional(parseString),
         })
         expect(parseUser({ id: 1 })).toHaveProperty('tag', 'success')
+        expect(parseUser({ id: 1, email: undefined })).toHaveProperty(
+          'tag',
+          'success',
+        )
         expect(parseUser({ id: 1, email: 'alice@test.com' })).toHaveProperty(
           'tag',
           'success',
@@ -208,7 +215,6 @@ describe('parsing', () => {
           'tag',
           'failure',
         )
-        expect(parseUser({ id: 1 })).toHaveProperty('tag', 'failure')
         expect(parseUser({})).toHaveProperty('tag', 'failure')
       })
       describe('type annotation', () => {
