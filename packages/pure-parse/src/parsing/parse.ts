@@ -8,9 +8,9 @@ import {
   isSymbol,
   isUndefined,
   Primitive,
-} from './validation'
-import * as V from './validation'
-import { hasKey } from './utils'
+} from '../validation'
+import * as V from '../validation'
+import { hasKey } from '../internals'
 
 /**
  * The data adheres to the schema. The `value` is equal to the parsed data
@@ -250,7 +250,7 @@ export const undefineable = <T>(
  */
 
 const wasPropParseSuccess = <T>(
-  prop: [string, ParseSuccess<T> | ParseSuccessPropAbsent | ParseFailure],
+  prop: [string, ParseResult<T>],
 ): prop is [string, ParseSuccess<T> | ParseSuccessPropAbsent] =>
   prop[1].tag !== 'failure'
 
