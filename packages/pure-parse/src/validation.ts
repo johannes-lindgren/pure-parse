@@ -22,7 +22,7 @@ export type Infer<
 export const isUnknown = (data: unknown): data is unknown => true
 
 /*
- * Primitives
+ * Primitive value types
  */
 
 export const isNull = (data: unknown): data is null => data === null
@@ -44,6 +44,18 @@ export const isBigInt = (data: unknown): data is bigint =>
 
 export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
+
+/*
+ * Reference types
+ */
+
+export const isObject = (data: unknown): data is object =>
+  typeof data === 'object' && data !== null
+
+export const isArray: (data: unknown) => data is unknown[] = Array.isArray
+
+export const isFunction = (data: unknown): data is Function =>
+  typeof data === 'function'
 
 /*
  *

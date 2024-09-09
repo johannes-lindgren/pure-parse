@@ -22,7 +22,10 @@ import {
   nonEmptyArray,
   isNonEmptyArray,
   undefineable,
-  OptionalValidator,
+  isBigInt,
+  isObject,
+  isArray,
+  isFunction,
 } from './validation'
 import { Equals } from './internals'
 
@@ -35,6 +38,7 @@ describe('validation', () => {
         expect(isUnknown(false)).toEqual(true)
         expect(isUnknown(true)).toEqual(true)
         expect(isUnknown(123)).toEqual(true)
+        expect(isUnknown(123n)).toEqual(true)
         expect(isUnknown('aaaaa')).toEqual(true)
         expect(isUnknown({})).toEqual(true)
         expect(isUnknown([])).toEqual(true)
@@ -61,6 +65,12 @@ describe('validation', () => {
         expect(isNull(0)).toEqual(false)
         expect(isNull(1)).toEqual(false)
         expect(isNull(3.14159)).toEqual(false)
+      })
+      it('validates bigint', () => {
+        expect(isNull(0n)).toEqual(false)
+        expect(isNull(-1n)).toEqual(false)
+        expect(isNull(1n)).toEqual(false)
+        expect(isNull(1324n)).toEqual(false)
       })
       it('validates strings', () => {
         expect(isNull('')).toEqual(false)
@@ -100,6 +110,12 @@ describe('validation', () => {
         expect(isUndefined(1)).toEqual(false)
         expect(isUndefined(3.14159)).toEqual(false)
       })
+      it('validates bigint', () => {
+        expect(isUndefined(0n)).toEqual(false)
+        expect(isUndefined(-1n)).toEqual(false)
+        expect(isUndefined(1n)).toEqual(false)
+        expect(isUndefined(1324n)).toEqual(false)
+      })
       it('validates strings', () => {
         expect(isUndefined('')).toEqual(false)
         expect(isUndefined('hello')).toEqual(false)
@@ -137,6 +153,12 @@ describe('validation', () => {
         expect(isBoolean(0)).toEqual(false)
         expect(isBoolean(1)).toEqual(false)
         expect(isBoolean(3.14159)).toEqual(false)
+      })
+      it('validates bigint', () => {
+        expect(isBoolean(0n)).toEqual(false)
+        expect(isBoolean(-1n)).toEqual(false)
+        expect(isBoolean(1n)).toEqual(false)
+        expect(isBoolean(1324n)).toEqual(false)
       })
       it('validates strings', () => {
         expect(isBoolean('')).toEqual(false)
@@ -176,6 +198,12 @@ describe('validation', () => {
         expect(isNumber(1)).toEqual(true)
         expect(isNumber(3.14159)).toEqual(true)
       })
+      it('validates bigint', () => {
+        expect(isNumber(0n)).toEqual(false)
+        expect(isNumber(-1n)).toEqual(false)
+        expect(isNumber(1n)).toEqual(false)
+        expect(isNumber(1324n)).toEqual(false)
+      })
       it('validates strings', () => {
         expect(isNumber('')).toEqual(false)
         expect(isNumber('hello')).toEqual(false)
@@ -188,6 +216,49 @@ describe('validation', () => {
       })
       it('validates objects', () => {
         expect(isNumber({})).toEqual(false)
+      })
+    })
+
+    describe('isBigInt', () => {
+      it('validates null', () => {
+        expect(isBigInt(null)).toEqual(false)
+      })
+      it('validates undefined', () => {
+        expect(isBigInt(undefined)).toEqual(false)
+      })
+      it('validates unassigned values', () => {
+        let data
+        expect(isBigInt(data)).toEqual(false)
+      })
+      it('validates booleans', () => {
+        expect(isBigInt(false)).toEqual(false)
+        expect(isBigInt(true)).toEqual(false)
+      })
+      it('validates numbers', () => {
+        expect(isBigInt(NaN)).toEqual(false)
+        expect(isBigInt(Infinity)).toEqual(false)
+        expect(isBigInt(0)).toEqual(false)
+        expect(isBigInt(1)).toEqual(false)
+        expect(isBigInt(3.14159)).toEqual(false)
+      })
+      it('validates bigint', () => {
+        expect(isBigInt(0n)).toEqual(true)
+        expect(isBigInt(-1n)).toEqual(true)
+        expect(isBigInt(1n)).toEqual(true)
+        expect(isBigInt(1324n)).toEqual(true)
+      })
+      it('validates strings', () => {
+        expect(isBigInt('')).toEqual(false)
+        expect(isBigInt('hello')).toEqual(false)
+      })
+      it('validates symbols', () => {
+        expect(isBigInt(Symbol())).toEqual(false)
+      })
+      it('validates arrays', () => {
+        expect(isBigInt([])).toEqual(false)
+      })
+      it('validates objects', () => {
+        expect(isBigInt({})).toEqual(false)
       })
     })
 
@@ -213,6 +284,12 @@ describe('validation', () => {
         expect(isString(1)).toEqual(false)
         expect(isString(3.14159)).toEqual(false)
       })
+      it('validates bigint', () => {
+        expect(isString(0n)).toEqual(false)
+        expect(isString(-1n)).toEqual(false)
+        expect(isString(1n)).toEqual(false)
+        expect(isString(1324n)).toEqual(false)
+      })
       it('validates strings', () => {
         expect(isString('')).toEqual(true)
         expect(isString('hello')).toEqual(true)
@@ -227,9 +304,6 @@ describe('validation', () => {
         expect(isString({})).toEqual(false)
       })
     })
-
-    // TODO
-    describe.todo('isBigInt', () => {})
 
     describe('isSymbol', () => {
       it('validates null', () => {
@@ -253,6 +327,12 @@ describe('validation', () => {
         expect(isSymbol(1)).toEqual(false)
         expect(isSymbol(3.14159)).toEqual(false)
       })
+      it('validates bigint', () => {
+        expect(isSymbol(0n)).toEqual(false)
+        expect(isSymbol(-1n)).toEqual(false)
+        expect(isSymbol(1n)).toEqual(false)
+        expect(isSymbol(1324n)).toEqual(false)
+      })
       it('validates strings', () => {
         expect(isSymbol('')).toEqual(false)
         expect(isSymbol('hello')).toEqual(false)
@@ -268,7 +348,143 @@ describe('validation', () => {
       })
     })
   })
-
+  describe('reference types', () => {
+    describe('isObject', () => {
+      it('validates null', () => {
+        expect(isObject(null)).toEqual(false)
+      })
+      it('validates undefined', () => {
+        expect(isObject(undefined)).toEqual(false)
+      })
+      it('validates unassigned values', () => {
+        let data
+        expect(isObject(data)).toEqual(false)
+      })
+      it('validates booleans', () => {
+        expect(isObject(false)).toEqual(false)
+        expect(isObject(true)).toEqual(false)
+      })
+      it('validates numbers', () => {
+        expect(isObject(NaN)).toEqual(false)
+        expect(isObject(Infinity)).toEqual(false)
+        expect(isObject(0)).toEqual(false)
+        expect(isObject(1)).toEqual(false)
+        expect(isObject(3.14159)).toEqual(false)
+      })
+      it('validates bigint', () => {
+        expect(isObject(0n)).toEqual(false)
+        expect(isObject(-1n)).toEqual(false)
+        expect(isObject(1n)).toEqual(false)
+        expect(isObject(1324n)).toEqual(false)
+      })
+      it('validates strings', () => {
+        expect(isObject('')).toEqual(false)
+        expect(isObject('hello')).toEqual(false)
+      })
+      it('validates symbols', () => {
+        expect(isObject(Symbol())).toEqual(false)
+      })
+      it('validates objects', () => {
+        expect(isObject({})).toEqual(true)
+      })
+      it('validates arrays', () => {
+        expect(isObject([])).toEqual(true)
+      })
+      it('validates functions', () => {
+        expect(isObject(() => undefined)).toEqual(false)
+      })
+    })
+    describe('isArray', () => {
+      it('validates null', () => {
+        expect(isArray(null)).toEqual(false)
+      })
+      it('validates undefined', () => {
+        expect(isArray(undefined)).toEqual(false)
+      })
+      it('validates unassigned values', () => {
+        let data
+        expect(isArray(data)).toEqual(false)
+      })
+      it('validates booleans', () => {
+        expect(isArray(false)).toEqual(false)
+        expect(isArray(true)).toEqual(false)
+      })
+      it('validates numbers', () => {
+        expect(isArray(NaN)).toEqual(false)
+        expect(isArray(Infinity)).toEqual(false)
+        expect(isArray(0)).toEqual(false)
+        expect(isArray(1)).toEqual(false)
+        expect(isArray(3.14159)).toEqual(false)
+      })
+      it('validates bigint', () => {
+        expect(isArray(0n)).toEqual(false)
+        expect(isArray(-1n)).toEqual(false)
+        expect(isArray(1n)).toEqual(false)
+        expect(isArray(1324n)).toEqual(false)
+      })
+      it('validates strings', () => {
+        expect(isArray('')).toEqual(false)
+        expect(isArray('hello')).toEqual(false)
+      })
+      it('validates symbols', () => {
+        expect(isArray(Symbol())).toEqual(false)
+      })
+      it('validates objects', () => {
+        expect(isArray({})).toEqual(false)
+      })
+      it('validates arrays', () => {
+        expect(isArray([])).toEqual(true)
+      })
+      it('validates functions', () => {
+        expect(isArray(() => undefined)).toEqual(false)
+      })
+    })
+    describe('isFunction', () => {
+      it('validates null', () => {
+        expect(isFunction(null)).toEqual(false)
+      })
+      it('validates undefined', () => {
+        expect(isFunction(undefined)).toEqual(false)
+      })
+      it('validates unassigned values', () => {
+        let data
+        expect(isFunction(data)).toEqual(false)
+      })
+      it('validates booleans', () => {
+        expect(isFunction(false)).toEqual(false)
+        expect(isFunction(true)).toEqual(false)
+      })
+      it('validates numbers', () => {
+        expect(isFunction(NaN)).toEqual(false)
+        expect(isFunction(Infinity)).toEqual(false)
+        expect(isFunction(0)).toEqual(false)
+        expect(isFunction(1)).toEqual(false)
+        expect(isFunction(3.14159)).toEqual(false)
+      })
+      it('validates bigint', () => {
+        expect(isFunction(0n)).toEqual(false)
+        expect(isFunction(-1n)).toEqual(false)
+        expect(isFunction(1n)).toEqual(false)
+        expect(isFunction(1324n)).toEqual(false)
+      })
+      it('validates strings', () => {
+        expect(isFunction('')).toEqual(false)
+        expect(isFunction('hello')).toEqual(false)
+      })
+      it('validates symbols', () => {
+        expect(isFunction(Symbol())).toEqual(false)
+      })
+      it('validates objects', () => {
+        expect(isFunction({})).toEqual(false)
+      })
+      it('validates arrays', () => {
+        expect(isFunction([])).toEqual(false)
+      })
+      it('validates functions', () => {
+        expect(isFunction(() => undefined)).toEqual(true)
+      })
+    })
+  })
   describe('algebraic data types', () => {
     describe('literal types', () => {
       describe('type checking', () => {
