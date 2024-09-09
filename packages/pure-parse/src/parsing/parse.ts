@@ -249,14 +249,19 @@ export const undefineable = <T>(
  * Product types
  */
 
+// Helper to object
 const wasPropParseSuccess = <T>(
   prop: [string, ParseResult<T>],
-): prop is [string, ParseSuccess<T> | ParseSuccessPropAbsent] =>
+): prop is [string, Exclude<ParseResult<T>, { tag: 'failure' }>] =>
   prop[1].tag !== 'failure'
 
+// Helper to object
 const wasPropPresent = <T>(
-  prop: [string, ParseSuccess<T> | ParseSuccessPropAbsent],
-): prop is [string, ParseSuccess<T>] => prop[1].isSuccess
+  prop: [string, Exclude<ParseResult<T>, { tag: 'failure' }>],
+): prop is [
+  string,
+  Exclude<ParseResult<T>, { tag: 'failure' | 'success-prop-absent' }>,
+] => prop[1].tag !== 'success-prop-absent'
 
 /**
  * Validate structs; records that map known keys to a specific type.
