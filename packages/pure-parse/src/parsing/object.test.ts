@@ -181,7 +181,6 @@ describe('objects', () => {
       // The email can be a omitted -> Success
       expect(parseUser({ id: 1, name: 'Alice' })).toEqual({
         tag: 'success',
-        isSuccess: true,
         value: { id: 1, name: 'Alice' },
       })
 
@@ -190,14 +189,12 @@ describe('objects', () => {
         parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
       ).toEqual({
         tag: 'success',
-        isSuccess: true,
         value: { id: 1, name: 'Alice', email: 'alice@test.com' },
       })
 
       // The email can't be a number -> falls back
       expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
         tag: 'success',
-        isSuccess: true,
         value: { id: 1, name: 'Alice', email: defaultEmail },
       })
     })
@@ -214,14 +211,12 @@ describe('objects', () => {
         parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
       ).toEqual({
         tag: 'success',
-        isSuccess: true,
         value: { id: 1, name: 'Alice', email: 'alice@test.com' },
       })
 
       // number fails -> Falls back
       expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
         tag: 'success',
-        isSuccess: true,
         value: { id: 1, name: 'Alice', email: defaultEmail },
       })
 

@@ -5,8 +5,6 @@ import { optionalSymbol } from './optionalSymbol'
  */
 export type ParseSuccess<T> = {
   tag: 'success'
-  // TODO remove isSuccess
-  isSuccess: true
   value: T
 }
 
@@ -15,7 +13,6 @@ export type ParseSuccess<T> = {
  */
 export type ParseSuccessFallback<T> = {
   tag: 'success-fallback'
-  isSuccess: true
   value: T
 }
 
@@ -24,7 +21,6 @@ export type ParseSuccessFallback<T> = {
  */
 export type ParseSuccessPropAbsent = {
   tag: 'success-prop-absent'
-  isSuccess: true
 }
 
 /**
@@ -32,7 +28,6 @@ export type ParseSuccessPropAbsent = {
  */
 export type ParseFailure = {
   tag: 'failure'
-  isSuccess: false
   error: string
 }
 
@@ -51,24 +46,20 @@ export type OptionalParseResult<T> = ParseResult<T>
 
 export const success = <T>(value: T): ParseSuccess<T> => ({
   tag: 'success',
-  isSuccess: true,
   value,
 })
 
 export const successFallback = <T>(value: T): ParseSuccessFallback<T> => ({
   tag: 'success-fallback',
-  isSuccess: true,
   value,
 })
 
 export const successOptional = (): ParseSuccessPropAbsent => ({
   tag: 'success-prop-absent',
-  isSuccess: true,
 })
 
 export const failure = (error: string): ParseFailure => ({
   tag: 'failure',
-  isSuccess: false,
   error,
 })
 
@@ -119,3 +110,13 @@ export const fallback =
  */
 export const parseUnknown = (data: unknown): ParseSuccess<unknown> =>
   success(data)
+
+export const isSuccess = <T>(
+  result: ParseResult<T>,
+): result is
+  | ParseSuccess<T>
+  | ParseSuccessFallback<T>
+  | ParseSuccessPropAbsent =>
+  result.tag === 'success' ||
+  result.tag === 'success-fallback' ||
+  result.tag === 'success-prop-absent'
