@@ -9,15 +9,10 @@ import {
   RequiredParser,
   RequiredParseResult,
   success,
+  successFallback,
   successOptional,
 } from './parse'
 import { optionalSymbol } from './optionalSymbol'
-
-// Local helper function
-const wasPropParseSuccess = <T>(
-  prop: [string, ParseResult<T>],
-): prop is [string, Exclude<ParseResult<T>, { tag: 'failure' }>] =>
-  prop[1].tag !== 'failure'
 
 // Local helper function
 const wasPropPresent = <T>(
@@ -66,10 +61,25 @@ export const object =
       const value = data[key]
       return [key, parser(value)] as [string, ParseResult<unknown>]
     })
-    if (!results.every(wasPropParseSuccess)) {
+    const { allSuccess, allOriginal } = results.reduce(
+      (acc, [_, result]) => {
+        acc.allSuccess &&= result.tag !== 'failure'
+        acc.allOriginal &&= result.tag === 'success'
+        return acc
+      },
+      {
+        allSuccess: true,
+        allOriginal: true,
+      },
+    )
+    if (allOriginal) {
+      // Preserve reference equality if no properties were falling back to defaults
+      return success(data as T)
+    }
+    if (!allSuccess) {
       return failure('Not all properties are valid')
     }
-    return success(
+    return successFallback(
       // TODO if none of the successes were fallbacks, we can just return data as is, thus preserving equality
       Object.fromEntries(
         results
