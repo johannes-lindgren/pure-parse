@@ -1,5 +1,6 @@
 import {
   failure,
+  isSuccess,
   ParseSuccess,
   ParseSuccessFallback,
   RequiredParser,
@@ -11,7 +12,7 @@ import {
 const areAllSuccesses = <T>(
   results: RequiredParseResult<T>[],
 ): results is (ParseSuccess<T> | ParseSuccessFallback<T>)[] =>
-  results.every((result) => result.isSuccess)
+  results.every((result) => isSuccess(result))
 
 /**
  * Validate arrays

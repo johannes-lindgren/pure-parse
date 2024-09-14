@@ -9,7 +9,6 @@ describe('arrays', () => {
     const parseArr = array(literal('a'))
     expect(parseArr(['a', 'a'])).toEqual({
       tag: 'success',
-      isSuccess: true,
       value: ['a', 'a'],
     })
     expect(parseArr(['a', 'b'])).toHaveProperty('tag', 'failure')
@@ -18,22 +17,18 @@ describe('arrays', () => {
     const parseArr = array(fallback(literal('#FF0000'), '#00FF00'))
     expect(parseArr(['#FF0000', '#FF0000'])).toEqual({
       tag: 'success',
-      isSuccess: true,
       value: ['#FF0000', '#FF0000'],
     })
     expect(parseArr(['#FF0000', '#XXYYZZ'])).toEqual({
       tag: 'success',
-      isSuccess: true,
       value: ['#FF0000', '#00FF00'],
     })
     expect(parseArr(['#XXYYZZ', '#XXYYZZ'])).toEqual({
       tag: 'success',
-      isSuccess: true,
       value: ['#00FF00', '#00FF00'],
     })
     expect(parseArr(['#FF0000', '#XXYYZZ', '#FF0000', '#XXYYZZ'])).toEqual({
       tag: 'success',
-      isSuccess: true,
       value: ['#FF0000', '#00FF00', '#FF0000', '#00FF00'],
     })
   })
