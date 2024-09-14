@@ -1,4 +1,5 @@
 import { hasKey, OptionalKeys, RequiredKeys } from './internals'
+import { Primitive } from './shared'
 /*
  * Utility Types
  */
@@ -62,22 +63,6 @@ export const isFunction = (data: unknown): data is Function =>
  * Algebraic Data Types
  *
  */
-
-/*
- * "Constant" Types
- */
-
-/**
- * A JavaScript primitive
- */
-export type Primitive =
-  | null
-  | undefined
-  | boolean
-  | number
-  | string
-  | bigint
-  | symbol
 
 /*
  * Higher order functions
