@@ -53,3 +53,7 @@ export const nullable = <T>(
 export const undefineable = <T>(
   parser: RequiredParser<T>,
 ): RequiredParser<T | undefined> => union(parseUndefined, parser)
+
+export const optionalNullable = <T>(
+  parser: RequiredParser<T>,
+): OptionalParser<T | null> => optional(nullable(parser))
