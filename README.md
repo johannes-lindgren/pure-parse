@@ -38,6 +38,8 @@ const isUser = object<User>({
 })
 ```
 
+Furthermore, this library is designed to be:
+
 - Lightweight—0.7 kB minified + zipped
 - Robust—built on top of functional programming principles, while having thorough tests for both the executable code and the type system.
 - Composable & Extendable—easily extend the library with your own validation functions.
