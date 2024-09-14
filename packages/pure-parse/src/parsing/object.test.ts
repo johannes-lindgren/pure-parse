@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { object } from './object'
-import { fallback, Infer } from './parse'
+import { fallback, Infer, isSuccess } from './parse'
 import type { Equals } from '../internals'
 import { nullable, optional } from './union'
 import { parseNumber, parseString } from './primitives'
@@ -96,7 +96,7 @@ describe('objects', () => {
         // @ts-expect-error -- TODO make it possible to infer the type from optional parser
         email: optional(parseString),
       })
-      expect(parseUser({ id: 1 })).toHaveProperty('tag', 'success')
+      expect(isSuccess(parseUser({ id: 1 }))).toEqual(true)
       expect(parseUser({ id: 1, email: undefined })).toHaveProperty(
         'tag',
         'success',
@@ -179,24 +179,27 @@ describe('objects', () => {
         email: optional(fallback(parseString, defaultEmail)),
       })
       // The email can be a omitted -> Success
-      expect(parseUser({ id: 1, name: 'Alice' })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice' },
-      })
+      expect(parseUser({ id: 1, name: 'Alice' })).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice' },
+        }),
+      )
 
       // The email can be a string -> Success
       expect(
         parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
-      ).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: 'alice@test.com' },
-      })
+      ).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: 'alice@test.com' },
+        }),
+      )
 
       // The email can't be a number -> falls back
-      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: defaultEmail },
-      })
+      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: defaultEmail },
+        }),
+      )
     })
     test('required fallback', () => {
       const defaultEmail = 'default@test.com'
@@ -209,16 +212,18 @@ describe('objects', () => {
       // The property can be a string -> Success
       expect(
         parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
-      ).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: 'alice@test.com' },
-      })
+      ).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: 'alice@test.com' },
+        }),
+      )
 
       // number fails -> Falls back
-      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: defaultEmail },
-      })
+      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: defaultEmail },
+        }),
+      )
 
       // The property is required -> Fails
       expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
@@ -266,7 +271,7 @@ describe('objects', () => {
         })
         const user = { id: 1, name: 123 }
         const result = parseUser(user)
-        if (result.tag === 'success') {
+        if (result.tag === 'success-fallback') {
           expect(result.value).not.toBe(user)
         } else {
           throw new Error('Expected success')

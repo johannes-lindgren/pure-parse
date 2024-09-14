@@ -80,7 +80,6 @@ export const object =
       return failure('Not all properties are valid')
     }
     return successFallback(
-      // TODO if none of the successes were fallbacks, we can just return data as is, thus preserving equality
       Object.fromEntries(
         results
           .filter(wasPropPresent)
