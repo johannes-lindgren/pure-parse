@@ -71,7 +71,6 @@ describe('parsing', () => {
       }
       expect(parseDocument(data)).toEqual({
         tag: 'success',
-        isSuccess: true,
         value: {
           title: data.title,
           content: [
