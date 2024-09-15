@@ -81,7 +81,11 @@ export const object =
     }
     return successFallback(
       Object.fromEntries(
-        results
+        (
+          results as Array<
+            [string, Exclude<ParseResult<T>, { tag: 'failure' }>]
+          >
+        )
           .filter(wasPropPresent)
           .map(([key, result]) => [key, result.value]),
       ),
