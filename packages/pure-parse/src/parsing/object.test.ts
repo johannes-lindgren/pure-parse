@@ -1,9 +1,10 @@
 import { describe, expect, it, test } from 'vitest'
 import { object } from './object'
-import { fallback, Infer, isSuccess } from './parse'
+import { Infer, isSuccess } from './parse'
 import type { Equals } from '../internals'
 import { nullable, optional } from './union'
 import { parseNumber, parseString } from './primitives'
+import { fallback } from './fallback'
 
 describe('objects', () => {
   describe('required properties', () => {
@@ -323,4 +324,5 @@ describe('objects', () => {
       })
     })
   })
+  describe.todo('self-referential objects')
 })

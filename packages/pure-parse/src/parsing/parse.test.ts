@@ -1,18 +1,11 @@
 import { describe, expect, it, test } from 'vitest'
-import { fallback } from './parse'
 import { array } from './array'
 import { object } from './object'
 import { optional, union } from './union'
 import { literal, parseNumber, parseString } from './primitives'
+import { fallback } from './fallback'
 
 describe('parsing', () => {
-  describe('fallback', () => {
-    test.todo('on success')
-    test.todo('on validation failure')
-    test.todo('on fallback')
-    test.todo('on optional properties')
-    test.todo('fallback on fallback')
-  })
   describe('some use cases', () => {
     test('parsing objects in an array with fallback', () => {
       /*
@@ -84,5 +77,4 @@ describe('parsing', () => {
       )
     })
   })
-  describe.todo('recursive types')
 })

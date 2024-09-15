@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { literal } from './primitives'
-import { fallback } from './parse'
+import { fallback } from './fallback'
 
 describe('primitives', () => {
   describe.todo('null')

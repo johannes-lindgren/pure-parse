@@ -7,8 +7,8 @@ import {
   undefineable,
   union,
 } from './union'
-import { fallback } from './parse'
 import { object } from './object'
+import { fallback } from './fallback'
 
 describe('unions', () => {
   describe('union', () => {

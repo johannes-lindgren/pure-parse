@@ -61,17 +61,14 @@ export const object =
       const value = data[key]
       return [key, parser(value)] as [string, ParseResult<unknown>]
     })
-    const { allSuccess, allOriginal } = results.reduce(
-      (acc, [_, result]) => {
-        acc.allSuccess &&= result.tag !== 'failure'
-        acc.allOriginal &&= result.tag === 'success'
-        return acc
-      },
-      {
-        allSuccess: true,
-        allOriginal: true,
-      },
-    )
+    // Imperative programming for performance
+    let allSuccess = true
+    let allOriginal = true
+    for (const [_, result] of results) {
+      allSuccess &&= result.tag !== 'failure'
+      allOriginal &&= result.tag === 'success'
+    }
+
     if (allOriginal) {
       // Preserve reference equality if no properties were falling back to defaults
       return success(data as T)
