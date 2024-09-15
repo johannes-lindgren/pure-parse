@@ -6,6 +6,17 @@ import { nullable, optional } from './union'
 import { parseNumber, parseString } from './primitives'
 
 describe('objects', () => {
+  describe('unknown properties', () => {
+    it('allows unknown properties', () => {
+      const parseObj = object({})
+      const data = { a: 'unexpected!' }
+      expect(parseObj(data)).toEqual(
+        expect.objectContaining({
+          value: data,
+        }),
+      )
+    })
+  })
   describe('required properties', () => {
     test('parsing', () => {
       const parseUser = object({
@@ -197,6 +208,20 @@ describe('objects', () => {
         tag: 'success',
         value: { id: 1, name: 'Alice', email: defaultEmail },
       })
+    })
+    it('includes unknown properties', () => {
+      const parseUser = object({
+        id: parseNumber,
+      })
+      const data = {
+        id: 123,
+        unknownProp: 'unexpected!',
+      }
+      expect(parseUser(data)).toEqual(
+        expect.objectContaining({
+          value: data,
+        }),
+      )
     })
     test('required fallback', () => {
       const defaultEmail = 'default@test.com'
