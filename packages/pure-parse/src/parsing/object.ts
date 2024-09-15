@@ -5,8 +5,6 @@ import {
   OptionalParser,
   ParseFailure,
   ParseResult,
-  ParseSuccess,
-  ParseSuccessFallback,
   ParseSuccessPropAbsent,
   RequiredParser,
   RequiredParseResult,
@@ -23,38 +21,6 @@ const wasPropPresent = <T>(
   string,
   Exclude<ParseResult<T>, { tag: 'failure' | 'success-prop-absent' }>,
 ] => prop[1].tag !== 'success-prop-absent'
-
-const analyze = <T>(
-  results: Array<[string, ParseResult<T>]>,
-):
-  | {
-      tag: 'all-original'
-    }
-  | {
-      tag: 'some-unoriginal'
-      results: Array<[string, Exclude<ParseResult<T>, { tag: 'failure' }>]>
-    }
-  | {
-      tag: 'failure'
-    } => {
-  let allOriginal = true
-  for (const [, result] of results) {
-    if (result.tag === 'failure') {
-      return { tag: 'failure' }
-    }
-    if (result.tag === 'success-fallback') {
-      allOriginal = false
-    }
-  }
-  return allOriginal
-    ? { tag: 'all-original' }
-    : {
-        tag: 'some-unoriginal',
-        results: results as Array<
-          [string, Exclude<ParseResult<T>, { tag: 'failure' }>]
-        >,
-      }
-}
 
 /**
  * Validate structs; records that map known keys to a specific type.
@@ -80,7 +46,7 @@ export const object =
     if (!isObject(data)) {
       return failure('Not an object')
     }
-    const parseResults = Object.keys(schema).map((key) => {
+    const results = Object.keys(schema).map((key) => {
       const parser = schema[key]
       if (parser === undefined) {
         // TODO this shouldn't happen, as the type ensures that all properties are validators
@@ -95,17 +61,27 @@ export const object =
       const value = data[key]
       return [key, parser(value)] as [string, ParseResult<unknown>]
     })
-    const anlyticsResult = analyze(parseResults)
-    if (anlyticsResult.tag === 'failure') {
-      return failure('Not all properties are valid')
-    }
-    if (anlyticsResult.tag === 'all-original') {
+    const { allSuccess, allOriginal } = results.reduce(
+      (acc, [_, result]) => {
+        acc.allSuccess &&= result.tag !== 'failure'
+        acc.allOriginal &&= result.tag === 'success'
+        return acc
+      },
+      {
+        allSuccess: true,
+        allOriginal: true,
+      },
+    )
+    if (allOriginal) {
       // Preserve reference equality if no properties were falling back to defaults
       return success(data as T)
     }
+    if (!allSuccess) {
+      return failure('Not all properties are valid')
+    }
     return successFallback(
       Object.fromEntries(
-        anlyticsResult.results
+        results
           .filter(wasPropPresent)
           .map(([key, result]) => [key, result.value]),
       ),

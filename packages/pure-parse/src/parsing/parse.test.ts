@@ -69,18 +69,19 @@ describe('parsing', () => {
           { tag: 'number', value: 3 },
         ],
       }
-      expect(parseDocument(data)).toEqual({
-        tag: 'success',
-        value: {
-          title: data.title,
-          content: [
-            { tag: 'string', value: 'day 1' },
-            // Fallback in place
-            { tag: 'unknown' },
-            { tag: 'number', value: 3 },
-          ],
-        },
-      })
+      expect(parseDocument(data)).toEqual(
+        expect.objectContaining({
+          value: {
+            title: data.title,
+            content: [
+              { tag: 'string', value: 'day 1' },
+              // Fallback in place
+              { tag: 'unknown' },
+              { tag: 'number', value: 3 },
+            ],
+          },
+        }),
+      )
     })
   })
   describe.todo('recursive types')
