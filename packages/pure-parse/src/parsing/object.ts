@@ -42,9 +42,6 @@ const analyze = <T>(
     if (result.tag === 'failure') {
       return { tag: 'failure' }
     }
-    if (result.tag === 'success') {
-      allOriginal = false
-    }
     if (result.tag === 'success-fallback') {
       allOriginal = false
     }
