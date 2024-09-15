@@ -94,16 +94,6 @@ export type Infer<T extends Parser<unknown>> = T extends Parser<infer D>
  * Utility functions
  */
 
-export const fallback =
-  <T, F>(parser: Parser<T>, defaultValue: F): InfallibleParser<T | F> =>
-  (data: unknown): ParseSuccess<T> | ParseSuccessFallback<F> => {
-    const result = parser(data)
-    if (result.tag !== 'success') {
-      return successFallback(defaultValue)
-    }
-    return result
-  }
-
 /**
  * Use to skip validation, as it returns true for any input.
  * @param data
