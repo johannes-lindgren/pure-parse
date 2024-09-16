@@ -1,9 +1,10 @@
 import { describe, expect, it, test } from 'vitest'
 import { object } from './object'
-import { fallback, Infer } from './parse'
+import { Infer, isSuccess } from './parse'
 import type { Equals } from '../internals'
 import { nullable, optional } from './union'
 import { parseNumber, parseString } from './primitives'
+import { fallback } from './fallback'
 
 describe('objects', () => {
   describe('unknown properties', () => {
@@ -107,7 +108,7 @@ describe('objects', () => {
         // @ts-expect-error -- TODO make it possible to infer the type from optional parser
         email: optional(parseString),
       })
-      expect(parseUser({ id: 1 })).toHaveProperty('tag', 'success')
+      expect(isSuccess(parseUser({ id: 1 }))).toEqual(true)
       expect(parseUser({ id: 1, email: undefined })).toHaveProperty(
         'tag',
         'success',
@@ -190,24 +191,27 @@ describe('objects', () => {
         email: optional(fallback(parseString, defaultEmail)),
       })
       // The email can be a omitted -> Success
-      expect(parseUser({ id: 1, name: 'Alice' })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice' },
-      })
+      expect(parseUser({ id: 1, name: 'Alice' })).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice' },
+        }),
+      )
 
       // The email can be a string -> Success
       expect(
         parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
-      ).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: 'alice@test.com' },
-      })
+      ).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: 'alice@test.com' },
+        }),
+      )
 
       // The email can't be a number -> falls back
-      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: defaultEmail },
-      })
+      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: defaultEmail },
+        }),
+      )
     })
     it('includes unknown properties', () => {
       const parseUser = object({
@@ -234,16 +238,18 @@ describe('objects', () => {
       // The property can be a string -> Success
       expect(
         parseUser({ id: 1, name: 'Alice', email: 'alice@test.com' }),
-      ).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: 'alice@test.com' },
-      })
+      ).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: 'alice@test.com' },
+        }),
+      )
 
       // number fails -> Falls back
-      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual({
-        tag: 'success',
-        value: { id: 1, name: 'Alice', email: defaultEmail },
-      })
+      expect(parseUser({ id: 1, name: 'Alice', email: 123 })).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice', email: defaultEmail },
+        }),
+      )
 
       // The property is required -> Fails
       expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
@@ -252,5 +258,96 @@ describe('objects', () => {
       )
     })
   })
-  describe.todo('referential preservation')
+  describe('referential preservation', () => {
+    describe('shallow object', () => {
+      it('preserves reference when all properties are success', () => {
+        const parseUser = object({
+          id: parseNumber,
+          name: parseString,
+        })
+        const user = { id: 1, name: 'Alice' }
+        const result = parseUser(user)
+        if (result.tag === 'success') {
+          expect(result.value).toBe(user)
+        } else {
+          throw new Error('Expected success')
+        }
+      })
+      it('preserves reference when a property is optional', () => {
+        type User = {
+          id: number
+          name?: string
+        }
+        const parseUser = object<User>({
+          id: parseNumber,
+          name: optional(parseString),
+        })
+        const user = { id: 1, name: 'Alice' }
+        const result = parseUser(user)
+        if (result.tag === 'success') {
+          expect(result.value).toBe(user)
+        } else {
+          throw new Error('Expected success')
+        }
+      })
+      it('does not preserve reference when a property is fallback', () => {
+        const parseUser = object({
+          id: parseNumber,
+          name: fallback(parseString, 'Anonymous'),
+        })
+        const user = { id: 1, name: 123 }
+        const result = parseUser(user)
+        if (result.tag === 'success-fallback') {
+          expect(result.value).not.toBe(user)
+        } else {
+          throw new Error('Expected success')
+        }
+      })
+    })
+    describe('nested object', () => {
+      it('preserves reference when all properties are success', () => {
+        const parseUser = object({
+          id: parseNumber,
+          name: parseString,
+          address: object({
+            street: parseString,
+            city: parseString,
+          }),
+        })
+        const user = {
+          id: 1,
+          name: 'Alice',
+          address: { street: '1st', city: 'NY' },
+        }
+        const result = parseUser(user)
+        if (result.tag === 'success') {
+          expect(result.value).toBe(user)
+        } else {
+          throw new Error('Expected success')
+        }
+      })
+      it('does not preserve reference when a nested property fallback', () => {
+        const parseUser = object({
+          id: parseNumber,
+          name: parseString,
+          address: object({
+            street: parseString,
+            city: fallback(parseString, 'NY'),
+          }),
+        })
+        const user = {
+          id: 1,
+          name: 'Alice',
+          address: { street: '1st', city: 123 },
+        }
+        const result = parseUser(user)
+        if (result.tag === 'success-fallback') {
+          expect(result.value).not.toBe(user)
+        } else {
+          throw new Error('Expected success')
+        }
+      })
+    })
+  })
+  describe.todo('self-referential objects')
 })
