@@ -3,17 +3,21 @@ import { object } from './object'
 import { Infer, isSuccess } from './parse'
 import type { Equals } from '../internals'
 import { nullable, optional } from './union'
-import { parseNumber, parseString } from './primitives'
+import { literal, parseBoolean, parseNumber, parseString } from './primitives'
 import { fallback } from './fallback'
 
 describe('objects', () => {
   describe('unknown properties', () => {
-    it('allows unknown properties', () => {
-      const parseObj = object({})
-      const data = { a: 'unexpected!' }
+    it('excludes unknown properties', () => {
+      const parseObj = object({
+        expected: literal(true),
+      })
+      const data = { expected: true, unexpected: true }
       expect(parseObj(data)).toEqual(
         expect.objectContaining({
-          value: data,
+          value: {
+            expected: true,
+          },
         }),
       )
     })
@@ -213,17 +217,19 @@ describe('objects', () => {
         }),
       )
     })
-    it('includes unknown properties', () => {
+    it('excludes unknown properties', () => {
       const parseUser = object({
         id: parseNumber,
       })
       const data = {
         id: 123,
-        unknownProp: 'unexpected!',
+        unexpected: true,
       }
       expect(parseUser(data)).toEqual(
         expect.objectContaining({
-          value: data,
+          value: {
+            id: 123,
+          },
         }),
       )
     })
@@ -260,7 +266,7 @@ describe('objects', () => {
   })
   describe('referential preservation', () => {
     describe('shallow object', () => {
-      it('preserves reference when all properties are success', () => {
+      it('preserves reference when all properties are validates', () => {
         const parseUser = object({
           id: parseNumber,
           name: parseString,
@@ -296,6 +302,19 @@ describe('objects', () => {
           name: fallback(parseString, 'Anonymous'),
         })
         const user = { id: 1, name: 123 }
+        const result = parseUser(user)
+        if (result.tag === 'success-fallback') {
+          expect(result.value).not.toBe(user)
+        } else {
+          throw new Error('Expected success')
+        }
+      })
+      it('does not preserve reference when there are unknown properties', () => {
+        const parseUser = object({
+          id: parseNumber,
+          name: fallback(parseString, 'Anonymous'),
+        })
+        const user = { id: 1, name: 'Johannes', isAdmin: true }
         const result = parseUser(user)
         if (result.tag === 'success-fallback') {
           expect(result.value).not.toBe(user)
@@ -347,6 +366,67 @@ describe('objects', () => {
           throw new Error('Expected success')
         }
       })
+    })
+  })
+  describe('prototype pollution', () => {
+    it('prevents prototype pollution', () => {
+      const parseUser = object({
+        id: parseNumber,
+        name: parseString,
+      })
+      const data = JSON.parse(
+        '{"__proto__": {"isAdmin": true}, "id": 1, "name": "Alice"}',
+      )
+      const result = parseUser(data)
+      if (result.tag === 'failure') {
+        throw new Error('Expected success')
+      }
+      expect(result).toEqual(
+        expect.objectContaining({
+          value: { id: 1, name: 'Alice' },
+        }),
+      )
+      expect(result.value).not.toHaveProperty('isAdmin')
+      expect(result.value).not.toHaveProperty('__proto__')
+
+      // Without parsing, prototype pollution can happen
+      expect(Object.assign({}, data)).toHaveProperty('isAdmin')
+      // After parsing, the prototype pollution is impossible
+      expect(Object.assign({}, result.value)).not.toHaveProperty('isAdmin')
+    })
+    it('allows you to shoot yourself in the foot, if you really want it', () => {
+      const parseUser = object({
+        id: parseNumber,
+        name: parseString,
+        ['__proto__']: object({
+          isAdmin: parseBoolean,
+        }),
+      })
+      const data = JSON.parse(
+        '{"__proto__": {"isAdmin": true}, "id": 1, "name": "Alice"}',
+      )
+      const result = parseUser(data)
+      if (result.tag === 'failure') {
+        throw new Error('Expected success')
+      }
+      expect(result.value).not.toHaveProperty('isAdmin')
+      expect(result.value).toHaveProperty('__proto__')
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          value: {
+            id: 1,
+            name: 'Alice',
+            ['__proto__']: {
+              isAdmin: true,
+            },
+          },
+        }),
+      )
+      // Without parsing, prototype pollution can happen
+      expect(Object.assign({}, data)).toHaveProperty('isAdmin', true)
+      // After parsing, the prototype pollution is impossible
+      expect(Object.assign({}, result.value)).toHaveProperty('isAdmin', true)
     })
   })
   describe.todo('self-referential objects')

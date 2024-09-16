@@ -69,12 +69,12 @@ export const object =
       allOriginal &&= result.tag === 'success'
     }
 
-    if (allOriginal) {
-      // Preserve reference equality if no properties were falling back to defaults
-      return success(data as T)
-    }
     if (!allSuccess) {
       return failure('Not all properties are valid')
+    }
+    if (allOriginal && results.length === Object.keys(data).length) {
+      // Preserve reference equality if no properties were falling back to defaults
+      return success(data as T)
     }
     return successFallback(
       Object.fromEntries(
