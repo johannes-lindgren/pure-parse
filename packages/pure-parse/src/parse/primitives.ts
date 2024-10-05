@@ -1,4 +1,4 @@
-import * as V from '../validation'
+import * as V from '../validate'
 import {
   isBigInt,
   isBoolean,
@@ -7,9 +7,9 @@ import {
   isString,
   isSymbol,
   isUndefined,
-} from '../validation'
+} from '../validate'
 import { failure, ParseFailure, ParseSuccess, success } from './parse'
-import { Primitive } from '../shared'
+import { Primitive } from '../common'
 
 /**
  *

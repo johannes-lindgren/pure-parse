@@ -1,33 +1,23 @@
-import { array, isNumber, object, parseJson, isJsonValue } from 'pure-parse'
+import { validationTests } from './validate.ts'
+import { parsingTests } from './parse.ts'
 
-/**
- * Just for CI/CD testing: the actual UI doesn't matter
- */
-
-const tests = [
-  ['isNumber(1)', isNumber(1)],
-  ['object({ a: isNumber })({ a: 1 })', object({ a: isNumber })({ a: 1 })],
-  ['array(isNumber)([1,2,3])', array(isNumber)([1, 2, 3])],
-  [
-    'parseJson(object({ a: isNumber }))(JSON.stringify({ a: 1 }))',
-    parseJson(object({ a: isNumber }))(JSON.stringify({ a: 1 })),
-  ],
-  ['isJsonValue({ a: 1 })', isJsonValue({ a: 1 })],
-]
+const renderTests = (tests: unknown[][]) =>
+  `<ul>${tests
+    .map(
+      (test) => `
+        <li>
+          <code>${test[0]}</code> → <code>${JSON.stringify(test[1])}</code>
+        </li>
+    `,
+    )
+    .join('')}</ul>`
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
     <h1>Pure Parse Dist Tests</h1>
-    <ul>
-    ${tests
-      .map(
-        (test) => `
-        <li>
-          <code>${test[0]}</code> is <code>${test[1]}</code>
-        </li>
-    `,
-      )
-      .join('')}
-    </ul>
+    <h2><code>pure-parse</code></h2>
+    ${renderTests(parsingTests)}
+    <h2><code>pure-parse/validate</code></h2>
+    ${renderTests(validationTests)}
   </div>
 `

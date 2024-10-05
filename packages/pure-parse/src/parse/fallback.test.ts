@@ -28,11 +28,11 @@ describe('fallback', () => {
     )
   })
   describe('referential preservation', () => {
-    test('parsing success, where the reference is preserves', () => {
+    test('parse success, where the reference is preserves', () => {
       const parseStr = fallback(parseString, 'fallback')
       expect(parseStr('hello')).toHaveProperty('tag', 'success')
     })
-    test('parsing failure with fallback, where the reference is preserves', () => {
+    test('parse failure with fallback, where the reference is preserves', () => {
       const parseStr = fallback(parseString, 'fallback')
       expect(parseStr(123)).toHaveProperty('tag', 'success-fallback')
     })

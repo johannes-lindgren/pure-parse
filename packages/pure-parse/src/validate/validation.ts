@@ -1,5 +1,5 @@
-import { hasKey, OptionalKeys, RequiredKeys } from './internals'
-import { Primitive } from './shared'
+import { hasKey, OptionalKeys, RequiredKeys } from '../internals'
+import { Primitive } from '../common'
 /*
  * Utility Types
  */

@@ -1,7 +1,6 @@
 import {
   failure,
   isSuccess,
-  ParseResult,
   ParseSuccess,
   ParseSuccessFallback,
   RequiredParser,

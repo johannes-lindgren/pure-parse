@@ -27,7 +27,7 @@ import {
   isArray,
   isFunction,
 } from './validation'
-import { Equals } from './internals'
+import { Equals } from '../internals'
 
 describe('validation', () => {
   describe('primitives', () => {

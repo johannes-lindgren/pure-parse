@@ -5,9 +5,9 @@ import { optional, union } from './union'
 import { literal, parseNumber, parseString } from './primitives'
 import { fallback } from './fallback'
 
-describe('parsing', () => {
+describe('parse', () => {
   describe('some use cases', () => {
-    test('parsing objects in an array with fallback', () => {
+    test('parse objects in an array with fallback', () => {
       /*
        * Type aliases
        */
