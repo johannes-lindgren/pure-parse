@@ -46,36 +46,40 @@ export const object =
     if (!isObject(data)) {
       return failure('Not an object')
     }
-    const results = Object.keys(schema).map((key) => {
+    const schemaKeys = Object.keys(schema)
+    const results = []
+    let allOriginal = true
+    let key
+    for (key in schema) {
       const parser = schema[key]
-      if (parser === undefined) {
-        // TODO this shouldn't happen, as the type ensures that all properties are validators
-        return [key, failure('No parser for the key')] as [string, ParseFailure]
-      }
       if (!hasKey(data, key)) {
-        // If the key is not present, the validator must represent an optional property
-        return optionalSymbol in parser
-          ? ([key, successOptional()] as [string, ParseSuccessPropAbsent])
-          : ([key, failure('Key is missing')] as [string, ParseFailure])
+        if (optionalSymbol in parser) {
+          results.push([key, successOptional()] as [
+            string,
+            ParseSuccessPropAbsent,
+          ])
+        } else {
+          return failure('Not all properties are valid')
+        }
+        continue
       }
       const value = data[key]
-      return [key, parser(value)] as [string, ParseResult<unknown>]
-    })
-    // Imperative programming for performance
-    let allSuccess = true
-    let allOriginal = true
-    for (const [_, result] of results) {
-      allSuccess &&= result.tag !== 'failure'
-      allOriginal &&= result.tag === 'success'
+      const result = parser(value)
+      if (result.tag === 'failure') {
+        return failure('Not all properties are valid')
+      }
+      if (result.tag === 'success-fallback') {
+        allOriginal = false
+      }
+      results.push([key, result] as [string, ParseResult<unknown>])
     }
 
-    if (!allSuccess) {
-      return failure('Not all properties are valid')
-    }
     if (allOriginal && results.length === Object.keys(data).length) {
-      // Preserve reference equality if no properties were falling back to defaults
+      // Preserve reference equality if no properties were falling back to defaults.
+      //  If true, this is a huge performance boost.
       return success(data as T)
     }
+
     return successFallback(
       Object.fromEntries(
         (
