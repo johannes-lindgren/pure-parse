@@ -2,6 +2,7 @@ import { isObject } from '../validate'
 import {
   failure,
   OptionalParser,
+  ParseSuccess,
   RequiredParser,
   RequiredParseResult,
   success,
@@ -33,10 +34,10 @@ export const object =
       return failure('Not an object')
     }
     // const results = []
-    const dataOutput = {}
+    const dataOutput = {} as Record<string, unknown>
     for (const key in schema) {
       const parser = schema[key]!
-      const value = data[key]
+      const value = (data as Record<string, unknown>)[key]
       // Perf: only check if the key is present if we got undefined => huge performance boost
       if (value === undefined && !data.hasOwnProperty(key)) {
         if (optionalSymbol in parser) {
@@ -50,8 +51,8 @@ export const object =
       if (parseResult.tag === 'failure') {
         return failure('Not all properties are valid')
       }
-      dataOutput[key] = parseResult.value
+      dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
     }
 
-    return success(dataOutput)
+    return success(dataOutput) as RequiredParseResult<T>
   }
