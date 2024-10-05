@@ -21,7 +21,7 @@ describe('primitives', () => {
     test('with fallback', () => {
       const parseLiteral = fallback(literal('#FF0000'), '#00FF00')
       expect(parseLiteral('#XXYYZZ')).toEqual({
-        tag: 'success-fallback',
+        tag: 'success',
         value: '#00FF00',
       })
     })

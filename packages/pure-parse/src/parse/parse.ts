@@ -9,14 +9,6 @@ export type ParseSuccess<T> = {
 }
 
 /**
- * The data did not adhere to the schema, but the fallback returned a valid data. The `value` is _not_ equal to the parsed data
- */
-export type ParseSuccessFallback<T> = {
-  tag: 'success-fallback'
-  value: T
-}
-
-/**
  * The property is absent, but it's optional which means that the parse was successful.
  */
 export type ParseSuccessPropAbsent = {
@@ -34,23 +26,14 @@ export type ParseFailure = {
 export type ParseResult<T> =
   | ParseSuccess<T>
   | ParseFailure
-  | ParseSuccessFallback<T>
   | ParseSuccessPropAbsent
 
-export type RequiredParseResult<T> =
-  | ParseSuccess<T>
-  | ParseFailure
-  | ParseSuccessFallback<T>
+export type RequiredParseResult<T> = ParseSuccess<T> | ParseFailure
 
 export type OptionalParseResult<T> = ParseResult<T>
 
 export const success = <T>(value: T): ParseSuccess<T> => ({
   tag: 'success',
-  value,
-})
-
-export const successFallback = <T>(value: T): ParseSuccessFallback<T> => ({
-  tag: 'success-fallback',
   value,
 })
 
@@ -74,9 +57,7 @@ export type OptionalParser<T> = {
   [optionalSymbol]?: true
 } & ((data: unknown) => OptionalParseResult<T | undefined>)
 
-export type InfallibleParser<T> = (
-  data: unknown,
-) => ParseSuccess<T> | ParseSuccessFallback<T>
+export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
 
 export type FallibleParser<T> = (
   data: unknown,
@@ -103,10 +84,5 @@ export const parseUnknown = (data: unknown): ParseSuccess<unknown> =>
 
 export const isSuccess = <T>(
   result: ParseResult<T>,
-): result is
-  | ParseSuccess<T>
-  | ParseSuccessFallback<T>
-  | ParseSuccessPropAbsent =>
-  result.tag === 'success' ||
-  result.tag === 'success-fallback' ||
-  result.tag === 'success-prop-absent'
+): result is ParseSuccess<T> | ParseSuccessPropAbsent =>
+  result.tag === 'success' || result.tag === 'success-prop-absent'

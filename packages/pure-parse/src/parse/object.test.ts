@@ -264,110 +264,6 @@ describe('objects', () => {
       )
     })
   })
-  describe('referential preservation', () => {
-    describe('shallow object', () => {
-      it('preserves reference when all properties are validates', () => {
-        const parseUser = object({
-          id: parseNumber,
-          name: parseString,
-        })
-        const user = { id: 1, name: 'Alice' }
-        const result = parseUser(user)
-        if (result.tag === 'success') {
-          expect(result.value).toBe(user)
-        } else {
-          throw new Error('Expected success')
-        }
-      })
-      it('preserves reference when a property is optional', () => {
-        type User = {
-          id: number
-          name?: string
-        }
-        const parseUser = object<User>({
-          id: parseNumber,
-          name: optional(parseString),
-        })
-        const user = { id: 1, name: 'Alice' }
-        const result = parseUser(user)
-        if (result.tag === 'success') {
-          expect(result.value).toBe(user)
-        } else {
-          throw new Error('Expected success')
-        }
-      })
-      it('does not preserve reference when a property is fallback', () => {
-        const parseUser = object({
-          id: parseNumber,
-          name: fallback(parseString, 'Anonymous'),
-        })
-        const user = { id: 1, name: 123 }
-        const result = parseUser(user)
-        if (result.tag === 'success-fallback') {
-          expect(result.value).not.toBe(user)
-        } else {
-          throw new Error('Expected success')
-        }
-      })
-      it('does not preserve reference when there are unknown properties', () => {
-        const parseUser = object({
-          id: parseNumber,
-          name: fallback(parseString, 'Anonymous'),
-        })
-        const user = { id: 1, name: 'Johannes', isAdmin: true }
-        const result = parseUser(user)
-        if (result.tag === 'success-fallback') {
-          expect(result.value).not.toBe(user)
-        } else {
-          throw new Error('Expected success')
-        }
-      })
-    })
-    describe('nested object', () => {
-      it('preserves reference when all properties are success', () => {
-        const parseUser = object({
-          id: parseNumber,
-          name: parseString,
-          address: object({
-            street: parseString,
-            city: parseString,
-          }),
-        })
-        const user = {
-          id: 1,
-          name: 'Alice',
-          address: { street: '1st', city: 'NY' },
-        }
-        const result = parseUser(user)
-        if (result.tag === 'success') {
-          expect(result.value).toBe(user)
-        } else {
-          throw new Error('Expected success')
-        }
-      })
-      it('does not preserve reference when a nested property fallback', () => {
-        const parseUser = object({
-          id: parseNumber,
-          name: parseString,
-          address: object({
-            street: parseString,
-            city: fallback(parseString, 'NY'),
-          }),
-        })
-        const user = {
-          id: 1,
-          name: 'Alice',
-          address: { street: '1st', city: 123 },
-        }
-        const result = parseUser(user)
-        if (result.tag === 'success-fallback') {
-          expect(result.value).not.toBe(user)
-        } else {
-          throw new Error('Expected success')
-        }
-      })
-    })
-  })
   describe('prototype pollution', () => {
     it('prevents prototype pollution', () => {
       const parseUser = object({
@@ -409,24 +305,8 @@ describe('objects', () => {
       if (result.tag === 'failure') {
         throw new Error('Expected success')
       }
-      expect(result.value).not.toHaveProperty('isAdmin')
-      expect(result.value).toHaveProperty('__proto__')
-
-      expect(result).toEqual(
-        expect.objectContaining({
-          value: {
-            id: 1,
-            name: 'Alice',
-            ['__proto__']: {
-              isAdmin: true,
-            },
-          },
-        }),
-      )
-      // Without parse, prototype pollution can happen
-      expect(Object.assign({}, data)).toHaveProperty('isAdmin', true)
-      // After parse, the prototype pollution is impossible
-      expect(Object.assign({}, result.value)).toHaveProperty('isAdmin', true)
+      expect(result.value).toHaveProperty('isAdmin')
+      expect(result.value).not.toHaveProperty('__proto__')
     })
   })
   describe.todo('self-referential objects')

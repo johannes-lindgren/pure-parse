@@ -38,7 +38,7 @@ export const object =
       const parser = schema[key]!
       const value = data[key]
       // Perf: only check if the key is present if we got undefined => huge performance boost
-      if (value === undefined && !data.hasOwn(key)) {
+      if (value === undefined && !data.hasOwnProperty(key)) {
         if (optionalSymbol in parser) {
           // The key is optional, so we can skip it
           continue
