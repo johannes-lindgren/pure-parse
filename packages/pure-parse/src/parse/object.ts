@@ -1,26 +1,12 @@
 import { isObject } from '../validate'
-import { hasKey } from '../internals'
 import {
   failure,
   OptionalParser,
-  ParseFailure,
-  ParseResult,
-  ParseSuccessPropAbsent,
   RequiredParser,
   RequiredParseResult,
   success,
-  successFallback,
-  successOptional,
 } from './parse'
 import { optionalSymbol } from './optionalSymbol'
-
-// Local helper function
-const wasPropPresent = <T>(
-  prop: [string, Exclude<ParseResult<T>, { tag: 'failure' }>],
-): prop is [
-  string,
-  Exclude<ParseResult<T>, { tag: 'failure' | 'success-prop-absent' }>,
-] => prop[1].tag !== 'success-prop-absent'
 
 /**
  * Validate structs; records that map known keys to a specific type.
@@ -46,49 +32,26 @@ export const object =
     if (!isObject(data)) {
       return failure('Not an object')
     }
-    const schemaKeys = Object.keys(schema)
-    const results = []
-    let allOriginal = true
-    let key
-    for (key in schema) {
-      const parser = schema[key]
-      if (!hasKey(data, key)) {
-        if (optionalSymbol in parser) {
-          results.push([key, successOptional()] as [
-            string,
-            ParseSuccessPropAbsent,
-          ])
-        } else {
-          return failure('Not all properties are valid')
-        }
-        continue
-      }
+    // const results = []
+    const dataOutput = {}
+    for (const key in schema) {
+      const parser = schema[key]!
       const value = data[key]
-      const result = parser(value)
-      if (result.tag === 'failure') {
+      // Perf: only check if the key is present if we got undefined => huge performance boost
+      if (value === undefined && !data.hasOwn(key)) {
+        if (optionalSymbol in parser) {
+          // The key is optional, so we can skip it
+          continue
+        }
         return failure('Not all properties are valid')
       }
-      if (result.tag === 'success-fallback') {
-        allOriginal = false
+
+      const parseResult = parser(value)
+      if (parseResult.tag === 'failure') {
+        return failure('Not all properties are valid')
       }
-      results.push([key, result] as [string, ParseResult<unknown>])
+      dataOutput[key] = parseResult.value
     }
 
-    if (allOriginal && results.length === Object.keys(data).length) {
-      // Preserve reference equality if no properties were falling back to defaults.
-      //  If true, this is a huge performance boost.
-      return success(data as T)
-    }
-
-    return successFallback(
-      Object.fromEntries(
-        (
-          results as Array<
-            [string, Exclude<ParseResult<T>, { tag: 'failure' }>]
-          >
-        )
-          .filter(wasPropPresent)
-          .map(([key, result]) => [key, result.value]),
-      ),
-    ) as RequiredParseResult<T>
+    return success(dataOutput)
   }
