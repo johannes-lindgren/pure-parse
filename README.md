@@ -169,7 +169,7 @@ A typical JavaScript programs need to parse some JSON data. Therefore, this libr
 ```ts
 const data = parseJson(object({ id: isNumber }))('{ "a": 1 }')
 if (data instanceof Error) {
-  // the parse failed
+  // the parsing failed
 } else {
   // data is of type `{ id: number }`.
 }

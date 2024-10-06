@@ -17,14 +17,14 @@ export type ParseSuccessFallback<T> = {
 }
 
 /**
- * The property is absent, but it's optional which means that the parse was successful.
+ * The property is absent, but it's optional which means that the parsing was successful.
  */
 export type ParseSuccessPropAbsent = {
   tag: 'success-prop-absent'
 }
 
 /**
- * The parse failed.
+ * The parsing failed.
  */
 export type ParseFailure = {
   tag: 'failure'

@@ -23,7 +23,7 @@ describe('objects', () => {
     })
   })
   describe('required properties', () => {
-    test('parse', () => {
+    test('parsing', () => {
       const parseUser = object({
         id: parseNumber,
         name: parseString,
