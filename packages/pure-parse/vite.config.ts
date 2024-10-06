@@ -10,12 +10,32 @@ export default defineConfig({
     }),
   ],
   build: {
-    lib: {
-      // Could also be a dictionary or array of multiple entry points
-      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-      name: 'pureParse',
-      fileName: 'index',
+    rollupOptions: {
+      input: {
+        index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+        'validate/index': fileURLToPath(
+          new URL('./src/validate/index.ts', import.meta.url),
+        ),
+      },
+      preserveEntrySignatures: 'exports-only',
+      output: [
+        {
+          // ESM build
+          format: 'es',
+          entryFileNames: '[name].js',
+          dir: 'dist',
+          preserveModules: true, // Keeps module structure
+          preserveModulesRoot: 'src',
+        },
+        {
+          // CJS build
+          format: 'cjs',
+          entryFileNames: '[name].cjs',
+          dir: 'dist',
+          preserveModules: true, // Keeps module structure
+          preserveModulesRoot: 'src',
+        },
+      ],
     },
-    emptyOutDir: false,
   },
 })

@@ -1,4 +1,4 @@
-import { isObject } from '../validation'
+import { isObject } from '../validate'
 import { hasKey } from '../internals'
 import {
   failure,
