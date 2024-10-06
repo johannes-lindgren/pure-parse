@@ -18,8 +18,6 @@ export type ParseFailure = {
 
 export type ParseResult<T> = ParseSuccess<T> | ParseFailure
 
-export type OptionalParseResult<T> = ParseResult<T>
-
 export const success = <T>(value: T): ParseSuccess<T> => ({
   tag: 'success',
   value,
@@ -32,18 +30,14 @@ export const failure = (error: string): ParseFailure => ({
 
 export type Parser<T> = (data: unknown) => ParseResult<T>
 
+export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
+
 /**
  * Special validator to check optional values
  */
 export type OptionalParser<T> = {
   [optionalSymbol]?: true
-} & ((data: unknown) => OptionalParseResult<T | undefined>)
-
-export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
-
-export type FallibleParser<T> = (
-  data: unknown,
-) => ParseSuccess<T> | ParseFailure
+} & ((data: unknown) => ParseResult<T | undefined>)
 
 /*
  * Utility types
