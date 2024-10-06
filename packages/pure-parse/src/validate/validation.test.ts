@@ -24,7 +24,7 @@ import {
   isUndefined,
   isUnknown,
 } from './guards'
-import { Infer } from '../common/infer'
+import { Infer } from '../common'
 
 describe('validation', () => {
   describe('algebraic data types', () => {
