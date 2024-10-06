@@ -1,4 +1,4 @@
-import { InfallibleParser, RequiredParser, success } from './parse'
+import { InfallibleParser, Parser, success } from './parse'
 
 /**
  * Use to provide a default value when parsing fails.
@@ -6,7 +6,7 @@ import { InfallibleParser, RequiredParser, success } from './parse'
  * @param defaultValue
  */
 export const fallback =
-  <T, F>(parser: RequiredParser<T>, defaultValue: F): InfallibleParser<T | F> =>
+  <T, F>(parser: Parser<T>, defaultValue: F): InfallibleParser<T | F> =>
   (data: unknown) => {
     const result = parser(data)
     switch (result.tag) {

@@ -4,7 +4,7 @@ import {
   OptionalParser,
   ParseFailure,
   ParseSuccess,
-  RequiredParser,
+  Parser,
   success,
 } from './parse'
 import { parseNull, parseUndefined } from './primitives'
@@ -21,7 +21,7 @@ import { parseNull, parseUndefined } from './primitives'
 export const union =
   <T extends readonly [...unknown[]]>(
     ...parsers: {
-      [K in keyof T]: RequiredParser<T[K]>
+      [K in keyof T]: Parser<T[K]>
     }
   ) =>
   (data: unknown): ParseSuccess<T[number]> | ParseFailure => {
@@ -38,7 +38,7 @@ export const union =
  * Represent an optional property, which is different from a required property that can be `undefined`.
  * @param parser
  */
-export const optional = <T>(parser: RequiredParser<T>): OptionalParser<T> =>
+export const optional = <T>(parser: Parser<T>): OptionalParser<T> =>
   /*
    * { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
    */
@@ -46,14 +46,12 @@ export const optional = <T>(parser: RequiredParser<T>): OptionalParser<T> =>
     [optionalSymbol]: true,
   }) as unknown as OptionalParser<T>
 
-export const nullable = <T>(
-  parser: RequiredParser<T>,
-): RequiredParser<T | null> => union(parseNull, parser)
+export const nullable = <T>(parser: Parser<T>): Parser<T | null> =>
+  union(parseNull, parser)
 
-export const undefineable = <T>(
-  parser: RequiredParser<T>,
-): RequiredParser<T | undefined> => union(parseUndefined, parser)
+export const undefineable = <T>(parser: Parser<T>): Parser<T | undefined> =>
+  union(parseUndefined, parser)
 
 export const optionalNullable = <T>(
-  parser: RequiredParser<T>,
+  parser: Parser<T>,
 ): OptionalParser<T | null> => optional(nullable(parser))

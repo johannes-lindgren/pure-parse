@@ -3,8 +3,8 @@ import {
   failure,
   OptionalParser,
   ParseSuccess,
-  RequiredParser,
-  RequiredParseResult,
+  Parser,
+  ParseResult,
   success,
 } from './parse'
 import { optionalSymbol } from './optionalSymbol'
@@ -27,9 +27,9 @@ export const object =
     // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
     [K in keyof T]-?: {} extends Pick<T, K>
       ? OptionalParser<T[K]>
-      : RequiredParser<T[K]>
+      : Parser<T[K]>
   }) =>
-  (data: unknown): RequiredParseResult<T> => {
+  (data: unknown): ParseResult<T> => {
     if (!isObject(data)) {
       return failure('Not an object')
     }
@@ -53,5 +53,5 @@ export const object =
       dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
     }
 
-    return success(dataOutput) as RequiredParseResult<T>
+    return success(dataOutput) as ParseResult<T>
   }
