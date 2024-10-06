@@ -50,7 +50,7 @@ export const object =
       if (parseResult.tag === 'failure') {
         return failure('Not all properties are valid')
       }
-      dataOutput[key] = parseResult.value
+      dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
     }
 
     return success(dataOutput) as RequiredParseResult<T>
