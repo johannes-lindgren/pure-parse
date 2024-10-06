@@ -1,7 +1,7 @@
 import { InfallibleParser, RequiredParser, success } from './parse'
 
 /**
- * Use to provide a default value when parse fails.
+ * Use to provide a default value when parsing fails.
  * @param parser
  * @param defaultValue
  */
