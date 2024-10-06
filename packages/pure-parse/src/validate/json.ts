@@ -1,13 +1,5 @@
-import {
-  array,
-  partialRecord,
-  isBoolean,
-  isNull,
-  isNumber,
-  isString,
-  union,
-  Validator,
-} from './validation'
+import { array, partialRecord, union, Validator } from './validation'
+import { isBoolean, isNull, isNumber, isString } from './guards'
 
 /**
  * A value that represent any JSON-serializable data

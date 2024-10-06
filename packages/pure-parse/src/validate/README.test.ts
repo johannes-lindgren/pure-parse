@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import {
-  array,
-  isString,
-  literal,
-  object,
-  union,
-  Validator,
-} from './validation'
+import { array, literal, object, union, Validator } from './validation'
+import { isString } from './guards'
 
 describe('README examples', () => {
   describe('Tree', () => {

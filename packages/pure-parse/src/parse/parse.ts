@@ -40,14 +40,6 @@ export type OptionalParser<T> = {
 } & ((data: unknown) => ParseResult<T | undefined>)
 
 /*
- * Utility types
- */
-
-export type Infer<T extends Parser<unknown>> = T extends Parser<infer D>
-  ? D
-  : never
-
-/*
  * Utility functions
  */
 
