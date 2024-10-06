@@ -33,12 +33,11 @@ export const object =
     if (!isObject(data)) {
       return failure('Not an object')
     }
-    // const results = []
     const dataOutput = {} as Record<string, unknown>
     for (const key in schema) {
-      const parser = schema[key]!
+      const parser = schema[key]
       const value = (data as Record<string, unknown>)[key]
-      // Perf: only check if the key is present if we got undefined => huge performance boost
+      // Perf: only check if the property exists the value is undefined => huge performance boost
       if (value === undefined && !data.hasOwnProperty(key)) {
         if (optionalSymbol in parser) {
           // The key is optional, so we can skip it
