@@ -2,14 +2,14 @@ import {
   failure,
   isSuccess,
   ParseSuccess,
-  RequiredParser,
-  RequiredParseResult,
+  Parser,
+  ParseResult,
   success,
 } from './parse'
 
 // Local helper function
 const areAllSuccesses = <T>(
-  results: RequiredParseResult<T>[],
+  results: ParseResult<T>[],
 ): results is ParseSuccess<T>[] => results.every((result) => isSuccess(result))
 
 /**
@@ -18,12 +18,12 @@ const areAllSuccesses = <T>(
  * @param parseItem
  */
 export const array =
-  <T>(parseItem: RequiredParser<T>): RequiredParser<T[]> =>
+  <T>(parseItem: Parser<T>): Parser<T[]> =>
   (data: unknown) => {
     if (!Array.isArray(data)) {
       return failure('Not an array')
     }
-    const results: RequiredParseResult<T>[] = data.map(parseItem)
+    const results: ParseResult<T>[] = data.map(parseItem)
 
     // Imperative programming for performance
     let allSuccess = true
@@ -37,8 +37,8 @@ export const array =
 
     // If any element is a fallback, return a new array
     return success(
-      (
-        results as Array<Exclude<RequiredParseResult<T>, { tag: 'failure' }>>
-      ).map((result) => result.value),
+      (results as Array<Exclude<ParseResult<T>, { tag: 'failure' }>>).map(
+        (result) => result.value,
+      ),
     )
   }
