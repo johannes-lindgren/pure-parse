@@ -61,3 +61,6 @@ export const parseUnknown = (data: unknown): ParseSuccess<unknown> =>
 export const isSuccess = <T>(
   result: ParseResult<T>,
 ): result is ParseSuccess<T> => result.tag === 'success'
+
+export const isFailure = <T>(result: ParseResult<T>): result is ParseFailure =>
+  result.tag === 'failure'
