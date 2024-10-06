@@ -1,10 +1,11 @@
 import { describe, expect, it, test } from 'vitest'
 import { object } from './object'
-import { Infer, isSuccess } from './parse'
+import { isSuccess } from './parse'
 import type { Equals } from '../internals'
 import { nullable, optional } from './union'
 import { literal, parseBoolean, parseNumber, parseString } from './primitives'
 import { fallback } from './fallback'
+import { Infer } from '../common'
 
 describe('objects', () => {
   describe('unknown properties', () => {
