@@ -5,6 +5,7 @@ import type { Equals } from '../internals'
 import { nullable, optional } from './union'
 import { literal, parseBoolean, parseNumber, parseString } from './primitives'
 import { fallback } from './fallback'
+import { Infer } from '../common/infer'
 
 describe('objects', () => {
   describe('unknown properties', () => {
