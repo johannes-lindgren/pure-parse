@@ -1,26 +1,13 @@
 import { isObject } from '../validate'
-import { hasKey } from '../internals'
 import {
   failure,
   OptionalParser,
-  ParseFailure,
-  ParseResult,
-  ParseSuccessPropAbsent,
+  ParseSuccess,
   RequiredParser,
   RequiredParseResult,
   success,
-  successFallback,
-  successOptional,
 } from './parse'
 import { optionalSymbol } from './optionalSymbol'
-
-// Local helper function
-const wasPropPresent = <T>(
-  prop: [string, Exclude<ParseResult<T>, { tag: 'failure' }>],
-): prop is [
-  string,
-  Exclude<ParseResult<T>, { tag: 'failure' | 'success-prop-absent' }>,
-] => prop[1].tag !== 'success-prop-absent'
 
 /**
  * Validate structs; records that map known keys to a specific type.
@@ -46,45 +33,25 @@ export const object =
     if (!isObject(data)) {
       return failure('Not an object')
     }
-    const results = Object.keys(schema).map((key) => {
+    const dataOutput = {} as Record<string, unknown>
+    for (const key in schema) {
       const parser = schema[key]
-      if (parser === undefined) {
-        // TODO this shouldn't happen, as the type ensures that all properties are validators
-        return [key, failure('No parser for the key')] as [string, ParseFailure]
+      const value = (data as Record<string, unknown>)[key]
+      // Perf: only check if the property exists the value is undefined => huge performance boost
+      if (value === undefined && !data.hasOwnProperty(key)) {
+        if (optionalSymbol in parser) {
+          // The key is optional, so we can skip it
+          continue
+        }
+        return failure('Not all properties are valid')
       }
-      if (!hasKey(data, key)) {
-        // If the key is not present, the validator must represent an optional property
-        return optionalSymbol in parser
-          ? ([key, successOptional()] as [string, ParseSuccessPropAbsent])
-          : ([key, failure('Key is missing')] as [string, ParseFailure])
+
+      const parseResult = parser(value)
+      if (parseResult.tag === 'failure') {
+        return failure('Not all properties are valid')
       }
-      const value = data[key]
-      return [key, parser(value)] as [string, ParseResult<unknown>]
-    })
-    // Imperative programming for performance
-    let allSuccess = true
-    let allOriginal = true
-    for (const [_, result] of results) {
-      allSuccess &&= result.tag !== 'failure'
-      allOriginal &&= result.tag === 'success'
+      dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
     }
 
-    if (!allSuccess) {
-      return failure('Not all properties are valid')
-    }
-    if (allOriginal && results.length === Object.keys(data).length) {
-      // Preserve reference equality if no properties were falling back to defaults
-      return success(data as T)
-    }
-    return successFallback(
-      Object.fromEntries(
-        (
-          results as Array<
-            [string, Exclude<ParseResult<T>, { tag: 'failure' }>]
-          >
-        )
-          .filter(wasPropPresent)
-          .map(([key, result]) => [key, result.value]),
-      ),
-    ) as RequiredParseResult<T>
+    return success(dataOutput) as RequiredParseResult<T>
   }

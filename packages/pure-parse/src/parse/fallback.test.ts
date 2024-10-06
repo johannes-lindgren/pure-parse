@@ -27,16 +27,6 @@ describe('fallback', () => {
       }),
     )
   })
-  describe('referential preservation', () => {
-    test('parsing success, where the reference is preserves', () => {
-      const parseStr = fallback(parseString, 'fallback')
-      expect(parseStr('hello')).toHaveProperty('tag', 'success')
-    })
-    test('parsing failure with fallback, where the reference is preserves', () => {
-      const parseStr = fallback(parseString, 'fallback')
-      expect(parseStr(123)).toHaveProperty('tag', 'success-fallback')
-    })
-  })
   describe('fallback on fallback', () => {
     it('uses the first fallback', () => {
       const parseStr = fallback(fallback(parseString, 'fallback'), 'fallback2')

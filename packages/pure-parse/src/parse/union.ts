@@ -4,10 +4,8 @@ import {
   OptionalParser,
   ParseFailure,
   ParseSuccess,
-  ParseSuccessFallback,
   RequiredParser,
   success,
-  successFallback,
 } from './parse'
 import { parseNull, parseUndefined } from './primitives'
 
@@ -26,19 +24,11 @@ export const union =
       [K in keyof T]: RequiredParser<T[K]>
     }
   ) =>
-  (
-    data: unknown,
-  ):
-    | ParseSuccess<T[number]>
-    | ParseSuccessFallback<T[number]>
-    | ParseFailure => {
+  (data: unknown): ParseSuccess<T[number]> | ParseFailure => {
     for (const parser of parsers) {
       const result = parser(data)
       if (result.tag === 'success') {
         return success(result.value)
-      }
-      if (result.tag === 'success-fallback') {
-        return successFallback(result.value)
       }
     }
     return failure('No parser in the union matched')
