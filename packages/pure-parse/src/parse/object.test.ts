@@ -23,7 +23,7 @@ describe('objects', () => {
     })
   })
   describe('required properties', () => {
-    test('parse', () => {
+    test('parsing', () => {
       const parseUser = object({
         id: parseNumber,
         name: parseString,
@@ -90,7 +90,7 @@ describe('objects', () => {
     })
   })
   describe('required union properties', () => {
-    test('parse', () => {
+    test('parsing', () => {
       const parseUser = object({
         id: parseNumber,
         email: nullable(parseString),
@@ -106,7 +106,7 @@ describe('objects', () => {
     })
   })
   describe('optional properties', () => {
-    test('parse', () => {
+    test('parsing', () => {
       const parseUser = object({
         id: parseNumber,
         // @ts-expect-error -- TODO make it possible to infer the type from optional parser
@@ -285,9 +285,9 @@ describe('objects', () => {
       expect(result.value).not.toHaveProperty('isAdmin')
       expect(result.value).not.toHaveProperty('__proto__')
 
-      // Without parse, prototype pollution can happen
+      // Without parsing, prototype pollution can happen
       expect(Object.assign({}, data)).toHaveProperty('isAdmin')
-      // After parse, the prototype pollution is impossible
+      // After parsing, the prototype pollution is impossible
       expect(Object.assign({}, result.value)).not.toHaveProperty('isAdmin')
     })
     it('allows you to shoot yourself in the foot, if you really want it', () => {

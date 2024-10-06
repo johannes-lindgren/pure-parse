@@ -48,7 +48,7 @@ describe('json', () => {
     it('does not throw errors', () => {
       expect(() => parseJson(isUnknown)('not a json!')).not.toThrow()
     })
-    it('returns an error if the parse failed', () => {
+    it('returns an error if the parsing failed', () => {
       expect(parseJson(isUnknown)('not a json!')).toBeInstanceOf(Error)
     })
     it('returns an error if the validation failed', () => {
