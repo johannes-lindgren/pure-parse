@@ -109,7 +109,6 @@ describe('objects', () => {
     test('parsing', () => {
       const parseUser = object({
         id: parseNumber,
-        // @ts-expect-error -- TODO make it possible to infer the type from optional parser
         email: optional(parseString),
       })
       expect(isSuccess(parseUser({ id: 1 }))).toEqual(true)
@@ -154,7 +153,6 @@ describe('objects', () => {
     test('optional optional properties', () => {
       const parseUser = object({
         id: parseNumber,
-        // @ts-expect-error -- can't wrap an optional with another optional
         email: optional(optional(parseString)),
       })
     })
@@ -165,7 +163,6 @@ describe('objects', () => {
       }
       const parseUser = object({
         id: parseNumber,
-        // @ts-expect-error -- TODO make it possible to infer the type from optional parser
         email: optional(parseString),
       })
       type InferredUser = Infer<typeof parseUser>
@@ -191,7 +188,6 @@ describe('objects', () => {
       const parseUser = object({
         id: parseNumber,
         name: parseString,
-        // @ts-expect-error -- TODO make it possible to infer the type from optional parser
         email: optional(fallback(parseString, defaultEmail)),
       })
       // The email can be a omitted -> Success

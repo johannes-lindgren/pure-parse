@@ -9,13 +9,6 @@ export type ParseSuccess<T> = {
 }
 
 /**
- * The property is absent, but it's optional which means that the parsing was successful.
- */
-export type ParseSuccessPropAbsent = {
-  tag: 'success-prop-absent'
-}
-
-/**
  * The parsing failed.
  */
 export type ParseFailure = {
@@ -23,10 +16,7 @@ export type ParseFailure = {
   error: string
 }
 
-export type ParseResult<T> =
-  | ParseSuccess<T>
-  | ParseFailure
-  | ParseSuccessPropAbsent
+export type ParseResult<T> = ParseSuccess<T> | ParseFailure
 
 export type RequiredParseResult<T> = ParseSuccess<T> | ParseFailure
 
@@ -35,10 +25,6 @@ export type OptionalParseResult<T> = ParseResult<T>
 export const success = <T>(value: T): ParseSuccess<T> => ({
   tag: 'success',
   value,
-})
-
-export const successOptional = (): ParseSuccessPropAbsent => ({
-  tag: 'success-prop-absent',
 })
 
 export const failure = (error: string): ParseFailure => ({
@@ -84,5 +70,4 @@ export const parseUnknown = (data: unknown): ParseSuccess<unknown> =>
 
 export const isSuccess = <T>(
   result: ParseResult<T>,
-): result is ParseSuccess<T> | ParseSuccessPropAbsent =>
-  result.tag === 'success' || result.tag === 'success-prop-absent'
+): result is ParseSuccess<T> => result.tag === 'success'
