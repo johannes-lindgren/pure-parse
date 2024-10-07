@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { array, literal, object, union, Validator } from './validation'
+import { array, literal, object, union, Guard } from './validation'
 import { isString } from './guards'
 
 describe('README examples', () => {
@@ -10,21 +10,21 @@ describe('README examples', () => {
       data: (Tree<T> | Leaf<T>)[]
     }
     const leaf =
-      <T>(validator: Validator<T>) =>
+      <T>(guard: Guard<T>) =>
       (data: unknown): data is Leaf<T> =>
         object({
           tag: literal('leaf'),
-          data: validator,
+          data: guard,
         })(data)
 
     const tree =
-      <T>(validator: Validator<T>) =>
+      <T>(guard: Guard<T>) =>
       (data: unknown): data is Tree<T> =>
         union(
-          leaf(validator),
+          leaf(guard),
           object({
             tag: literal('tree'),
-            data: array(union(leaf(validator), tree(validator))),
+            data: array(union(leaf(guard), tree(guard))),
           }),
         )(data)
     describe('leaf', () => {

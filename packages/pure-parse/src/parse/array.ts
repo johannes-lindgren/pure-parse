@@ -14,7 +14,7 @@ const areAllSuccesses = <T>(
 
 /**
  * Validate arrays
- * @return a validator function that validates arrays
+ * @return a function that parses arrays
  * @param parseItem
  */
 export const array =

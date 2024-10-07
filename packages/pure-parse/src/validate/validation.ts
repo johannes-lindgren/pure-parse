@@ -5,7 +5,7 @@ import { isNull, isUndefined } from './guards'
 /**
  * A function that returns a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.
  */
-export type Validator<T> = (data: unknown) => data is T
+export type Guard<T> = (data: unknown) => data is T
 
 /*
  * Higher order functions
@@ -18,7 +18,7 @@ export type Validator<T> = (data: unknown) => data is T
 export const literal =
   <const T extends readonly [...Primitive[]]>(
     ...constants: T
-  ): Validator<T[number]> =>
+  ): Guard<T[number]> =>
   (data: unknown): data is T[number] =>
     constants.some((constant) => constant === data)
 
@@ -27,89 +27,88 @@ export const literal =
  */
 
 /**
- * Note that the type parameter is an array of validators; it's not a union type.
+ * Note that the type parameter is an array of guards; it's not a union type.
  * This is because TypeScript doesn't allow you to convert unions to tuples, but it does allow you to convert tuples to unions.
  * Therefore, when you state the type parameter explicitly, provide an array to represent the union:
  * ```ts
  * const isStringOrNumber = union<[string, number]>([isString, isNumber])
  * ```
- * @param validators any of these validator functions must match the data.
+ * @param guards any of these guard functions must match the data.
  */
 export const union =
   <T extends readonly [...unknown[]]>(
-    ...validators: {
-      [K in keyof T]: Validator<T[K]>
+    ...guards: {
+      [K in keyof T]: Guard<T[K]>
     }
   ) =>
   (data: unknown): data is T[number] =>
-    validators.some((validator) => validator(data))
+    guards.some((guard) => guard(data))
 
 /**
- * Used to represent optional validators at runtime and compile-time in two different ways
+ * Used to represent optional guards at runtime and compile-time in two different ways
  */
 const optionalSymbol = Symbol('optional')
 
 /**
- * Special validator to check optional values
+ * Special guard to check optional values
  */
-export type OptionalValidator<T> = { [optionalSymbol]: true } & ((
+export type OptionalGuard<T> = { [optionalSymbol]: true } & ((
   data: unknown,
 ) => data is typeof optionalSymbol | T | undefined)
 
 /**
  * Represent an optional property, which is different from a required property that can be `undefined`.
- * @param validator
+ * @param guard
  */
-export const optional = <T>(validator: Validator<T>): OptionalValidator<T> =>
+export const optional = <T>(guard: Guard<T>): OptionalGuard<T> =>
   /*
-   * { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
+   * { [optionalValue]: true } is used at runtime by `object` to check if a guard represents an optional value.
    */
-  Object.assign(union(isUndefined, validator), {
+  Object.assign(union(isUndefined, guard), {
     [optionalSymbol]: true,
-  }) as OptionalValidator<T>
+  }) as OptionalGuard<T>
 
 /**
- * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for optional(union(isNull, validator)).
- * @param validator
+ * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for optional(union(isNull, guard)).
+ * @param guard
  */
-export const optionalNullable = <T>(validator: Validator<T>) =>
-  optional(union(isNull, validator))
+export const optionalNullable = <T>(guard: Guard<T>) =>
+  optional(union(isNull, guard))
 
 /**
- * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for union(isNull, validator).
- * @param validator
+ * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for union(isNull, guard).
+ * @param guard
  */
-export const nullable = <T>(validator: Validator<T>) => union(isNull, validator)
+export const nullable = <T>(guard: Guard<T>) => union(isNull, guard)
 
 /**
- * Create a union with `undefined`, which is different from optional properties. Alias for union(isUndefined, validator).
- * @param validator
+ * Create a union with `undefined`, which is different from optional properties. Alias for union(isUndefined, guard).
+ * @param guard
  */
-export const undefineable = <T>(validator: Validator<T>) =>
-  union(isUndefined, validator)
+export const undefineable = <T>(guard: Guard<T>) => union(isUndefined, guard)
 
 /*
  * Product Types
  */
 
 /**
- * @param validators an array of validators. Each validator validates the corresponding element in the data tuple.
+ * @param guards an array of guards. Each guard validates the corresponding element in the data tuple.
  */
 export const tuple =
   <T extends readonly [...unknown[]]>(
-    validators: [
+    guards: [
       ...{
-        [K in keyof T]: Validator<T[K]>
+        [K in keyof T]: Guard<T[K]>
       },
     ],
-  ): Validator<T> =>
+  ): Guard<T> =>
   (data: unknown): data is T =>
     Array.isArray(data) &&
-    data.length === validators.length &&
-    validators.every((validator, index) => validator(data[index]))
+    data.length === guards.length &&
+    guards.every((guard, index) => guard(data[index]))
 
 /**
- * Validate structs; records that map known keys to a specific type.
+ * Objects have a fixed set of properties that can have different types.
  *
  * ```ts
  * const isUser = object({
@@ -122,9 +121,7 @@ export const tuple =
  */
 export const object =
   <T extends Record<string, unknown>>(schema: {
-    [K in keyof T]-?: {} extends Pick<T, K>
-      ? OptionalValidator<T[K]>
-      : Validator<T[K]>
+    [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
   }) =>
   (
     data: unknown,
@@ -133,30 +130,36 @@ export const object =
     typeof data === 'object' &&
     data !== null &&
     Object.keys(schema).every((key) => {
-      const validator = schema[key]
-      if (validator === undefined) {
-        // TODO this shouldn't happen, as the type ensures that all properties are validators
+      const guard = schema[key]
+      if (guard === undefined) {
+        // TODO this shouldn't happen, as the type ensures that all properties are guards
         return false
       }
       if (!hasKey(data, key)) {
-        // If the key is not present, the validator must represent an optional property
-        return optionalSymbol in validator
+        // If the key is not present, the guard must represent an optional property
+        return optionalSymbol in guard
       }
       const value = data[key]
 
-      return validator(value)
+      return guard(value)
     })
 
 /**
- * Validate `Record<?, ?>`; objects that definitely map strings to another specific type.
+ * Records have a fixed set of keys that all map to the same type. Can be described with the [Record](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) utility type; for example:
+ * ```ts
+ * const isPalette = record(
+ *  ['success', 'info', 'warning', 'error'],
+ *  parseString
+ * )
+ * ```
  * @param keys a list of every possible key
- * @param validateValue validates every value
+ * @param valueGuard validates every value
  */
 export const record =
   <Keys extends readonly [...string[]], Value>(
     keys: Keys,
-    validateValue: Validator<Value>,
-  ): Validator<Record<Keys[number], Value>> =>
+    valueGuard: Guard<Value>,
+  ): Guard<Record<Keys[number], Value>> =>
   (data: unknown): data is Record<Keys[number], Value> =>
     typeof data === 'object' &&
     data !== null &&
@@ -164,28 +167,33 @@ export const record =
     // No extra keys
     Object.keys(data).every((key) => keys.includes(key)) &&
     // Every value is valid
-    Object.values(data).every(validateValue) &&
+    Object.values(data).every(valueGuard) &&
     // Either: a) undefined is a valid value, or b) every key is present
-    (validateValue(undefined) || keys.every((key) => key in data))
+    (valueGuard(undefined) || keys.every((key) => key in data))
 
 /**
- * Validate `Partial<Record<?, ?>>`; objects that optionally map strings to another specific type.
- * @param validKey validates every key
- * @param validateValue validates every value
+ * Partial records are records with a known set of keys, but where not all keys map to values.
+ * That is, every property is optional. In TypeScript, this can be represented by `Record<string, ?>`, or `Partial<Record<?, ?>>`:
+ * ```ts
+ * // words -> description
+ * const isDictionary = partialRecord(isString, isString)
+ * ```
+ * @param keyGard validates every key
+ * @param valueGuard validates every value
  */
 export const partialRecord =
   <Key extends string, Value>(
-    validKey: Validator<Key>,
-    validateValue: Validator<Value>,
-  ): Validator<Partial<Record<Key, Value>>> =>
+    keyGard: Guard<Key>,
+    valueGuard: Guard<Value>,
+  ): Guard<Partial<Record<Key, Value>>> =>
   (data: unknown): data is Partial<Record<Key, Value>> =>
     typeof data === 'object' &&
     data !== null &&
     !Array.isArray(data) &&
     // No extra keys
-    Object.keys(data).every(validKey) &&
+    Object.keys(data).every(keyGard) &&
     // Every value is valid
-    Object.values(data).every(validateValue)
+    Object.values(data).every(valueGuard)
 
 /*
  * Recursive Types
@@ -194,19 +202,19 @@ export const partialRecord =
 /**
  * Validate arrays
  * @param validateItem validates every item in the array
- * @return a validator function that validates arrays
+ * @return a guard function that validates arrays
  */
 export const array =
-  <T>(validateItem: Validator<T>): Validator<T[]> =>
+  <T>(validateItem: Guard<T>): Guard<T[]> =>
   (data: unknown): data is T[] =>
     Array.isArray(data) && data.every(validateItem)
 
 /**
  * Validate non-empty arrays
  * @param validateItem validates every item in the array
- * @return a validator function that validates non-empty arrays
+ * @return a guard function that validates non-empty arrays
  */
 export const nonEmptyArray =
-  <T>(validateItem: Validator<T>): Validator<[T, ...T[]]> =>
+  <T>(validateItem: Guard<T>): Guard<[T, ...T[]]> =>
   (data: unknown): data is [T, ...T[]] =>
     Array.isArray(data) && data.length !== 0 && data.every(validateItem)
