@@ -1,4 +1,4 @@
-import { isObject } from '../validate'
+import { isObject } from '../guard'
 import {
   failure,
   OptionalParser,

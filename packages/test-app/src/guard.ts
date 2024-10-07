@@ -4,7 +4,7 @@ import {
   object,
   parseJson,
   isJsonValue,
-} from 'pure-parse/validate'
+} from 'pure-parse/guard'
 
 /**
  * Just for CI/CD testing: the actual UI doesn't matter

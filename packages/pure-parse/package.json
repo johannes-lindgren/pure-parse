@@ -36,10 +36,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./validate": {
+    "./guard": {
       "require": "./dist/index.cjs",
-      "types": "./dist/validate/index.d.ts",
-      "import": "./dist/validate/index.js"
+      "types": "./dist/guard/index.d.ts",
+      "import": "./dist/guard/index.js"
     }
   },
   "scripts": {

@@ -1,5 +1,5 @@
 import { Parser } from '../parse'
-import { Guard } from '../validate'
+import { Guard } from '../guard'
 
 /**
  * Extract the type from a parser or guards
