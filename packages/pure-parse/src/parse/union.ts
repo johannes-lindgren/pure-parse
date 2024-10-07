@@ -10,13 +10,13 @@ import {
 import { parseNull, parseUndefined } from './primitives'
 
 /**
- * Note that the type parameter is an array of validators; it's not a union type.
+ * Note that the type parameter is an array of parsers; it's not a union type.
  * This is because TypeScript doesn't allow you to convert unions to tuples, but it does allow you to convert tuples to unions.
  * Therefore, when you state the type parameter explicitly, provide an array to represent the union:
  * ```ts
  * const isStringOrNumber = union<[string, number]>([isString, isNumber])
  * ```
- * @param parsers any of these validator functions must match the data.
+ * @param parsers any of these parser functions must match the data.
  */
 export const union =
   <T extends readonly [...unknown[]]>(
@@ -40,7 +40,7 @@ export const union =
  */
 export const optional = <T>(parser: Parser<T>): OptionalParser<T> =>
   /*
-   * { [optionalValue]: true } is used at runtime by `object` to check if a validator represents an optional value.
+   * { [optionalValue]: true } is used at runtime by `object` to check if a parser represents an optional value.
    */
   Object.assign(union(parseUndefined, parser), {
     [optionalSymbol]: true,

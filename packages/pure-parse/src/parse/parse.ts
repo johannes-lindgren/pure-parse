@@ -33,7 +33,7 @@ export type Parser<T> = (data: unknown) => ParseResult<T>
 export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
 
 /**
- * Special validator to check optional values
+ * Special parser to check optional values
  */
 export type OptionalParser<T> = {
   [optionalSymbol]?: true

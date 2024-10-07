@@ -1,4 +1,4 @@
-import { array, partialRecord, union, Validator } from './validation'
+import { array, partialRecord, union, Guard } from './validation'
 import { isBoolean, isNull, isNumber, isString } from './guards'
 
 /**
@@ -27,7 +27,7 @@ export const isJsonValue = (data: unknown): data is JsonValue =>
  * @param is - a validation function
  */
 export const parseJson =
-  <T>(is: Validator<T>) =>
+  <T>(is: Guard<T>) =>
   (text: string): T | Error => {
     try {
       const data = JSON.parse(text)

@@ -1,4 +1,4 @@
-import { validationTests } from './validate.ts'
+import { guardTests } from './guard.ts'
 import { parsingTests } from './parse.ts'
 
 const renderTests = (tests: unknown[][]) =>
@@ -17,7 +17,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <h1>Pure Parse Dist Tests</h1>
     <h2><code>pure-parse</code></h2>
     ${renderTests(parsingTests)}
-    <h2><code>pure-parse/validate</code></h2>
-    ${renderTests(validationTests)}
+    <h2><code>pure-parse/guard</code></h2>
+    ${renderTests(guardTests)}
   </div>
 `

@@ -9,7 +9,7 @@ import {
   tuple,
   nullable,
   optionalNullable,
-  Validator,
+  Guard,
   record,
   undefineable,
 } from './validation'
@@ -31,13 +31,13 @@ describe('validation', () => {
         describe('type inference', () => {
           it('works with literals', () => {
             const symb = Symbol()
-            literal(symb) satisfies Validator<typeof symb>
-            literal('red') satisfies Validator<'red'>
+            literal(symb) satisfies Guard<typeof symb>
+            literal('red') satisfies Guard<'red'>
             // @ts-expect-error
-            literal('red') satisfies Validator<'green'>
-            literal(1) satisfies Validator<1>
+            literal('red') satisfies Guard<'green'>
+            literal(1) satisfies Guard<1>
             // @ts-expect-error
-            literal(1) satisfies Validator<2>
+            literal(1) satisfies Guard<2>
           })
           it('forbids non-literals', () => {
             // @ts-expect-error
@@ -78,12 +78,12 @@ describe('validation', () => {
           expect(isInUnion(false)).toEqual(false)
         })
         it('infers the types of unions of literals', () => {
-          literal('red', 1, true) satisfies Validator<'red' | 1 | true>
-          literal('red', 'green', 'blue') satisfies Validator<
+          literal('red', 1, true) satisfies Guard<'red' | 1 | true>
+          literal('red', 'green', 'blue') satisfies Guard<
             'red' | 'green' | 'blue'
           >
           // @ts-expect-error
-          literal('red', 'green', 'blue') satisfies Validator<'red'>
+          literal('red', 'green', 'blue') satisfies Guard<'red'>
         })
         test('explicit type annotation', () => {
           literal<['red', 'green', 'blue']>('red', 'green', 'blue')
@@ -123,30 +123,30 @@ describe('validation', () => {
     describe('sum types', () => {
       describe('unions', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
+          it('returns a guard', () => {
             union(
               literal('red'),
               literal('green'),
               literal('blue'),
-            ) satisfies Validator<'red' | 'green' | 'blue'>
-            union(isString, isUndefined) satisfies Validator<string | undefined>
-            union(isString, isNumber) satisfies Validator<string | number>
-            union(isString) satisfies Validator<string>
+            ) satisfies Guard<'red' | 'green' | 'blue'>
+            union(isString, isUndefined) satisfies Guard<string | undefined>
+            union(isString, isNumber) satisfies Guard<string | number>
+            union(isString) satisfies Guard<string>
 
             union(
               literal('red'),
               literal('green'),
               literal('blue'),
               // @ts-expect-error
-            ) satisfies Validator<'a' | 'b' | 'c'>
+            ) satisfies Guard<'a' | 'b' | 'c'>
             union(
               literal('red'),
               literal('green'),
               literal('blue'),
               // @ts-expect-error
-            ) satisfies Validator<'red'>
+            ) satisfies Guard<'red'>
             // @ts-expect-error
-            union(isString, isUndefined) satisfies Validator<string>
+            union(isString, isUndefined) satisfies Guard<string>
           })
           describe('explicit generic type annotation', () => {
             it('works with literals', () => {
@@ -162,14 +162,14 @@ describe('validation', () => {
                 literal('c'),
               )
             })
-            it('requires a validator of each type', () => {
+            it('requires a guard of each type', () => {
               union<[string, undefined]>(isString, isUndefined)
               // @ts-expect-error
               union<[string, undefined]>(isUndefined)
               // @ts-expect-error
               union<[string, undefined]>(isString)
             })
-            it('allows nested validators', () => {
+            it('allows nested guards', () => {
               union<[string, number, undefined | null]>(
                 isString,
                 isNumber,
@@ -194,13 +194,13 @@ describe('validation', () => {
           expect(isUnion(null)).toEqual(false)
           expect(isUnion(undefined)).toEqual(false)
         })
-        it('matches any of the the validators in the array', () => {
+        it('matches any of the the guards in the array', () => {
           const isUnion = union(isString, isNumber, isNull)
           expect(isUnion('a')).toEqual(true)
           expect(isUnion(123)).toEqual(true)
           expect(isUnion(null)).toEqual(true)
         })
-        it('only matches the validators in the array', () => {
+        it('only matches the guards in the array', () => {
           const isUnion = union(isString, isNumber, isNull)
           expect(isUnion('a')).toEqual(true)
           expect(isUnion(123)).toEqual(true)
@@ -211,7 +211,7 @@ describe('validation', () => {
           expect(isUnion(undefined)).toEqual(false)
         })
       })
-      describe('generic property validators', () => {
+      describe('generic property guards', () => {
         it('allows for generic, higher-order validation function', () => {
           type TreeNode<T> = {
             data: T
@@ -219,7 +219,7 @@ describe('validation', () => {
 
           const isTreeNode = <T>(
             isData: (data: unknown) => data is T,
-          ): Validator<TreeNode<T>> =>
+          ): Guard<TreeNode<T>> =>
             object({
               // In v0.0.0-beta.3, this caused a problem with optional properties.
               // Because data can be undefined, it got interpreted as an optional property, which clashed with the
@@ -235,12 +235,12 @@ describe('validation', () => {
         it('mismatches undefined', () => {
           expect(optional(isString)(null)).toEqual(false)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(optional(isBoolean)(true)).toEqual(true)
           expect(optional(isNumber)(123)).toEqual(true)
           expect(optional(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(optional(isBoolean)(123)).toEqual(false)
           expect(optional(isNumber)('hello')).toEqual(false)
           expect(optional(isString)(true)).toEqual(false)
@@ -286,12 +286,12 @@ describe('validation', () => {
         it('mismatches undefined', () => {
           expect(nullable(isString)(null)).toEqual(true)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(true)).toEqual(true)
           expect(nullable(isNumber)(123)).toEqual(true)
           expect(nullable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(123)).toEqual(false)
           expect(nullable(isNumber)('hello')).toEqual(false)
           expect(nullable(isString)(true)).toEqual(false)
@@ -304,12 +304,12 @@ describe('validation', () => {
         it('mismatches undefined', () => {
           expect(optionalNullable(isString)(null)).toEqual(true)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(optionalNullable(isBoolean)(true)).toEqual(true)
           expect(optionalNullable(isNumber)(123)).toEqual(true)
           expect(optionalNullable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(optionalNullable(isBoolean)(123)).toEqual(false)
           expect(optionalNullable(isNumber)('hello')).toEqual(false)
           expect(optionalNullable(isString)(true)).toEqual(false)
@@ -331,12 +331,12 @@ describe('validation', () => {
         it('matches null', () => {
           expect(nullable(isString)(null)).toEqual(true)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(true)).toEqual(true)
           expect(nullable(isNumber)(123)).toEqual(true)
           expect(nullable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(123)).toEqual(false)
           expect(nullable(isNumber)('hello')).toEqual(false)
           expect(nullable(isString)(true)).toEqual(false)
@@ -349,12 +349,12 @@ describe('validation', () => {
         it('mismatches null', () => {
           expect(undefineable(isString)(null)).toEqual(false)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(undefineable(isBoolean)(true)).toEqual(true)
           expect(undefineable(isNumber)(123)).toEqual(true)
           expect(undefineable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(undefineable(isBoolean)(123)).toEqual(false)
           expect(undefineable(isNumber)('hello')).toEqual(false)
           expect(undefineable(isString)(true)).toEqual(false)
@@ -364,20 +364,20 @@ describe('validation', () => {
     describe('product types', () => {
       describe('tuples', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
-            tuple([]) satisfies Validator<[]>
-            tuple([isString]) satisfies Validator<[string]>
-            tuple([isString, isNumber]) satisfies Validator<[string, number]>
-            tuple([isNumber, isNumber, isNumber]) satisfies Validator<
+          it('returns a guard', () => {
+            tuple([]) satisfies Guard<[]>
+            tuple([isString]) satisfies Guard<[string]>
+            tuple([isString, isNumber]) satisfies Guard<[string, number]>
+            tuple([isNumber, isNumber, isNumber]) satisfies Guard<
               [number, number, number]
             >
 
             // @ts-expect-error
-            tuple([isNumber]) satisfies Validator<[number, number]>
+            tuple([isNumber]) satisfies Guard<[number, number]>
             // @ts-expect-error
-            tuple([isString, isString]) satisfies Validator<[number, number]>
+            tuple([isString, isString]) satisfies Guard<[number, number]>
             // @ts-expect-error
-            tuple([isNumber, isNumber]) satisfies Validator<[string, string]>
+            tuple([isNumber, isNumber]) satisfies Guard<[string, string]>
           })
           test('explicit generic type annotation', () => {
             tuple<[]>([])
@@ -415,33 +415,33 @@ describe('validation', () => {
       })
       describe('objects', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
-            object({ a: isString }) satisfies Validator<{ a: string }>
-            object({ a: isNumber }) satisfies Validator<{ a: number }>
+          it('returns a guard', () => {
+            object({ a: isString }) satisfies Guard<{ a: string }>
+            object({ a: isNumber }) satisfies Guard<{ a: number }>
             object({
               a: object({
                 b: isNumber,
               }),
-            }) satisfies Validator<{ a: { b: number } }>
+            }) satisfies Guard<{ a: { b: number } }>
 
             // @ts-expect-error
-            object({ a: isString }) satisfies Validator<{ a: number }>
+            object({ a: isString }) satisfies Guard<{ a: number }>
             // @ts-expect-error
-            object({ a: isNumber }) satisfies Validator<{ a: string }>
+            object({ a: isNumber }) satisfies Guard<{ a: string }>
             // @ts-expect-error
-            object({ a: isNumber }) satisfies Validator<{ x: number }>
+            object({ a: isNumber }) satisfies Guard<{ x: number }>
 
             object({
               a: object({ b: isNumber }),
               // @ts-expect-error
-            }) satisfies Validator<{ a: { b: string } }>
+            }) satisfies Guard<{ a: { b: string } }>
 
             object({
               b: object({
                 b: isNumber,
               }),
               // @ts-expect-error
-            }) satisfies Validator<{ x: { y: number } }>
+            }) satisfies Guard<{ x: { y: number } }>
           })
           describe('explicit generic type annotation', () => {
             it('handles optional properties', () => {
@@ -651,15 +651,15 @@ describe('validation', () => {
       })
       describe('partial records', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
-            partialRecord(isString, isString) satisfies Validator<
+          it('returns a guard', () => {
+            partialRecord(isString, isString) satisfies Guard<
               Partial<Record<string, string>>
             >
-            partialRecord(isString, isNumber) satisfies Validator<
+            partialRecord(isString, isNumber) satisfies Guard<
               Partial<Record<string, number>>
             >
             // @ts-expect-error
-            partialRecord(isString, isString) satisfies Validator<
+            partialRecord(isString, isString) satisfies Guard<
               Partial<Record<string, number>>
             >
           })
@@ -721,7 +721,7 @@ describe('validation', () => {
         test('extra properties in the schema', () => {
           const isObj = object({
             a: isNumber,
-            // @ts-expect-error - all properties must be validator functions
+            // @ts-expect-error - all properties must be guard functions
             b: 123,
           })
         })
@@ -756,12 +756,12 @@ describe('validation', () => {
       })
       describe('records', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
+          it('returns a guard', () => {
             const keys = ['a', 'b', 'c'] as const
-            record(keys, isString) satisfies Validator<Record<string, string>>
-            record(keys, isNumber) satisfies Validator<Record<string, number>>
+            record(keys, isString) satisfies Guard<Record<string, string>>
+            record(keys, isNumber) satisfies Guard<Record<string, number>>
             // @ts-expect-error
-            record(keys, isString) satisfies Validator<Record<string, number>>
+            record(keys, isString) satisfies Guard<Record<string, number>>
           })
           describe('explicit generic type annotation', () => {
             test('string as key', () => {})
@@ -852,10 +852,10 @@ describe('validation', () => {
     describe('recursive types', () => {
       describe('isArray', () => {
         describe('types', () => {
-          it('returns a validator', () => {
-            array(isString) satisfies Validator<string[]>
+          it('returns a guard', () => {
+            array(isString) satisfies Guard<string[]>
             // @ts-expect-error
-            array(isString) satisfies Validator<number[]>
+            array(isString) satisfies Guard<number[]>
           })
           it('infers the exact type', () => {
             // Number
