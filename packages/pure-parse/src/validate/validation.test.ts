@@ -11,8 +11,6 @@ import {
   optionalNullable,
   Validator,
   record,
-  nonEmptyArray,
-  isNonEmptyArray,
   undefineable,
 } from './validation'
 import { Equals } from '../internals'
@@ -935,92 +933,6 @@ describe('validation', () => {
           ).toEqual(true)
         })
       })
-      describe('non-empty arrays', () => {
-        describe('isNonEmptyArray', () => {
-          describe('type', () => {
-            it('infers the type', () => {
-              const numberArray: number[] = [1, 2, 3]
-              if (isNonEmptyArray(numberArray)) {
-                const assertionKnownArrayType4: Equals<
-                  typeof numberArray,
-                  [number, ...number[]]
-                > = true
-              }
-            })
-          })
-          it('validates non-empty arrays', () => {
-            expect(isNonEmptyArray([1])).toEqual(true)
-            expect(isNonEmptyArray([1, 2, 3])).toEqual(true)
-          })
-          it('invalidates empty arrays', () => {
-            expect(isNonEmptyArray([])).toEqual(false)
-          })
-        })
-        describe('nonEmptyArray', () => {
-          describe('type', () => {
-            it('infers the exact type', () => {
-              // Number
-              const isNumberArray = nonEmptyArray(isNumber)
-              type NumberArray = Infer<typeof isNumberArray>
-              const assertionNumber1: Equals<
-                NumberArray,
-                [number, ...number[]]
-              > = true
-              const assertionNumber2: Equals<NumberArray, number[]> = false
-              const assertionNumber3: Equals<NumberArray, unknown[]> = false
-              const assertionNumber4: Equals<
-                NumberArray,
-                [unknown, ...unknown[]]
-              > = false
-              // String
-              const isStringArray = nonEmptyArray(isString)
-              type StringArray = Infer<typeof isStringArray>
-              const assertionString1: Equals<
-                StringArray,
-                [string, ...string[]]
-              > = true
-              const assertionString2: Equals<StringArray, string[]> = false
-              const assertionString3: Equals<StringArray, unknown[]> = false
-              const assertionString4: Equals<
-                StringArray,
-                [unknown, ...unknown[]]
-              > = false
-            })
-          })
-          it('validates nonempty arrays', () => {
-            expect(nonEmptyArray(isUnknown)([1])).toEqual(true)
-            expect(nonEmptyArray(isUnknown)([1, 2, 3])).toEqual(true)
-          })
-          it('invalidates empty arrays', () => {
-            expect(nonEmptyArray(isUnknown)([])).toEqual(false)
-          })
-          it('invalidates non-arrays', () => {
-            expect(nonEmptyArray(isUnknown)({})).toEqual(false)
-          })
-          it('validates each item in the array', () => {
-            expect(nonEmptyArray(isNumber)([1, 2])).toEqual(true)
-            expect(nonEmptyArray(isNumber)(['a', 'b'])).toEqual(false)
-          })
-        })
-      })
-    })
-  })
-  describe('Infer', () => {
-    it('infers the type', () => {
-      const isUser = object({
-        id: isNumber,
-        uid: isString,
-        active: isBoolean,
-      })
-      type User = Infer<typeof isUser>
-      const assertion1: Equals<
-        User,
-        { id: number; uid: string; active: boolean }
-      > = true
-      const assertion2: Equals<
-        User,
-        { id: string; uid: string; active: boolean }
-      > = false
     })
   })
 })

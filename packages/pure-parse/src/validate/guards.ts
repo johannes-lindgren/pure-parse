@@ -1,3 +1,7 @@
+/*
+ * Primitive value types
+ */
+
 /**
  * Returns true for any input. Use to skip validation.
  * @param data
@@ -24,6 +28,10 @@ export const isBigInt = (data: unknown): data is bigint =>
 export const isSymbol = (data: unknown): data is symbol =>
   typeof data === 'symbol'
 
+/*
+ * Reference types
+ */
+
 export const isObject = (data: unknown): data is object =>
   typeof data === 'object' && data !== null
 
@@ -31,3 +39,11 @@ export const isArray: (data: unknown) => data is unknown[] = Array.isArray
 
 export const isFunction = (data: unknown): data is Function =>
   typeof data === 'function'
+
+/**
+ * Use this when the data that you want to validate is already a known array
+ * @param data an array
+ * @return `true` if data has at least one element
+ */
+export const isNonEmptyArray = <T>(data: T[]): data is [T, ...T[]] =>
+  data.length !== 0

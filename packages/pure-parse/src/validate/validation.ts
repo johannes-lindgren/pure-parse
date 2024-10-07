@@ -1,28 +1,11 @@
 import { hasKey, OptionalKeys, RequiredKeys } from '../internals'
 import { Primitive } from '../common'
 import { isNull, isUndefined } from './guards'
-/*
- * Utility Types
- */
 
 /**
  * A function that returns a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.
  */
 export type Validator<T> = (data: unknown) => data is T
-
-/*
- * Primitive value types
- */
-
-/*
- * Reference types
- */
-
-/*
- *
- * Algebraic Data Types
- *
- */
 
 /*
  * Higher order functions
@@ -227,11 +210,3 @@ export const nonEmptyArray =
   <T>(validateItem: Validator<T>): Validator<[T, ...T[]]> =>
   (data: unknown): data is [T, ...T[]] =>
     Array.isArray(data) && data.length !== 0 && data.every(validateItem)
-
-/**
- * Use this when the data that you want to validate is already a known array
- * @param data an array
- * @return `true` if data has at least one element
- */
-export const isNonEmptyArray = <T>(data: T[]): data is [T, ...T[]] =>
-  data.length !== 0
