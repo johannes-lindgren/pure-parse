@@ -41,7 +41,7 @@ export const isFunction = (data: unknown): data is Function =>
   typeof data === 'function'
 
 /**
- * Use this when the data that you want to validate is already a known array
+ * Use this when the data that you want to guard is already a known array
  * @param data an array
  * @return `true` if data has at least one element
  */

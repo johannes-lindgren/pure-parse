@@ -152,7 +152,7 @@ export const object =
  *  parseString
  * )
  * ```
- * @param keys a list of every possible key
+ * @param keys validates every key
  * @param valueGuard validates every value
  */
 export const record =
@@ -201,20 +201,20 @@ export const partialRecord =
 
 /**
  * Validate arrays
- * @param validateItem validates every item in the array
+ * @param itemGuard validates every item in the array
  * @return a guard function that validates arrays
  */
 export const array =
-  <T>(validateItem: Guard<T>): Guard<T[]> =>
+  <T>(itemGuard: Guard<T>): Guard<T[]> =>
   (data: unknown): data is T[] =>
-    Array.isArray(data) && data.every(validateItem)
+    Array.isArray(data) && data.every(itemGuard)
 
 /**
  * Validate non-empty arrays
- * @param validateItem validates every item in the array
+ * @param itemGuard validates every item in the array
  * @return a guard function that validates non-empty arrays
  */
 export const nonEmptyArray =
-  <T>(validateItem: Guard<T>): Guard<[T, ...T[]]> =>
+  <T>(itemGuard: Guard<T>): Guard<[T, ...T[]]> =>
   (data: unknown): data is [T, ...T[]] =>
-    Array.isArray(data) && data.length !== 0 && data.every(validateItem)
+    Array.isArray(data) && data.length !== 0 && data.every(itemGuard)
