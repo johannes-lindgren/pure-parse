@@ -10,7 +10,7 @@ import {
  * Just for CI/CD testing: the actual UI doesn't matter
  */
 
-export const validationTests = [
+export const guardTests = [
   ['isNumber(1)', isNumber(1)],
   ['object({ a: isNumber })({ a: 1 })', object({ a: isNumber })({ a: 1 })],
   ['array(isNumber)([1,2,3])', array(isNumber)([1, 2, 3])],
