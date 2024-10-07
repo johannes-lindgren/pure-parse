@@ -5,12 +5,14 @@
 ## literal()
 
 ```ts
-function literal<T>(...constants): (data) => ParseFailure | ParseSuccess<T[number]>
+function literal<T>(
+  ...constants
+): (data) => ParseFailure | ParseSuccess<T[number]>
 ```
 
 ### Type Parameters
 
-• **T** *extends* readonly [`Primitive`](../common/Primitive.md#primitive)[]
+• **T** _extends_ readonly [`Primitive`](../common/Primitive.md#primitive)[]
 
 ### Parameters
 
@@ -30,7 +32,7 @@ One or more primitive values that are compared against `data` with the `===` ope
 
 [`ParseFailure`](parse.md#parsefailure) \| [`ParseSuccess`](parse.md#parsesuccesst)\<`T`\[`number`\]\>
 
-***
+---
 
 ## parseBigInt()
 
@@ -46,7 +48,7 @@ function parseBigInt(data): ParseFailure | ParseSuccess<bigint>
 
 [`ParseFailure`](parse.md#parsefailure) \| [`ParseSuccess`](parse.md#parsesuccesst)\<`bigint`\>
 
-***
+---
 
 ## parseBoolean()
 
@@ -62,7 +64,7 @@ function parseBoolean(data): ParseFailure | ParseSuccess<boolean>
 
 [`ParseFailure`](parse.md#parsefailure) \| [`ParseSuccess`](parse.md#parsesuccesst)\<`boolean`\>
 
-***
+---
 
 ## parseNull()
 
@@ -78,7 +80,7 @@ function parseNull(data): ParseFailure | ParseSuccess<null>
 
 [`ParseFailure`](parse.md#parsefailure) \| [`ParseSuccess`](parse.md#parsesuccesst)\<`null`\>
 
-***
+---
 
 ## parseNumber()
 
@@ -94,7 +96,7 @@ function parseNumber(data): ParseFailure | ParseSuccess<number>
 
 [`ParseFailure`](parse.md#parsefailure) \| [`ParseSuccess`](parse.md#parsesuccesst)\<`number`\>
 
-***
+---
 
 ## parseString()
 
@@ -110,7 +112,7 @@ function parseString(data): ParseFailure | ParseSuccess<string>
 
 [`ParseFailure`](parse.md#parsefailure) \| [`ParseSuccess`](parse.md#parsesuccesst)\<`string`\>
 
-***
+---
 
 ## parseSymbol()
 
@@ -126,7 +128,7 @@ function parseSymbol(data): ParseFailure | ParseSuccess<symbol>
 
 [`ParseFailure`](parse.md#parsefailure) \| [`ParseSuccess`](parse.md#parsesuccesst)\<`symbol`\>
 
-***
+---
 
 ## parseUndefined()
 

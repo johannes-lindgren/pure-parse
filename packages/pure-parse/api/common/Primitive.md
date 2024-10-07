@@ -5,7 +5,7 @@
 ## Primitive
 
 ```ts
-type Primitive: 
+type Primitive:
   | null
   | undefined
   | boolean

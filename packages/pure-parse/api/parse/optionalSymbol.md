@@ -5,7 +5,7 @@
 ## optionalSymbol
 
 ```ts
-const optionalSymbol: typeof optionalSymbol;
+const optionalSymbol: typeof optionalSymbol
 ```
 
 Used to represent optional parsers at runtime and compile-time in two different ways

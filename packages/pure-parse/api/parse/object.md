@@ -21,7 +21,7 @@ const parseUser = object({
 
 ### Type Parameters
 
-• **T** *extends* `Record`\<`string`, `unknown`\>
+• **T** _extends_ `Record`\<`string`, `unknown`\>
 
 ### Parameters
 

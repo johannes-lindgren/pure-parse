@@ -20,7 +20,7 @@ type InfallibleParser<T>: (data) => ParseSuccess<T>;
 
 [`ParseSuccess`](parse.md#parsesuccesst)\<`T`\>
 
-***
+---
 
 ## OptionalParser\<T\>
 
@@ -42,7 +42,7 @@ optional [optionalSymbol]: true;
 
 • **T**
 
-***
+---
 
 ## ParseFailure
 
@@ -57,16 +57,16 @@ The parsing failed.
 #### error
 
 ```ts
-error: string;
+error: string
 ```
 
 #### tag
 
 ```ts
-tag: "failure";
+tag: 'failure'
 ```
 
-***
+---
 
 ## Parser()\<T\>
 
@@ -86,7 +86,7 @@ type Parser<T>: (data) => ParseResult<T>;
 
 [`ParseResult`](parse.md#parseresultt)\<`T`\>
 
-***
+---
 
 ## ParseResult\<T\>
 
@@ -98,7 +98,7 @@ type ParseResult<T>: ParseSuccess<T> | ParseFailure;
 
 • **T**
 
-***
+---
 
 ## ParseSuccess\<T\>
 
@@ -117,16 +117,16 @@ The data adheres to the schema. The `value` is equal to the parsed data
 #### tag
 
 ```ts
-tag: "success";
+tag: 'success'
 ```
 
 #### value
 
 ```ts
-value: T;
+value: T
 ```
 
-***
+---
 
 ## failure()
 
@@ -142,7 +142,7 @@ function failure(error): ParseFailure
 
 [`ParseFailure`](parse.md#parsefailure)
 
-***
+---
 
 ## isFailure()
 
@@ -162,7 +162,7 @@ function isFailure<T>(result): result is ParseFailure
 
 `result is ParseFailure`
 
-***
+---
 
 ## isSuccess()
 
@@ -182,7 +182,7 @@ function isSuccess<T>(result): result is ParseSuccess<T>
 
 `result is ParseSuccess<T>`
 
-***
+---
 
 ## parseUnknown()
 
@@ -200,7 +200,7 @@ Use to skip validation, as it returns true for any input.
 
 [`ParseSuccess`](parse.md#parsesuccesst)\<`unknown`\>
 
-***
+---
 
 ## success()
 

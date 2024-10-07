@@ -20,7 +20,7 @@ function nullable<T>(parser): Parser<null | T>
 
 [`Parser`](parse.md#parsert)\<`null` \| `T`\>
 
-***
+---
 
 ## optional()
 
@@ -42,7 +42,7 @@ Represent an optional property, which is different from a required property that
 
 [`OptionalParser`](parse.md#optionalparsert)\<`T`\>
 
-***
+---
 
 ## optionalNullable()
 
@@ -62,7 +62,7 @@ function optionalNullable<T>(parser): OptionalParser<null | T>
 
 [`OptionalParser`](parse.md#optionalparsert)\<`null` \| `T`\>
 
-***
+---
 
 ## undefineable()
 
@@ -82,7 +82,7 @@ function undefineable<T>(parser): Parser<undefined | T>
 
 [`Parser`](parse.md#parsert)\<`undefined` \| `T`\>
 
-***
+---
 
 ## union()
 
@@ -93,13 +93,14 @@ function union<T>(...parsers): (data) => ParseFailure | ParseSuccess<T[number]>
 Note that the type parameter is an array of parsers; it's not a union type.
 This is because TypeScript doesn't allow you to convert unions to tuples, but it does allow you to convert tuples to unions.
 Therefore, when you state the type parameter explicitly, provide an array to represent the union:
+
 ```ts
 const isStringOrNumber = union<[string, number]>([isString, isNumber])
 ```
 
 ### Type Parameters
 
-• **T** *extends* readonly `unknown`[]
+• **T** _extends_ readonly `unknown`[]
 
 ### Parameters
 
