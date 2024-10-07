@@ -11,15 +11,13 @@ import { optionalSymbol } from './optionalSymbol'
 
 /**
  * Validate structs; records that map known keys to a specific type.
- *
- * ```ts
+ * @example
  * const parseUser = object({
  *   id: parseNumber,
  *   uid: parseString,
  *   active: parseBoolean,
  *   name: optional(parseString),
  * })
- * ```
  * @param schema maps keys to validation functions.
  */
 export const object =
