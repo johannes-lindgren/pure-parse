@@ -13,8 +13,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-        'validate/index': fileURLToPath(
-          new URL('./src/validate/index.ts', import.meta.url),
+        'guard/index': fileURLToPath(
+          new URL('./src/guard/index.ts', import.meta.url),
         ),
       },
       preserveEntrySignatures: 'exports-only',

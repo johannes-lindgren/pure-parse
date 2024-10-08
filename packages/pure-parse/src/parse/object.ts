@@ -1,35 +1,34 @@
-import { isObject } from '../validate'
+import { isObject } from '../guard'
 import {
   failure,
   OptionalParser,
   ParseSuccess,
-  RequiredParser,
-  RequiredParseResult,
+  Parser,
+  ParseResult,
   success,
-} from './parse'
-import { optionalSymbol } from './optionalSymbol'
+} from './types'
+import { optionalSymbol } from '../internals'
 
 /**
- * Validate structs; records that map known keys to a specific type.
- *
- * ```ts
+ * Objects have a fixed set of properties that can have different types.
+ * @example
  * const parseUser = object({
  *   id: parseNumber,
- *   uid: parseString,
  *   active: parseBoolean,
- *   name: optional(parseString),
+ *   name: parseString,
+ *   email: optional(parseString),
  * })
- * ```
  * @param schema maps keys to validation functions.
+ * @return a parser function that validates objects according to `schema`.
  */
 export const object =
   <T extends Record<string, unknown>>(schema: {
     // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
     [K in keyof T]-?: {} extends Pick<T, K>
       ? OptionalParser<T[K]>
-      : RequiredParser<T[K]>
-  }) =>
-  (data: unknown): RequiredParseResult<T> => {
+      : Parser<T[K]>
+  }): Parser<T> =>
+  (data) => {
     if (!isObject(data)) {
       return failure('Not an object')
     }
@@ -53,5 +52,5 @@ export const object =
       dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
     }
 
-    return success(dataOutput) as RequiredParseResult<T>
+    return success(dataOutput) as ParseResult<T>
   }

@@ -36,10 +36,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./validate": {
+    "./guard": {
       "require": "./dist/index.cjs",
-      "types": "./dist/validate/index.d.ts",
-      "import": "./dist/validate/index.js"
+      "types": "./dist/guard/index.d.ts",
+      "import": "./dist/guard/index.js"
     }
   },
   "scripts": {
@@ -49,16 +49,31 @@
     "test": "vitest",
     "check:types": "tsc",
     "check:formatting": "prettier . --check",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "predocs:build": "typedoc",
+    "predocs:watch": "typedoc --watch",
+    "docs:dev": "typedoc && (typedoc --watch & vitepress dev)",
+    "docs:build": "typedoc && vitepress build",
+    "docs:preview": "vitepress preview",
+    "analyze": "vite-bundle-visualizer"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
+    "highlight.js": "^11.10.0",
+    "vite-bundle-visualizer": "^1.2.1",
+    "vitepress": "^1.4.0",
     "prettier": "3.1.0",
+    "typedoc": "^0.26.8",
+    "typedoc-plugin-markdown": "^4.2.9",
+    "typedoc-vitepress-theme": "^1.0.2",
     "typescript": "^5.5.4",
     "vite": "^5.4.8",
     "vite-plugin-dts": "^4.2.3",
-    "vitest": "0.34.6"
+    "vitest": "0.34.6",
+    "sass-embedded": "^1.79.4",
+    "@egjs/vue3-flicking": "^4.11.4",
+    "@egjs/flicking-plugins": "^4.7.1"
   }
 }

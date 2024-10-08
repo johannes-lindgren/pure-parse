@@ -1,503 +1,43 @@
 import { describe, it, expect, test } from 'vitest'
 import {
   array,
-  isBoolean,
-  isNull,
-  isNumber,
   partialRecord,
-  isString,
-  isUndefined,
   object,
   union,
   literal,
-  isSymbol,
   optional,
   tuple,
-  isUnknown,
   nullable,
   optionalNullable,
-  Validator,
-  Infer,
+  Guard,
   record,
-  nonEmptyArray,
-  isNonEmptyArray,
   undefineable,
-  isBigInt,
-  isObject,
-  isArray,
-  isFunction,
 } from './validation'
 import { Equals } from '../internals'
+import {
+  isBoolean,
+  isNull,
+  isNumber,
+  isString,
+  isUndefined,
+  isUnknown,
+} from './guards'
+import { Infer } from '../common'
 
 describe('validation', () => {
-  describe('primitives', () => {
-    describe('isUnknown', () => {
-      it('is always true', () => {
-        expect(isUnknown(null)).toEqual(true)
-        expect(isUnknown(undefined)).toEqual(true)
-        expect(isUnknown(false)).toEqual(true)
-        expect(isUnknown(true)).toEqual(true)
-        expect(isUnknown(123)).toEqual(true)
-        expect(isUnknown(123n)).toEqual(true)
-        expect(isUnknown('aaaaa')).toEqual(true)
-        expect(isUnknown({})).toEqual(true)
-        expect(isUnknown([])).toEqual(true)
-      })
-    })
-    describe('isNull', () => {
-      it('validates null', () => {
-        expect(isNull(null)).toEqual(true)
-      })
-      it('validates undefined', () => {
-        expect(isNull(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isNull(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isNull(false)).toEqual(false)
-        expect(isNull(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isNull(NaN)).toEqual(false)
-        expect(isNull(Infinity)).toEqual(false)
-        expect(isNull(0)).toEqual(false)
-        expect(isNull(1)).toEqual(false)
-        expect(isNull(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isNull(0n)).toEqual(false)
-        expect(isNull(-1n)).toEqual(false)
-        expect(isNull(1n)).toEqual(false)
-        expect(isNull(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isNull('')).toEqual(false)
-        expect(isNull('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isNull(Symbol())).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isNull([])).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isNull({})).toEqual(false)
-      })
-    })
-
-    describe('isUndefined', () => {
-      it('validates null', () => {
-        expect(isUndefined(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isUndefined(undefined)).toEqual(true)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isUndefined(data)).toEqual(true)
-      })
-      it('validates booleans', () => {
-        expect(isUndefined(false)).toEqual(false)
-        expect(isUndefined(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isUndefined(Infinity)).toEqual(false)
-        expect(isUndefined(NaN)).toEqual(false)
-        expect(isUndefined(-1)).toEqual(false)
-        expect(isUndefined(0)).toEqual(false)
-        expect(isUndefined(1)).toEqual(false)
-        expect(isUndefined(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isUndefined(0n)).toEqual(false)
-        expect(isUndefined(-1n)).toEqual(false)
-        expect(isUndefined(1n)).toEqual(false)
-        expect(isUndefined(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isUndefined('')).toEqual(false)
-        expect(isUndefined('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isUndefined(Symbol())).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isUndefined([])).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isUndefined({})).toEqual(false)
-      })
-    })
-
-    describe('isBoolean', () => {
-      it('validates null', () => {
-        expect(isBoolean(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isBoolean(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isBoolean(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isBoolean(false)).toEqual(true)
-        expect(isBoolean(true)).toEqual(true)
-      })
-      it('validates numbers', () => {
-        expect(isBoolean(Infinity)).toEqual(false)
-        expect(isBoolean(NaN)).toEqual(false)
-        expect(isBoolean(-1)).toEqual(false)
-        expect(isBoolean(0)).toEqual(false)
-        expect(isBoolean(1)).toEqual(false)
-        expect(isBoolean(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isBoolean(0n)).toEqual(false)
-        expect(isBoolean(-1n)).toEqual(false)
-        expect(isBoolean(1n)).toEqual(false)
-        expect(isBoolean(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isBoolean('')).toEqual(false)
-        expect(isBoolean('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isBoolean(Symbol())).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isBoolean([])).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isBoolean({})).toEqual(false)
-      })
-    })
-
-    describe('isNumber', () => {
-      it('validates null', () => {
-        expect(isNumber(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isNumber(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isNumber(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isNumber(false)).toEqual(false)
-        expect(isNumber(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isNumber(Infinity)).toEqual(true)
-        expect(isNumber(NaN)).toEqual(true)
-        expect(isNumber(-1)).toEqual(true)
-        expect(isNumber(0)).toEqual(true)
-        expect(isNumber(1)).toEqual(true)
-        expect(isNumber(3.14159)).toEqual(true)
-      })
-      it('validates bigint', () => {
-        expect(isNumber(0n)).toEqual(false)
-        expect(isNumber(-1n)).toEqual(false)
-        expect(isNumber(1n)).toEqual(false)
-        expect(isNumber(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isNumber('')).toEqual(false)
-        expect(isNumber('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isNumber(Symbol())).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isNumber([])).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isNumber({})).toEqual(false)
-      })
-    })
-
-    describe('isBigInt', () => {
-      it('validates null', () => {
-        expect(isBigInt(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isBigInt(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isBigInt(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isBigInt(false)).toEqual(false)
-        expect(isBigInt(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isBigInt(NaN)).toEqual(false)
-        expect(isBigInt(Infinity)).toEqual(false)
-        expect(isBigInt(0)).toEqual(false)
-        expect(isBigInt(1)).toEqual(false)
-        expect(isBigInt(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isBigInt(0n)).toEqual(true)
-        expect(isBigInt(-1n)).toEqual(true)
-        expect(isBigInt(1n)).toEqual(true)
-        expect(isBigInt(1324n)).toEqual(true)
-      })
-      it('validates strings', () => {
-        expect(isBigInt('')).toEqual(false)
-        expect(isBigInt('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isBigInt(Symbol())).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isBigInt([])).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isBigInt({})).toEqual(false)
-      })
-    })
-
-    describe('isString', () => {
-      it('validates null', () => {
-        expect(isString(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isString(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isString(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isString(false)).toEqual(false)
-        expect(isString(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isString(NaN)).toEqual(false)
-        expect(isString(Infinity)).toEqual(false)
-        expect(isString(0)).toEqual(false)
-        expect(isString(1)).toEqual(false)
-        expect(isString(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isString(0n)).toEqual(false)
-        expect(isString(-1n)).toEqual(false)
-        expect(isString(1n)).toEqual(false)
-        expect(isString(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isString('')).toEqual(true)
-        expect(isString('hello')).toEqual(true)
-      })
-      it('validates symbols', () => {
-        expect(isString(Symbol())).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isString([])).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isString({})).toEqual(false)
-      })
-    })
-
-    describe('isSymbol', () => {
-      it('validates null', () => {
-        expect(isSymbol(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isSymbol(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isSymbol(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isSymbol(false)).toEqual(false)
-        expect(isSymbol(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isSymbol(NaN)).toEqual(false)
-        expect(isSymbol(Infinity)).toEqual(false)
-        expect(isSymbol(0)).toEqual(false)
-        expect(isSymbol(1)).toEqual(false)
-        expect(isSymbol(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isSymbol(0n)).toEqual(false)
-        expect(isSymbol(-1n)).toEqual(false)
-        expect(isSymbol(1n)).toEqual(false)
-        expect(isSymbol(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isSymbol('')).toEqual(false)
-        expect(isSymbol('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isSymbol(Symbol())).toEqual(true)
-      })
-      it('validates arrays', () => {
-        expect(isSymbol([])).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isSymbol({})).toEqual(false)
-      })
-    })
-  })
-  describe('reference types', () => {
-    describe('isObject', () => {
-      it('validates null', () => {
-        expect(isObject(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isObject(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isObject(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isObject(false)).toEqual(false)
-        expect(isObject(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isObject(NaN)).toEqual(false)
-        expect(isObject(Infinity)).toEqual(false)
-        expect(isObject(0)).toEqual(false)
-        expect(isObject(1)).toEqual(false)
-        expect(isObject(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isObject(0n)).toEqual(false)
-        expect(isObject(-1n)).toEqual(false)
-        expect(isObject(1n)).toEqual(false)
-        expect(isObject(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isObject('')).toEqual(false)
-        expect(isObject('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isObject(Symbol())).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isObject({})).toEqual(true)
-      })
-      it('validates arrays', () => {
-        expect(isObject([])).toEqual(true)
-      })
-      it('validates functions', () => {
-        expect(isObject(() => undefined)).toEqual(false)
-      })
-    })
-    describe('isArray', () => {
-      it('validates null', () => {
-        expect(isArray(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isArray(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isArray(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isArray(false)).toEqual(false)
-        expect(isArray(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isArray(NaN)).toEqual(false)
-        expect(isArray(Infinity)).toEqual(false)
-        expect(isArray(0)).toEqual(false)
-        expect(isArray(1)).toEqual(false)
-        expect(isArray(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isArray(0n)).toEqual(false)
-        expect(isArray(-1n)).toEqual(false)
-        expect(isArray(1n)).toEqual(false)
-        expect(isArray(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isArray('')).toEqual(false)
-        expect(isArray('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isArray(Symbol())).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isArray({})).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isArray([])).toEqual(true)
-      })
-      it('validates functions', () => {
-        expect(isArray(() => undefined)).toEqual(false)
-      })
-    })
-    describe('isFunction', () => {
-      it('validates null', () => {
-        expect(isFunction(null)).toEqual(false)
-      })
-      it('validates undefined', () => {
-        expect(isFunction(undefined)).toEqual(false)
-      })
-      it('validates unassigned values', () => {
-        let data
-        expect(isFunction(data)).toEqual(false)
-      })
-      it('validates booleans', () => {
-        expect(isFunction(false)).toEqual(false)
-        expect(isFunction(true)).toEqual(false)
-      })
-      it('validates numbers', () => {
-        expect(isFunction(NaN)).toEqual(false)
-        expect(isFunction(Infinity)).toEqual(false)
-        expect(isFunction(0)).toEqual(false)
-        expect(isFunction(1)).toEqual(false)
-        expect(isFunction(3.14159)).toEqual(false)
-      })
-      it('validates bigint', () => {
-        expect(isFunction(0n)).toEqual(false)
-        expect(isFunction(-1n)).toEqual(false)
-        expect(isFunction(1n)).toEqual(false)
-        expect(isFunction(1324n)).toEqual(false)
-      })
-      it('validates strings', () => {
-        expect(isFunction('')).toEqual(false)
-        expect(isFunction('hello')).toEqual(false)
-      })
-      it('validates symbols', () => {
-        expect(isFunction(Symbol())).toEqual(false)
-      })
-      it('validates objects', () => {
-        expect(isFunction({})).toEqual(false)
-      })
-      it('validates arrays', () => {
-        expect(isFunction([])).toEqual(false)
-      })
-      it('validates functions', () => {
-        expect(isFunction(() => undefined)).toEqual(true)
-      })
-    })
-  })
   describe('algebraic data types', () => {
     describe('literal types', () => {
       describe('type checking', () => {
         describe('type inference', () => {
           it('works with literals', () => {
             const symb = Symbol()
-            literal(symb) satisfies Validator<typeof symb>
-            literal('red') satisfies Validator<'red'>
+            literal(symb) satisfies Guard<typeof symb>
+            literal('red') satisfies Guard<'red'>
             // @ts-expect-error
-            literal('red') satisfies Validator<'green'>
-            literal(1) satisfies Validator<1>
+            literal('red') satisfies Guard<'green'>
+            literal(1) satisfies Guard<1>
             // @ts-expect-error
-            literal(1) satisfies Validator<2>
+            literal(1) satisfies Guard<2>
           })
           it('forbids non-literals', () => {
             // @ts-expect-error
@@ -538,12 +78,12 @@ describe('validation', () => {
           expect(isInUnion(false)).toEqual(false)
         })
         it('infers the types of unions of literals', () => {
-          literal('red', 1, true) satisfies Validator<'red' | 1 | true>
-          literal('red', 'green', 'blue') satisfies Validator<
+          literal('red', 1, true) satisfies Guard<'red' | 1 | true>
+          literal('red', 'green', 'blue') satisfies Guard<
             'red' | 'green' | 'blue'
           >
           // @ts-expect-error
-          literal('red', 'green', 'blue') satisfies Validator<'red'>
+          literal('red', 'green', 'blue') satisfies Guard<'red'>
         })
         test('explicit type annotation', () => {
           literal<['red', 'green', 'blue']>('red', 'green', 'blue')
@@ -583,30 +123,30 @@ describe('validation', () => {
     describe('sum types', () => {
       describe('unions', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
+          it('returns a guard', () => {
             union(
               literal('red'),
               literal('green'),
               literal('blue'),
-            ) satisfies Validator<'red' | 'green' | 'blue'>
-            union(isString, isUndefined) satisfies Validator<string | undefined>
-            union(isString, isNumber) satisfies Validator<string | number>
-            union(isString) satisfies Validator<string>
+            ) satisfies Guard<'red' | 'green' | 'blue'>
+            union(isString, isUndefined) satisfies Guard<string | undefined>
+            union(isString, isNumber) satisfies Guard<string | number>
+            union(isString) satisfies Guard<string>
 
             union(
               literal('red'),
               literal('green'),
               literal('blue'),
               // @ts-expect-error
-            ) satisfies Validator<'a' | 'b' | 'c'>
+            ) satisfies Guard<'a' | 'b' | 'c'>
             union(
               literal('red'),
               literal('green'),
               literal('blue'),
               // @ts-expect-error
-            ) satisfies Validator<'red'>
+            ) satisfies Guard<'red'>
             // @ts-expect-error
-            union(isString, isUndefined) satisfies Validator<string>
+            union(isString, isUndefined) satisfies Guard<string>
           })
           describe('explicit generic type annotation', () => {
             it('works with literals', () => {
@@ -622,14 +162,14 @@ describe('validation', () => {
                 literal('c'),
               )
             })
-            it('requires a validator of each type', () => {
+            it('requires a guard of each type', () => {
               union<[string, undefined]>(isString, isUndefined)
               // @ts-expect-error
               union<[string, undefined]>(isUndefined)
               // @ts-expect-error
               union<[string, undefined]>(isString)
             })
-            it('allows nested validators', () => {
+            it('allows nested guards', () => {
               union<[string, number, undefined | null]>(
                 isString,
                 isNumber,
@@ -654,13 +194,13 @@ describe('validation', () => {
           expect(isUnion(null)).toEqual(false)
           expect(isUnion(undefined)).toEqual(false)
         })
-        it('matches any of the the validators in the array', () => {
+        it('matches any of the the guards in the array', () => {
           const isUnion = union(isString, isNumber, isNull)
           expect(isUnion('a')).toEqual(true)
           expect(isUnion(123)).toEqual(true)
           expect(isUnion(null)).toEqual(true)
         })
-        it('only matches the validators in the array', () => {
+        it('only matches the guards in the array', () => {
           const isUnion = union(isString, isNumber, isNull)
           expect(isUnion('a')).toEqual(true)
           expect(isUnion(123)).toEqual(true)
@@ -671,7 +211,7 @@ describe('validation', () => {
           expect(isUnion(undefined)).toEqual(false)
         })
       })
-      describe('generic property validators', () => {
+      describe('generic property guards', () => {
         it('allows for generic, higher-order validation function', () => {
           type TreeNode<T> = {
             data: T
@@ -679,7 +219,7 @@ describe('validation', () => {
 
           const isTreeNode = <T>(
             isData: (data: unknown) => data is T,
-          ): Validator<TreeNode<T>> =>
+          ): Guard<TreeNode<T>> =>
             object({
               // In v0.0.0-beta.3, this caused a problem with optional properties.
               // Because data can be undefined, it got interpreted as an optional property, which clashed with the
@@ -695,12 +235,12 @@ describe('validation', () => {
         it('mismatches undefined', () => {
           expect(optional(isString)(null)).toEqual(false)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(optional(isBoolean)(true)).toEqual(true)
           expect(optional(isNumber)(123)).toEqual(true)
           expect(optional(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(optional(isBoolean)(123)).toEqual(false)
           expect(optional(isNumber)('hello')).toEqual(false)
           expect(optional(isString)(true)).toEqual(false)
@@ -746,12 +286,12 @@ describe('validation', () => {
         it('mismatches undefined', () => {
           expect(nullable(isString)(null)).toEqual(true)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(true)).toEqual(true)
           expect(nullable(isNumber)(123)).toEqual(true)
           expect(nullable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(123)).toEqual(false)
           expect(nullable(isNumber)('hello')).toEqual(false)
           expect(nullable(isString)(true)).toEqual(false)
@@ -764,12 +304,12 @@ describe('validation', () => {
         it('mismatches undefined', () => {
           expect(optionalNullable(isString)(null)).toEqual(true)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(optionalNullable(isBoolean)(true)).toEqual(true)
           expect(optionalNullable(isNumber)(123)).toEqual(true)
           expect(optionalNullable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(optionalNullable(isBoolean)(123)).toEqual(false)
           expect(optionalNullable(isNumber)('hello')).toEqual(false)
           expect(optionalNullable(isString)(true)).toEqual(false)
@@ -791,12 +331,12 @@ describe('validation', () => {
         it('matches null', () => {
           expect(nullable(isString)(null)).toEqual(true)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(true)).toEqual(true)
           expect(nullable(isNumber)(123)).toEqual(true)
           expect(nullable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(nullable(isBoolean)(123)).toEqual(false)
           expect(nullable(isNumber)('hello')).toEqual(false)
           expect(nullable(isString)(true)).toEqual(false)
@@ -809,12 +349,12 @@ describe('validation', () => {
         it('mismatches null', () => {
           expect(undefineable(isString)(null)).toEqual(false)
         })
-        it('matches the guard type of the validator argument', () => {
+        it('matches the guard type of the guard argument', () => {
           expect(undefineable(isBoolean)(true)).toEqual(true)
           expect(undefineable(isNumber)(123)).toEqual(true)
           expect(undefineable(isString)('hello')).toEqual(true)
         })
-        it('only matches the guard type of the validator argument', () => {
+        it('only matches the guard type of the guard argument', () => {
           expect(undefineable(isBoolean)(123)).toEqual(false)
           expect(undefineable(isNumber)('hello')).toEqual(false)
           expect(undefineable(isString)(true)).toEqual(false)
@@ -824,20 +364,20 @@ describe('validation', () => {
     describe('product types', () => {
       describe('tuples', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
-            tuple([]) satisfies Validator<[]>
-            tuple([isString]) satisfies Validator<[string]>
-            tuple([isString, isNumber]) satisfies Validator<[string, number]>
-            tuple([isNumber, isNumber, isNumber]) satisfies Validator<
+          it('returns a guard', () => {
+            tuple([]) satisfies Guard<[]>
+            tuple([isString]) satisfies Guard<[string]>
+            tuple([isString, isNumber]) satisfies Guard<[string, number]>
+            tuple([isNumber, isNumber, isNumber]) satisfies Guard<
               [number, number, number]
             >
 
             // @ts-expect-error
-            tuple([isNumber]) satisfies Validator<[number, number]>
+            tuple([isNumber]) satisfies Guard<[number, number]>
             // @ts-expect-error
-            tuple([isString, isString]) satisfies Validator<[number, number]>
+            tuple([isString, isString]) satisfies Guard<[number, number]>
             // @ts-expect-error
-            tuple([isNumber, isNumber]) satisfies Validator<[string, string]>
+            tuple([isNumber, isNumber]) satisfies Guard<[string, string]>
           })
           test('explicit generic type annotation', () => {
             tuple<[]>([])
@@ -875,33 +415,33 @@ describe('validation', () => {
       })
       describe('objects', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
-            object({ a: isString }) satisfies Validator<{ a: string }>
-            object({ a: isNumber }) satisfies Validator<{ a: number }>
+          it('returns a guard', () => {
+            object({ a: isString }) satisfies Guard<{ a: string }>
+            object({ a: isNumber }) satisfies Guard<{ a: number }>
             object({
               a: object({
                 b: isNumber,
               }),
-            }) satisfies Validator<{ a: { b: number } }>
+            }) satisfies Guard<{ a: { b: number } }>
 
             // @ts-expect-error
-            object({ a: isString }) satisfies Validator<{ a: number }>
+            object({ a: isString }) satisfies Guard<{ a: number }>
             // @ts-expect-error
-            object({ a: isNumber }) satisfies Validator<{ a: string }>
+            object({ a: isNumber }) satisfies Guard<{ a: string }>
             // @ts-expect-error
-            object({ a: isNumber }) satisfies Validator<{ x: number }>
+            object({ a: isNumber }) satisfies Guard<{ x: number }>
 
             object({
               a: object({ b: isNumber }),
               // @ts-expect-error
-            }) satisfies Validator<{ a: { b: string } }>
+            }) satisfies Guard<{ a: { b: string } }>
 
             object({
               b: object({
                 b: isNumber,
               }),
               // @ts-expect-error
-            }) satisfies Validator<{ x: { y: number } }>
+            }) satisfies Guard<{ x: { y: number } }>
           })
           describe('explicit generic type annotation', () => {
             it('handles optional properties', () => {
@@ -1111,15 +651,15 @@ describe('validation', () => {
       })
       describe('partial records', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
-            partialRecord(isString, isString) satisfies Validator<
+          it('returns a guard', () => {
+            partialRecord(isString, isString) satisfies Guard<
               Partial<Record<string, string>>
             >
-            partialRecord(isString, isNumber) satisfies Validator<
+            partialRecord(isString, isNumber) satisfies Guard<
               Partial<Record<string, number>>
             >
             // @ts-expect-error
-            partialRecord(isString, isString) satisfies Validator<
+            partialRecord(isString, isString) satisfies Guard<
               Partial<Record<string, number>>
             >
           })
@@ -1181,7 +721,7 @@ describe('validation', () => {
         test('extra properties in the schema', () => {
           const isObj = object({
             a: isNumber,
-            // @ts-expect-error - all properties must be validator functions
+            // @ts-expect-error - all properties must be guard functions
             b: 123,
           })
         })
@@ -1216,12 +756,12 @@ describe('validation', () => {
       })
       describe('records', () => {
         describe('type checking', () => {
-          it('returns a validator', () => {
+          it('returns a guard', () => {
             const keys = ['a', 'b', 'c'] as const
-            record(keys, isString) satisfies Validator<Record<string, string>>
-            record(keys, isNumber) satisfies Validator<Record<string, number>>
+            record(keys, isString) satisfies Guard<Record<string, string>>
+            record(keys, isNumber) satisfies Guard<Record<string, number>>
             // @ts-expect-error
-            record(keys, isString) satisfies Validator<Record<string, number>>
+            record(keys, isString) satisfies Guard<Record<string, number>>
           })
           describe('explicit generic type annotation', () => {
             test('string as key', () => {})
@@ -1312,10 +852,10 @@ describe('validation', () => {
     describe('recursive types', () => {
       describe('isArray', () => {
         describe('types', () => {
-          it('returns a validator', () => {
-            array(isString) satisfies Validator<string[]>
+          it('returns a guard', () => {
+            array(isString) satisfies Guard<string[]>
             // @ts-expect-error
-            array(isString) satisfies Validator<number[]>
+            array(isString) satisfies Guard<number[]>
           })
           it('infers the exact type', () => {
             // Number
@@ -1393,92 +933,6 @@ describe('validation', () => {
           ).toEqual(true)
         })
       })
-      describe('non-empty arrays', () => {
-        describe('isNonEmptyArray', () => {
-          describe('type', () => {
-            it('infers the type', () => {
-              const numberArray: number[] = [1, 2, 3]
-              if (isNonEmptyArray(numberArray)) {
-                const assertionKnownArrayType4: Equals<
-                  typeof numberArray,
-                  [number, ...number[]]
-                > = true
-              }
-            })
-          })
-          it('validates non-empty arrays', () => {
-            expect(isNonEmptyArray([1])).toEqual(true)
-            expect(isNonEmptyArray([1, 2, 3])).toEqual(true)
-          })
-          it('invalidates empty arrays', () => {
-            expect(isNonEmptyArray([])).toEqual(false)
-          })
-        })
-        describe('nonEmptyArray', () => {
-          describe('type', () => {
-            it('infers the exact type', () => {
-              // Number
-              const isNumberArray = nonEmptyArray(isNumber)
-              type NumberArray = Infer<typeof isNumberArray>
-              const assertionNumber1: Equals<
-                NumberArray,
-                [number, ...number[]]
-              > = true
-              const assertionNumber2: Equals<NumberArray, number[]> = false
-              const assertionNumber3: Equals<NumberArray, unknown[]> = false
-              const assertionNumber4: Equals<
-                NumberArray,
-                [unknown, ...unknown[]]
-              > = false
-              // String
-              const isStringArray = nonEmptyArray(isString)
-              type StringArray = Infer<typeof isStringArray>
-              const assertionString1: Equals<
-                StringArray,
-                [string, ...string[]]
-              > = true
-              const assertionString2: Equals<StringArray, string[]> = false
-              const assertionString3: Equals<StringArray, unknown[]> = false
-              const assertionString4: Equals<
-                StringArray,
-                [unknown, ...unknown[]]
-              > = false
-            })
-          })
-          it('validates nonempty arrays', () => {
-            expect(nonEmptyArray(isUnknown)([1])).toEqual(true)
-            expect(nonEmptyArray(isUnknown)([1, 2, 3])).toEqual(true)
-          })
-          it('invalidates empty arrays', () => {
-            expect(nonEmptyArray(isUnknown)([])).toEqual(false)
-          })
-          it('invalidates non-arrays', () => {
-            expect(nonEmptyArray(isUnknown)({})).toEqual(false)
-          })
-          it('validates each item in the array', () => {
-            expect(nonEmptyArray(isNumber)([1, 2])).toEqual(true)
-            expect(nonEmptyArray(isNumber)(['a', 'b'])).toEqual(false)
-          })
-        })
-      })
-    })
-  })
-  describe('Infer', () => {
-    it('infers the type', () => {
-      const isUser = object({
-        id: isNumber,
-        uid: isString,
-        active: isBoolean,
-      })
-      type User = Infer<typeof isUser>
-      const assertion1: Equals<
-        User,
-        { id: number; uid: string; active: boolean }
-      > = true
-      const assertion2: Equals<
-        User,
-        { id: string; uid: string; active: boolean }
-      > = false
     })
   })
 })
