@@ -8,7 +8,7 @@ import {
   isSymbol,
   isUndefined,
 } from '../guard'
-import { failure, ParseFailure, ParseSuccess, success } from './types'
+import { failure, ParseFailure, Parser, ParseSuccess, success } from './types'
 import { Primitive } from '../common'
 
 // TODO rename to primitive?
@@ -39,10 +39,11 @@ import { Primitive } from '../common'
  * const parseLogLevel = literal<LogLevelArray>('debug', 'info', 'warning', 'error')
  * ```
  * @param constants One or more primitive values that are compared against `data` with the `===` operator.
+ * @returns A parser function that validates the input against the provided constants.
  */
 export const literal = <const T extends readonly [...Primitive[]]>(
   ...constants: T
-) => {
+): Parser<T[number]> => {
   const v = V.literal(...constants)
   return (data: unknown): ParseSuccess<T[number]> | ParseFailure =>
     v(data)
@@ -55,7 +56,7 @@ export const literal = <const T extends readonly [...Primitive[]]>(
  * @example
  * parseUndefined(undefined) // => ParseSuccess<undefined>
  * parseUndefined(null) // => ParseFailure
- * @param data
+ * @param data data to be validated
  */
 export const parseUndefined = (
   data: unknown,
@@ -68,7 +69,7 @@ export const parseUndefined = (
  * parseNull(null) // => ParseSuccess<null>
  * @example
  * parseNull(undefined) // => ParseFailure
- * @param data
+ * @param data data to be validated
  */
 export const parseNull = (data: unknown): ParseSuccess<null> | ParseFailure =>
   isNull(data) ? success(data) : failure('Not null')
@@ -81,7 +82,7 @@ export const parseNull = (data: unknown): ParseSuccess<null> | ParseFailure =>
  * parseBoolean(false) // => ParseSuccess<boolean>
  * @example
  * parseBoolean(0) // => ParseFailure
- * @param data
+ * @param data data to be validated
  */
 export const parseBoolean = (
   data: unknown,
@@ -94,7 +95,7 @@ export const parseBoolean = (
  * parseNumber(0) // => ParseSuccess<number>
  * @example
  * parseNumber('0') // => ParseFailure
- * @param data
+ * @param data data to be validated
  */
 export const parseNumber = (
   data: unknown,
@@ -107,7 +108,7 @@ export const parseNumber = (
  * parseString('abc') // => ParseSuccess<string>
  * @example
  * parseString(0) // => ParseFailure
- * @param data
+ * @param data data to be validated
  */
 export const parseString = (
   data: unknown,
@@ -120,7 +121,7 @@ export const parseString = (
  * parseBigInt(0n) // => ParseSuccess<bigint>
  * @example
  * parseBigInt(0) // => ParseFailure
- * @param data
+ * @param data data to be validated
  */
 export const parseBigInt = (
   data: unknown,
@@ -133,9 +134,27 @@ export const parseBigInt = (
  * parseSymbol(Symbol('abc')) // => ParseSuccess<symbol>
  * @example
  * parseSymbol('abc') // => ParseFailure
- * @param data
+ * @param data data to be validated
  */
 export const parseSymbol = (
   data: unknown,
 ): ParseSuccess<symbol> | ParseFailure =>
   isSymbol(data) ? success(data) : failure('Not a symbol')
+
+/**
+ * Use to skip validation, as it returns `true` for any input.
+ * @example
+ * ```ts
+ * const parseResponse = object({
+ *   status: parseNumber,
+ *   data: unknown,
+ * })
+ * parseResponse({
+ *   status: 200,
+ *   data: { id: 123, name: 'John' }
+ * }) // => ParseSuccess<{ status: number, data: unknown }>
+ * ```
+ * @param data data to be validated
+ */
+export const parseUnknown = (data: unknown): ParseSuccess<unknown> =>
+  success(data)

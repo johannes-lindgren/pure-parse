@@ -44,15 +44,16 @@ export type OptionalParser<T> = {
  */
 
 /**
- * Use to skip validation, as it returns true for any input.
- * @param data
+ * Check if the result is a success
+ * @param result
  */
-export const parseUnknown = (data: unknown): ParseSuccess<unknown> =>
-  success(data)
-
 export const isSuccess = <T>(
   result: ParseResult<T>,
 ): result is ParseSuccess<T> => result.tag === 'success'
 
+/**
+ * Check if the result is a failure
+ * @param result
+ */
 export const isFailure = <T>(result: ParseResult<T>): result is ParseFailure =>
   result.tag === 'failure'
