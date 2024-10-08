@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitepress'
-import typedocSidebar from '../api/typedoc-sidebar.json'
-import { link } from 'typedoc-plugin-markdown/dist/libs/markdown'
+import typedocSidebar from '../docs/api/typedoc-sidebar.json'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -10,7 +9,7 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/docs/' },
+      { text: 'Home', link: '/' },
       { text: 'API', link: '/api/' },
     ],
 
@@ -18,13 +17,17 @@ export default defineConfig({
       {
         text: 'Getting Started',
         items: [
-          { text: 'Overview', link: '/docs/guide/overview' },
-          { text: 'Quick Start', link: '/docs/guide/getting-started' },
-          { text: 'Parsers', link: '/docs/guide/parsers' },
-          { text: 'Guards', link: '/docs/guide/guards' },
+          { text: 'Overview', link: '/guide/overview' },
+          { text: 'Quick Start', link: '/guide/getting-started' },
+          { text: 'Parsers', link: '/guide/parsers' },
+          { text: 'Guards', link: '/guide/guards' },
           {
             text: 'Comparison with Other Libraries',
-            link: '/docs/guide/comparison',
+            link: '/guide/comparison',
+          },
+          {
+            text: 'Declaring vs Inferring',
+            link: '/guide/declaring-vs-inferring',
           },
         ],
       },

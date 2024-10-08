@@ -27,5 +27,5 @@ vite.config.ts.timestamp-*
 
 
 # Docs
-api/
+/docs/api/
 .vitepress/cache/

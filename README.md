@@ -44,82 +44,10 @@ Furthermore, this library is designed to be:
 - Robust—built on top of functional programming principles, while having thorough tests for both the executable code and the type system.
 - Composable & Extendable—easily extend the library with your own validation functions.
 
-Are you wary of adding external dependencies to your projects? Since this project is so small, you can simply copy the source code and audit it yourself.
-
 <br/>
 <div align="center">
   <em>By <a href="https://github.com/johannes-lindgren">@johannes-lindgren</a></em>
 </div>
-
-## Documentation
-
-`pure-parse` provides the means to build _validation functions_, which is are functions that accepts one `unknown` argument and returns a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates).
-
-```ts
-export type Validator<T> = (data: unknown) => data is T
-```
-
-With a type predicate, TypeScript is able to narrow the type of argument _if the function returns `true`_.
-
-In [pure-parse](https://www.npmjs.com/package/pure-parse), each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) has a corresponding validation function:
-
-- `isNull`
-- `isUndefined`
-- `isBoolean`
-- `isNumber`
-- `isString`
-- `isBigInt`
-- `isSymbol`
-
-There is a second category of higher order functions that construct new, custom validation functions:
-
-- `literal`—for [literal types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types), and unions between literals; e.g. `"left"` or `"left" | "right"`.
-- `union`—for [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types), e.g. `string | number`.
-- `tuple`—for [tuple types](https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types), e.g. `[number, number]`.
-- `object`—for [object types](https://www.typescriptlang.org/docs/handbook/2/objects.html), e.g. `{ id: number, name?: string }`
-- `record`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) with a finite amount of keys; e.g. `Record<'left' | 'right' | 'top' | 'bottom', number>`
-- `partialRecord`—for [records](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) where not all values are defined; e.g. `Partial<Record<string, number>>`
-- `array`—for [arrays](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#arrays), e.g. `string[]`
-- `nonEmptyArrays`—for arrays with at least one item; for example `[string, ...string[]]`
-
-The third category is convenience functions for dealing with `null`, `undefined`, and optional properties:
-
-- `optional`–for optional properties. This function is special; only validator functions constructed with `optional` can describe optional properties.
-- `optionalNullable`–for optional nullable properties
-- `nullable`–for unions with `null`
-- `undefineable`–for unions with `undefined`. If this is used for a property on an object, the property is required–not optional–but can be set to `undefined`.
-
-By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
-
-```ts
-const isUsers = array(
-  object({
-    id: isNumber,
-    parentId: nullable(isNumber),
-    name: isString,
-    address: optional(
-      object({
-        country: isString,
-        city: isString,
-        streetAddress: isString,
-        zipCode: isNumber,
-      }),
-    ),
-  }),
-)
-```
-
-See more examples below.
-
-### Inferring Types
-
-To infer the type from a validator function, use the `Infer` utility type:
-
-```ts
-type Users = Infer<typeof isUsers>
-```
-
-⚠️ Note: optional properties will be inferred as required–but undefinable–properties. (This is either due to limitations of TypeScript or the skill of the author.) At runtime, the property is still optional; it's just the inferred type that has a slight discrepancy. For most use cases, this is not a problem to worry about. If you are adamant on being correct, consider declaring the type instead of inferring it (see the following section). Future version of this library might provide a solution.
 
 ### Declaring Types
 

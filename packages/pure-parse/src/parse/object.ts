@@ -10,15 +10,16 @@ import {
 import { optionalSymbol } from '../internals'
 
 /**
- * Validate structs; records that map known keys to a specific type.
+ * Objects have a fixed set of properties that can have different types.
  * @example
  * const parseUser = object({
  *   id: parseNumber,
- *   uid: parseString,
  *   active: parseBoolean,
- *   name: optional(parseString),
+ *   name: parseString,
+ *   email: optional(parseString),
  * })
  * @param schema maps keys to validation functions.
+ * @return a parser function that validates objects according to `schema`.
  */
 export const object =
   <T extends Record<string, unknown>>(schema: {
@@ -26,8 +27,8 @@ export const object =
     [K in keyof T]-?: {} extends Pick<T, K>
       ? OptionalParser<T[K]>
       : Parser<T[K]>
-  }) =>
-  (data: unknown): ParseResult<T> => {
+  }): Parser<T> =>
+  (data) => {
     if (!isObject(data)) {
       return failure('Not an object')
     }

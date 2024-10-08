@@ -1,5 +1,8 @@
 {
   "entryPointStrategy": "expand",
+  "out": "./docs/api",
+  "basePath": "./src",
+  "docsRoot": "/docs",
   "entryPoints": ["./src/parse", "./src/guard", "./src/common"],
   "exclude": ["**/*.test.ts"],
   "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
@@ -7,6 +10,7 @@
   "outputFileStrategy": "modules",
   "entryModule": "index",
   "indexFormat": "htmlTable",
+  "parametersFormat": "table",
   "useCodeBlocks": true,
   "disableSources": true,
   "membersWithOwnFile": ["Function", "TypeAlias"],
@@ -15,8 +19,12 @@
   "hideBreadcrumbs": true,
   "expandParameters": false,
   "expandObjects": true,
+  "blockTagsPreserveOrder": ["@example", "@returns"],
   "textContentMappings": {
     "title.indexPage": "API Reference",
     "title.memberPage": "{name}"
+  },
+  "sidebar": {
+    "collapsed": false
   }
 }

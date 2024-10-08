@@ -57,12 +57,13 @@ type User = {
   age: number
 }
 
-// If the parser is defined incorrectly, TypeScript will yield an error
 const parseUser = object<User>({
   name: parseString,
   age: parseNumber,
 })
 ```
+
+If the parser does not match the type argument (`User`), you will get a type error. This powerful feature ensures that the parsed result value always adheres to the type parameter.
 
 ## ...or Infer the Type
 
@@ -78,6 +79,8 @@ const parseUser = object({
 
 type User = Infer<typeof parseUser>
 ```
+
+This lets you write less repeated code, but the drawback is that your types are coupled to the library.
 
 ## Parse data
 
