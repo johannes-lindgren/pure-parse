@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 
 vite.config.ts.timestamp-*
+
+
+# Docs
+/docs/api/
+.vitepress/cache/

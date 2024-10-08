@@ -1,4 +1,9 @@
-import { hasKey, OptionalKeys, RequiredKeys } from '../internals'
+import {
+  hasKey,
+  OptionalKeys,
+  optionalSymbol,
+  RequiredKeys,
+} from '../internals'
 import { Primitive } from '../common'
 import { isNull, isUndefined } from './guards'
 
@@ -12,7 +17,26 @@ export type Guard<T> = (data: unknown) => data is T
  */
 
 /**
- *
+ * @example
+ * Commonly used in unions:
+ * ```ts
+ * const isLogLevel = literal('debug', 'info', 'warning', 'error')
+ * ```
+ * ```ts
+ * const isResult = union([
+ *  object({
+ *    tag: literal('success')
+ *  }),
+ *  object({
+ *    tag: literal('error')
+ *   }),
+ * ])
+ * ```
+ * @example
+ * Annotating `literal` requires you to wrap it in an array:
+ * ```ts
+ * const isColor = literal<['red', 'green', 'blue']>('red', 'green', 'blue')
+ * ```
  * @param constants compared against `data` with the `===` operator.
  */
 export const literal =
@@ -27,13 +51,26 @@ export const literal =
  */
 
 /**
- * Note that the type parameter is an array of guards; it's not a union type.
- * This is because TypeScript doesn't allow you to convert unions to tuples, but it does allow you to convert tuples to unions.
- * Therefore, when you state the type parameter explicitly, provide an array to represent the union:
+ *
+ * @example
+ * Commonly used in discriminated unions:
  * ```ts
- * const isStringOrNumber = union<[string, number]>([isString, isNumber])
+ * const isResult = union([
+ *  object({
+ *    tag: literal('success')
+ *  }),
+ *  object({
+ *    tag: literal('error')
+ *   }),
+ * ])
+ * ```
+ * @example
+ * Annotating a union literal requires you to wrap the types an array:
+ * ```ts
+ * const isId = union<[string, number]>(isString, isNumber)
  * ```
  * @param guards any of these guard functions must match the data.
+ * @return a guard function that validates unions
  */
 export const union =
   <T extends readonly [...unknown[]]>(
@@ -41,13 +78,12 @@ export const union =
       [K in keyof T]: Guard<T[K]>
     }
   ) =>
+  /**
+   * @param data data to be validated
+   * @return `true` if the data is in the specified union
+   */
   (data: unknown): data is T[number] =>
     guards.some((guard) => guard(data))
-
-/**
- * Used to represent optional guards at runtime and compile-time in two different ways
- */
-const optionalSymbol = Symbol('optional')
 
 /**
  * Special guard to check optional values
@@ -69,20 +105,20 @@ export const optional = <T>(guard: Guard<T>): OptionalGuard<T> =>
   }) as OptionalGuard<T>
 
 /**
- * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for optional(union(isNull, guard)).
+ * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for `optional(union(isNull, guard))`.
  * @param guard
  */
 export const optionalNullable = <T>(guard: Guard<T>) =>
   optional(union(isNull, guard))
 
 /**
- * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for union(isNull, guard).
+ * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for `union(isNull, guard)`.
  * @param guard
  */
 export const nullable = <T>(guard: Guard<T>) => union(isNull, guard)
 
 /**
- * Create a union with `undefined`, which is different from optional properties. Alias for union(isUndefined, guard).
+ * Create a union with `undefined`, which is different from optional properties. Alias for `union(isUndefined, guard)`.
  * @param guard
  */
 export const undefineable = <T>(guard: Guard<T>) => union(isUndefined, guard)

@@ -1,4 +1,4 @@
-import { InfallibleParser, Parser, success } from './parse'
+import { InfallibleParser, Parser, success } from './types'
 
 /**
  * Use to provide a default value when parsing fails.

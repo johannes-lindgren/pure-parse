@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { object } from './object'
-import { isSuccess } from './parse'
+import { isSuccess } from './types'
 import type { Equals } from '../internals'
 import { nullable, optional } from './union'
 import { literal, parseBoolean, parseNumber, parseString } from './primitives'
