@@ -31,60 +31,17 @@ features:
 ---
 
 <script setup>
-import CodeBlock from "/docs/components/CodeBlock.vue";
-
-const code = `
-type User = {
-  id: number
-  name: string
-}
-
-const isUser = object<User>({
-  id: isNumber,
-  name: isString,
-})
-`
+import WithinHero from "/docs/components/WithinHero.vue";
+import FlickingCode from "/docs/components/FlickingCode.vue";
 
 </script>
 
-<ClientOnly>
-    <Teleport to=".VPHero > .container">
-        <CodeBlock class="code-block-container" :code="code">
-            <template #caption>Declare the type</template>
-        </CodeBlock>
-    </Teleport>
-</ClientOnly>
-
-Let your types be the source of truth:
-
-Or—if you prefer—infer types from your parsers:
-
-```ts
-const isUser = object({
-  id: isNumber,
-  name: isString,
-})
-type User = Infer<typeof isUser>
-```
+<WithinHero>
+    <FlickingCode style="width: 100%"/>
+</WithinHero>
 
 <style lang="scss">
+@use 'sass:meta';
 
-.code-block-container {
-  order: 2;
-}
-
-.VPHero > .container > .main {
-    width: unset;
-    flex-shrink: unset;
-}
-
-.VPHero > .container {
-    gap: 32px;
-}
-
-@media (min-width: 960px) {
-    .VPHero > .container  {
-        gap: 64px;
-    }
-}
+@include meta.load-css('@egjs/vue3-flicking/dist/flicking.css');
 </style>

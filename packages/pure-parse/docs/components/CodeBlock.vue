@@ -9,9 +9,6 @@ hljs.registerLanguage('typescript', typescript)
 const props = defineProps({
   code: String,
 })
-// const highlightedCode = hljs.highlight(code, { language: 'typescript' }).value
-const container = document.querySelector('.container')
-console.log(container)
 
 const codeEl = ref()
 onMounted(() => {
@@ -63,6 +60,7 @@ html.dark {
   line-height: 24px;
   font-size: 14px;
   font-weight: 500;
+  padding: 0 4px;
   color: var(--vp-c-text-2);
 }
 
