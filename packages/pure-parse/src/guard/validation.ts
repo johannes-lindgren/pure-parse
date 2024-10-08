@@ -1,4 +1,9 @@
-import { hasKey, OptionalKeys, RequiredKeys } from '../internals'
+import {
+  hasKey,
+  OptionalKeys,
+  optionalSymbol,
+  RequiredKeys,
+} from '../internals'
 import { Primitive } from '../common'
 import { isNull, isUndefined } from './guards'
 
@@ -43,11 +48,6 @@ export const union =
   ) =>
   (data: unknown): data is T[number] =>
     guards.some((guard) => guard(data))
-
-/**
- * Used to represent optional guards at runtime and compile-time in two different ways
- */
-const optionalSymbol = Symbol('optional')
 
 /**
  * Special guard to check optional values

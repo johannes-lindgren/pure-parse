@@ -9,33 +9,33 @@ hero:
   actions:
     - theme: brand
       text: Getting Started
-      link: /docs/guide/getting-started
+      link: /guide/getting-started
     - theme: alt
       text: API Reference
       link: /api
 features:
   - title: Easy to use
     icon:
-      src: /docs/assets/block.svg
+      src: /assets/block.svg
     details: Compose and customize with ease
   - title: Lightweight
     icon:
-      src: /docs/assets/feather.svg
+      src: /assets/feather.svg
     details: 0 dependencies, tree-shakeable, and less than 3 kB gzipped
   - title: Fast
     icon:
-      src: /docs/assets/guage.svg
+      src: /assets/guage.svg
     details: Memoize and enjoy 4× faster than Zod
 ---
 
 <script setup>
-import WithinHero from "/docs/components/WithinHero.vue";
-import FlickingCode from "/docs/components/FlickingCode.vue";
+import WithinHero from "/components/WithinHero.vue";
+import FlickingCode from "/components/FlickingCode.vue";
 
 </script>
 
 <WithinHero>
-    <FlickingCode style="width: 100%"/>
+    <FlickingCode/>
 </WithinHero>
 
 <style lang="scss">

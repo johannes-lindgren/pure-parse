@@ -8,7 +8,7 @@ import {
   isSymbol,
   isUndefined,
 } from '../guard'
-import { failure, ParseFailure, ParseSuccess, success } from './parse'
+import { failure, ParseFailure, ParseSuccess, success } from './types'
 import { Primitive } from '../common'
 
 /**

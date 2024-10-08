@@ -5,7 +5,7 @@ import {
   Parser,
   ParseResult,
   success,
-} from './parse'
+} from './types'
 
 // Local helper function
 const areAllSuccesses = <T>(

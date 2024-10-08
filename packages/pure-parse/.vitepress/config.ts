@@ -6,10 +6,11 @@ import { link } from 'typedoc-plugin-markdown/dist/libs/markdown'
 export default defineConfig({
   title: 'pure-parse',
   description: 'Derive parsers from types',
+  srcDir: 'docs',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
+      { text: 'Home', link: '/docs/' },
       { text: 'API', link: '/api/' },
     ],
 
@@ -18,7 +19,7 @@ export default defineConfig({
         text: 'Getting Started',
         items: [
           { text: 'Overview', link: '/docs/guide/overview' },
-          { text: 'Getting Started', link: '/docs/guide/getting-started' },
+          { text: 'Quick Start', link: '/docs/guide/getting-started' },
           { text: 'Parsers', link: '/docs/guide/parsers' },
           { text: 'Guards', link: '/docs/guide/guards' },
           {

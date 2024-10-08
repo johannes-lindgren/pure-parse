@@ -1,4 +1,4 @@
-import { optionalSymbol } from './optionalSymbol'
+import { optionalSymbol } from '../internals'
 import {
   failure,
   OptionalParser,
@@ -6,7 +6,7 @@ import {
   ParseSuccess,
   Parser,
   success,
-} from './parse'
+} from './types'
 import { parseNull, parseUndefined } from './primitives'
 
 /**

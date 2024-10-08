@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { array } from './array'
-import { failure, success } from './parse'
+import { failure, success } from './types'
 
 import { literal, parseNumber, parseString } from './primitives'
 import { fallback } from './fallback'

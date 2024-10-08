@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CodeBlock from '/docs/components/CodeBlock.vue'
+import CodeBlock from '/components/CodeBlock.vue'
 
 import { AutoPlay } from '@egjs/flicking-plugins'
 import Flicking from '@egjs/vue3-flicking'

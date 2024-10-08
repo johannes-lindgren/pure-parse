@@ -1,4 +1,4 @@
-import { optionalSymbol } from './optionalSymbol'
+import { optionalSymbol } from '../internals'
 
 /**
  * The data adheres to the schema. The `value` is equal to the parsed data

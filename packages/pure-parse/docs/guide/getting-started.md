@@ -1,4 +1,4 @@
-# Getting started
+# Quick Start
 
 There is no special setup needed—just install the package and start parsing.
 

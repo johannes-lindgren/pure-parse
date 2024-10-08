@@ -6,8 +6,8 @@ import {
   Parser,
   ParseResult,
   success,
-} from './parse'
-import { optionalSymbol } from './optionalSymbol'
+} from './types'
+import { optionalSymbol } from '../internals'
 
 /**
  * Validate structs; records that map known keys to a specific type.
