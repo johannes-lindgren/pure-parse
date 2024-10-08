@@ -19,19 +19,19 @@ type User = {
   name: string
 }
 
-const isUser = object<User>({
-  id: isNumber,
-  name: isString,
+const parseUser = object<User>({
+  id: parseNumber,
+  name: parseString,
 })
 `
 
 const codeInfer = `
-const isUser = object({
-  id: isNumber,
-  name: isString,
+const parseUser = object({
+  id: parseNumber,
+  name: parseString,
 })
 
-type User = Infer<typeof isUser>
+type User = Infer<typeof parseUser>
 `
 </script>
 
@@ -39,16 +39,16 @@ type User = Infer<typeof isUser>
   <Flicking
     :options="{ horizontal: false, circular: true }"
     :plugins="plugins"
-    style="height: 400px"
+    class="flicking-code"
   >
     <div :key="0" class="flicking-code__panel">
       <CodeBlock :code="codeDeclare">
-        <template #caption>Declare the type</template>
+        <template #caption>Declare the type:</template>
       </CodeBlock>
     </div>
     <div :key="1" class="flicking-code__panel">
       <CodeBlock :code="codeInfer">
-        <template #caption>Infer the type</template>
+        <template #caption>...or infer the type:</template>
       </CodeBlock>
     </div>
   </Flicking>
@@ -58,11 +58,14 @@ type User = Infer<typeof isUser>
 @use 'sass:meta';
 
 @include meta.load-css('@egjs/vue3-flicking/dist/flicking.css');
+
+$panel-height: 300px;
+
 .flicking-code {
-  height: 400px;
+  height: $panel-height;
 }
 
 .flicking-code__panel {
-  height: 400px;
+  height: $panel-height;
 }
 </style>

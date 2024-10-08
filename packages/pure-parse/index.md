@@ -9,21 +9,23 @@ hero:
   actions:
     - theme: brand
       text: Getting Started
-      link: /getting-started
+      link: /docs/guide/getting-started
     - theme: alt
       text: API Reference
       link: /api
 features:
-  - title: Type safety
+  - title: Easy to use
     icon:
-      src: /docs/assets/typescript-logo.svg
-    details: Do derive types from your parsers if you so choose
+      src: /docs/assets/block.svg
+    details: Compose and customize with ease
   - title: Lightweight
-    icon: 🪶
-    details: No dependencies, tree-shakeable, and less than 3 kB gzipped
+    icon:
+      src: /docs/assets/feather.svg
+    details: 0 dependencies, tree-shakeable, and less than 3 kB gzipped
   - title: Fast
-    icon: 🚀
-    details: 4× faster than Zod
+    icon:
+      src: /docs/assets/guage.svg
+    details: Memoize and enjoy 4× faster than Zod
 ---
 
 <script setup>

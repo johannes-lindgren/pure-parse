@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import typedocSidebar from '../api/typedoc-sidebar.json'
+import { link } from 'typedoc-plugin-markdown/dist/libs/markdown'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -14,8 +15,17 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Examples',
-        items: [],
+        text: 'Getting Started',
+        items: [
+          { text: 'Overview', link: '/docs/guide/overview' },
+          { text: 'Getting Started', link: '/docs/guide/getting-started' },
+          { text: 'Parsers', link: '/docs/guide/parsers' },
+          { text: 'Guards', link: '/docs/guide/guards' },
+          {
+            text: 'Comparison with Other Libraries',
+            link: '/docs/guide/comparison',
+          },
+        ],
       },
       {
         text: 'API Reference',

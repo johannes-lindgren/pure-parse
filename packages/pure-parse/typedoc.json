@@ -1,6 +1,6 @@
 {
   "entryPointStrategy": "expand",
-  "entryPoints": ["./src/parse", "./src/validate", "./src/common"],
+  "entryPoints": ["./src/parse", "./src/guard", "./src/common"],
   "exclude": ["**/*.test.ts"],
   "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
   "githubPages": false,
@@ -11,7 +11,10 @@
   "disableSources": true,
   "membersWithOwnFile": ["Function", "TypeAlias"],
   "hideGroupHeadings": true,
+  "hidePageTitle": true,
+  "hideBreadcrumbs": true,
   "expandParameters": false,
+  "expandObjects": true,
   "textContentMappings": {
     "title.indexPage": "API Reference",
     "title.memberPage": "{name}"
