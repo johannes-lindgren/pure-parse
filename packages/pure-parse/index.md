@@ -14,17 +14,13 @@ hero:
       text: API Reference
       link: /api
 features:
-  - title: Type Aliases as the Source of Truth
-    icon:
-      src: /docs/assets/typescript-logo.svg
-    details: Derive your parsers from your type aliases—not the other way around.
-  - title: Type Inference
+  - title: Type safety
     icon:
       src: /docs/assets/typescript-logo.svg
     details: Do derive types from your parsers if you so choose
   - title: Lightweight
     icon: 🪶
-    details: No dependencies, < 3 kB gzipped, and tree-shakeable
+    details: No dependencies, tree-shakeable, and less than 3 kB gzipped
   - title: Fast
     icon: 🚀
     details: 4× faster than Zod

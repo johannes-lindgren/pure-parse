@@ -41,13 +41,13 @@ type User = Infer<typeof isUser>
     :plugins="plugins"
     style="height: 400px"
   >
-    <div :key="0" class="panel">
-      <CodeBlock class="code-block-container" :code="codeDeclare">
+    <div :key="0" class="flicking-code__panel">
+      <CodeBlock :code="codeDeclare">
         <template #caption>Declare the type</template>
       </CodeBlock>
     </div>
-    <div :key="1" class="panel">
-      <CodeBlock class="code-block-container" :code="codeInfer">
+    <div :key="1" class="flicking-code__panel">
+      <CodeBlock :code="codeInfer">
         <template #caption>Infer the type</template>
       </CodeBlock>
     </div>
@@ -58,7 +58,11 @@ type User = Infer<typeof isUser>
 @use 'sass:meta';
 
 @include meta.load-css('@egjs/vue3-flicking/dist/flicking.css');
-.panel {
+.flicking-code {
+  height: 400px;
+}
+
+.flicking-code__panel {
   height: 400px;
 }
 </style>

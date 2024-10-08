@@ -28,7 +28,9 @@ const escapeHtml = (unsafe) =>
 
 <template>
   <figure class="code-block">
-    <figcaption class="code-block__caption"><slot name="caption" /></figcaption>
+    <figcaption class="code-block__caption" v-if="$slots.caption">
+      <slot name="caption" />
+    </figcaption>
     <pre class="code-block__pre">
       <code
         class="code-block__code"
