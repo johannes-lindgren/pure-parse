@@ -19,7 +19,8 @@
     "validation",
     "parsing",
     "type",
-    "inference"
+    "inference",
+    "CRDT"
   ],
   "license": "MIT",
   "sideEffects": false,

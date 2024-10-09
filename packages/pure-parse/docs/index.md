@@ -1,31 +1,41 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
   name: PureParse
   text: Typesafe, lightweight parsers
-  tagline: Type aliases as your source of truth
+  tagline: Decouple type aliases from validation logic with explicit type declarations
   actions:
     - theme: brand
-      text: Getting Started
+      text: Quick Start
       link: /guide/getting-started
+    - theme: alt
+      text: Overview
+      link: /guide/overview
     - theme: alt
       text: API Reference
       link: /api
 features:
-  - title: Easy to use
-    icon:
-      src: /assets/block.svg
-    details: Compose and customize with ease
   - title: Lightweight
     icon:
-      src: /assets/feather.svg
-    details: 0 dependencies, tree-shakeable, and less than 3 kB gzipped
+      src: /feather.svg
+    details: 0 dependencies, tree-shakeable, and less than 3 kB gzipped.
+    link: /guide/overview#lightweight
+  - title: Easy to use
+    icon:
+      src: /block.svg
+    details: Compose and customize with ease.
+    link: /guide/overview#extensible-and-easy-to-use
   - title: Fast
     icon:
-      src: /assets/guage.svg
-    details: Memoize and enjoy 4× faster than Zod
+      src: /guage.svg
+    details: 4 times the speed of Zod. Memoize for even faster validation.
+    link: /guide/overview#fast
+  - title: Fail-safe
+    icon:
+      src: /shield.svg
+    details: Recover from errors gracefully when parsing large documents. Tested, failsafe, and secure.
+    link: /guide/overview#fail-safe
 ---
 
 <script setup>
@@ -37,9 +47,3 @@ import FlickingCode from "/components/FlickingCode.vue";
 <WithinHero>
     <FlickingCode/>
 </WithinHero>
-
-<style lang="scss">
-@use 'sass:meta';
-
-@include meta.load-css('@egjs/vue3-flicking/dist/flicking.css');
-</style>
