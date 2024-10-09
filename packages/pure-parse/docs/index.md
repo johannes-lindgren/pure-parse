@@ -7,7 +7,7 @@ hero:
   tagline: Decouple type aliases from validation logic with explicit type declarations
   actions:
     - theme: brand
-      text: Getting Started
+      text: Quick Start
       link: /guide/getting-started
     - theme: alt
       text: Overview

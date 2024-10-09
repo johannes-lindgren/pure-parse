@@ -2,10 +2,6 @@
 
 There is no special setup needed—just install the package and start parsing.
 
-## Installation
-
-Install the package:
-
 ::: code-group
 
 ```sh [npm]
@@ -29,8 +25,6 @@ $ bun add pure-parse
 ```
 
 :::
-
-PureParse provides the means to build _parsers_ and _guard_ functions.
 
 ## Create a Parser
 

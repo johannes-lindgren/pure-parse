@@ -4,12 +4,15 @@
   <p align="center">
     Decouple type aliases from validation logic with explicit type declarations
   </p>
+  <p align="center">
+    <a href="https://pure-parse.vercel.app">Documentation</a>
+  </p>
 </div>
 
 <p align="center">
 <a href="https://github.com/johannes-lindgren/pure-parse/actions?query=branch%3Amain"><img src="https://github.com/johannes-lindgren/pure-parse/actions/workflows/test.yml/badge.svg?event=push&branch=main" alt="CI Status for Tests" /></a>
-<a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/badge/licence-MIT-green" alt="License"></a>
-<a href="https://github.com/johannes-lindgren" rel="nofollow"><img src="https://img.shields.io/badge/created%20by-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
+<a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/badge/Licence-MIT-green" alt="License"></a>
+<a href="https://github.com/johannes-lindgren" rel="nofollow"><img src="https://img.shields.io/badge/Author-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
 </p>
 
 Declare the type:
@@ -38,8 +41,6 @@ type User = Infer<typeof parseUser>
 ```
 
 <br/>
-
-Documentation coming soon...
 
 <br/>
 <div align="center">
