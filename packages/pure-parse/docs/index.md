@@ -29,12 +29,12 @@ features:
   - title: Fast
     icon:
       src: /guage.svg
-    details: Enjoy 4 times the speed of Zod, or memoize for even faster validation.
+    details: 4 times the speed of Zod. Memoize for even faster validation.
     link: /guide/overview#fast
   - title: Fail-safe
     icon:
       src: /shield.svg
-    details: Recover from errors gracefully when parsing large documents.
+    details: Recover from errors gracefully when parsing large documents. Tested, failsafe, and secure.
     link: /guide/overview#fail
 ---
 
