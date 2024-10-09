@@ -1,7 +1,8 @@
 <div align="center">
-  <h1 align="center"><code>pure-parse</code></h1>
+  <h1 align="center">PureParse</h1>
+  <h3>Typesafe, lightweight parsers</h3>
   <p align="center">
-    Minimalistic, schema-free validation library with type inference and explicit type declarations.
+    Decouple type aliases from validation logic with explicit type declarations
   </p>
 </div>
 
@@ -11,11 +12,34 @@
 <a href="https://github.com/johannes-lindgren" rel="nofollow"><img src="https://img.shields.io/badge/created%20by-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
 </p>
 
+Declare the type:
+
+```ts
+type User = {
+  id: number
+  name: string
+}
+
+const parseUser = object<User>({
+  id: parseNumber,
+  name: parseString,
+})
+```
+
+...or infer the type:
+
+```ts
+const parseUser = object({
+  id: parseNumber,
+  name: parseString,
+})
+
+type User = Infer<typeof parseUser>
+```
+
 <br/>
 
-This minimalistic validation library lets you choose whether to declare your types explicitly or having them inferred.
-
-[//]: # 'TODO link to docs'
+Documentation coming soon...
 
 <br/>
 <div align="center">

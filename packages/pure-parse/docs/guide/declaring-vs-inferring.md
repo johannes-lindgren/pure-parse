@@ -1,3 +1,3 @@
 # Declaring versus Inferring
 
-`pure-parse` allows your to both:
+PureParse allows your to both:

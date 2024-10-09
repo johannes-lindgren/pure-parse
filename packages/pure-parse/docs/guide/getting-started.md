@@ -30,7 +30,7 @@ $ bun add pure-parse
 
 :::
 
-`pure-parse` provides the means to build _parsers_ and _guard_ functions.
+PureParse provides the means to build _parsers_ and _guard_ functions.
 
 ## Create a Parser
 
@@ -102,7 +102,7 @@ switch (result.tag) {
 
 ## Create a Type Guards
 
-You can create [type guards](guards) with a syntax:
+You can create [type guards](guards) with a similar syntax:
 
 ```ts
 import { guard, object, isString, isNumber } from 'pure-parse/guard'

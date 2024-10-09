@@ -1,8 +1,6 @@
 # Parsers
 
-[//]: # 'TODO link'
-
-Parsers are functions that accepts on `unknown` argument and returns a discriminated union, which is either a success or a failure:
+Parsers are functions that accepts an `unknown` argument and returns a discriminated union, which is either a success or a failure:
 
 ```ts
 type Parser<T>: (data) => ParseResult<T>

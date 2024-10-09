@@ -11,7 +11,7 @@ type Guard<T>: (data) => data is T;
 > [!INFO]
 > With a type predicate, TypeScript is able to narrow the type of argument _if the function returns `true`_.
 
-In [pure-parse](https://www.npmjs.com/package/pure-parse), each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) and reference type has a corresponding type guard:
+In [PureParse](https://www.npmjs.com/package/pure-parse), each [JavaScript primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) and reference type has a corresponding type guard:
 
 - `isNull`
 - `isUndefined`
@@ -343,7 +343,7 @@ isArticle({
 
 ## Custom Validator Functions
 
-It is trivial to extend the functionality of `pure-parse`: all you need to do is to define your own function with a type predicate. For convenience, use the `Validator<T>` generic type. Here's a working example with generic trees:
+It is trivial to extend the functionality of PureParse: all you need to do is to define your own function with a type predicate. For convenience, use the `Validator<T>` generic type. Here's a working example with generic trees:
 
 ```ts
 export type Leaf<T> = { tag: 'leaf'; data: T }
