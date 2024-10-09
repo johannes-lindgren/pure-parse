@@ -35,7 +35,7 @@ features:
     icon:
       src: /shield.svg
     details: Recover from errors gracefully when parsing large documents. Tested, failsafe, and secure.
-    link: /guide/overview#fail
+    link: /guide/overview#fail-safe
 ---
 
 <script setup>
