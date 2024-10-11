@@ -136,8 +136,7 @@ Due to a limitation of TypeScript, you can't' write `union<string | number>()` o
 Tuples are arrays of fixed length, where each element has a specific type. Use the `tuple()` function to create a validation function for a tuple type:
 
 ```ts
-import { tuple } from './validation'
-import { isTest } from 'std-env'
+import { tupleGuard as tuple } from 'pure-parse'
 
 const isCoordinate = tuple([isNumber, isNumber])
 isCoordinate([42, 34]) // -> true
@@ -176,8 +175,10 @@ const isUser = object({
 You can declare optional properties:
 
 ```ts
-import { optional } from './validation'
-import { optionalNullable } from 'pure-parse'
+import {
+  optionalGuard as optional,
+  optionalNullableGuard as optionalNullable,
+} from 'pure-parse'
 
 const isUser = object({
   id: isNumber,
@@ -192,8 +193,10 @@ isUser({ id: 42, age: null }) // -> true
 Note that optional properties are different from unions with `undefined`:
 
 ```ts
-import { optional } from './validation'
-import { optionalNullable } from 'pure-parse'
+import {
+  optionalGuard as optional,
+  optionalNullableGuard as optionalNullable,
+} from 'pure-parse'
 
 const isUser = object({
   name: optional(isString),
@@ -266,7 +269,7 @@ isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
 Sometimes, it's useful to know whether an array has at least one element. Use the `nonEmptyArray()` function to create a validation function for an array with at least one element:
 
 ```ts
-import { nonEmptyArray } from './validation'
+import { nonEmptyArrayGuard as nonEmptyArray } from 'pure-parse'
 
 const isToggleState = nonEmptyArray(literal('on', 'off', 'indeterminate'))
 ```
@@ -274,8 +277,9 @@ const isToggleState = nonEmptyArray(literal('on', 'off', 'indeterminate'))
 Both of these functions check every element in the array. If you already have an array of validated data, and you want to find out wether it is non-empty, you can use the `nonEmptyArray` function:
 
 ```ts
-import { isNonEmptyArray } from './validation'
-;(names: string[]) => {
+import { isNonEmptyArrayGuard as isNonEmptyArray } from 'pure-parse'
+
+const foo = (names: string[]) => {
   if (isNonEmptyArray(names)) {
     console.log(names[0]) // -> string
   }

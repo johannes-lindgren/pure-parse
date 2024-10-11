@@ -41,7 +41,7 @@ Joi can't infer the type from a schema.
 
 Ajv is a JSON Schema validator, which serves different purpose than PureParse.
 
-Ajv compiles JSON Schemas into JavaScript, which leads to fast execution. However, the JSON schemas syntax is verbose, does not interoperate well with TypeScript, and does not lend itself to custom validation logic.
+Ajv compiles JSON Schemas into JavaScript, which leads to fast execution. However, the JSON schema syntax is verbose, does not interoperate well with TypeScript, and does not lend itself well to customization of validation logic.
 
 ## Yup
 
