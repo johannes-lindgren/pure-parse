@@ -9,7 +9,7 @@
   "githubPages": false,
   "outputFileStrategy": "modules",
   "entryModule": "index",
-  "indexFormat": "htmlTable",
+  "indexFormat": "list",
   "parametersFormat": "table",
   "useCodeBlocks": true,
   "disableSources": true,
@@ -19,6 +19,7 @@
   "hideBreadcrumbs": true,
   "expandParameters": false,
   "expandObjects": true,
+  "readme": "./docs/api-index.md",
   "blockTagsPreserveOrder": ["@example", "@returns"],
   "textContentMappings": {
     "title.indexPage": "API Reference",
