@@ -49,8 +49,6 @@ Yup cannot _correctly_ infer the type from schemas—you can infer something, bu
 
 Yup does allow asynchronous validation, which PureParse does (yet) not support.
 
-Yup can be very slow.
-
 ## Typia
 
 Typia is a compiler that generates validation logic based on type aliases. The resulting code is incredibly fast, but customization happens in comments via a domain specific language, rather than with regular JavaScript code. When working with immutable data structures, PureParse can outperform Typia thanks to memoization.
