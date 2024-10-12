@@ -1,4 +1,4 @@
-import { optionalSymbol } from '../internals'
+import { OptionalKeys, optionalSymbol, RequiredKeys } from '../internals'
 import { Primitive } from '../common'
 import { isNull, isUndefined } from './guards'
 
@@ -178,23 +178,24 @@ export const tuple =
 export const objectGuard = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
-}): Guard<T> => {
-  const entries = Object.entries(schema)
-  const parsers = entries.map(([key, parser]) => parser)
-  const bodyPre = ['let value', `let guard`]
-  const expr = [`return typeof data === 'object'`, `data !== null`]
+}) => {
+  const schemaEntries = Object.entries(schema)
+  const guards = schemaEntries.map(([_, guard]) => guard)
+  const body = [`return typeof data === 'object'`, `data !== null`]
     .concat(
-      entries.map(([key], i) => {
-        const keyStr = JSON.stringify(key)
-        const tempValExpr = `((value = data[${keyStr}]) || true)`
-        const tempGuardExpr = `((guard = parsers[${i}]) || true)`
-        return `${tempValExpr} && ${tempGuardExpr} && (value === undefined && !data.hasOwnProperty(${keyStr}) ? guard[optionalSymbol] === true : guard(value))`
+      schemaEntries.map(([key], i) => {
+        const sanitizedKey = JSON.stringify(key)
+        const value = `data[${sanitizedKey}]`
+        const guard = `guards[${i}]`
+        return `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) ? ${guard}[optionalSymbol] === true : ${guard}(${value}))`
       }),
     )
     .join(' && ')
-  const body = [...bodyPre, expr].join(';')
-  const fun = new Function('data', 'optionalSymbol', 'parsers', body)
-  return (data) => fun(data, optionalSymbol, parsers)
+  const fun = new Function('data', 'optionalSymbol', 'guards', body)
+  return (
+    data: unknown,
+  ): data is Required<Pick<T, RequiredKeys<T>>> &
+    Partial<Pick<T, OptionalKeys<T>>> => fun(data, optionalSymbol, guards)
 }
 
 /**
