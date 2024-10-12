@@ -1,9 +1,4 @@
-import {
-  hasKey,
-  OptionalKeys,
-  optionalSymbol,
-  RequiredKeys,
-} from '../internals'
+import { optionalSymbol } from '../internals'
 import { Primitive } from '../common'
 import { isNull, isUndefined } from './guards'
 
@@ -155,30 +150,52 @@ export const tuple =
  * ```
  * @param schema maps keys to validation functions.
  */
-export const object =
-  <T extends Record<string, unknown>>(schema: {
-    [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
-  }) =>
-  (
-    data: unknown,
-  ): data is Required<Pick<T, RequiredKeys<T>>> &
-    Partial<Pick<T, OptionalKeys<T>>> =>
-    typeof data === 'object' &&
-    data !== null &&
-    Object.keys(schema).every((key) => {
-      const guard = schema[key]
-      if (guard === undefined) {
-        // TODO this shouldn't happen, as the type ensures that all properties are guards
-        return false
-      }
-      if (!hasKey(data, key)) {
-        // If the key is not present, the guard must represent an optional property
-        return optionalSymbol in guard
-      }
-      const value = data[key]
+// export const objectGuard =
+//   <T extends Record<string, unknown>>(schema: {
+//     [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
+//   }) =>
+//   (
+//     data: unknown,
+//   ): data is Required<Pick<T, RequiredKeys<T>>> &
+//     Partial<Pick<T, OptionalKeys<T>>> =>
+//     typeof data === 'object' &&
+//     data !== null &&
+//     Object.keys(schema).every((key) => {
+//       const guard = schema[key]
+//       if (guard === undefined) {
+//         // TODO this shouldn't happen, as the type ensures that all properties are guards
+//         return false
+//       }
+//       if (!hasKey(data, key)) {
+//         // If the key is not present, the guard must represent an optional property
+//         return optionalSymbol in guard
+//       }
+//       const value = data[key]
+//
+//       return guard(value)
+//     })
 
-      return guard(value)
-    })
+export const objectGuard = <T extends Record<string, unknown>>(schema: {
+  // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
+  [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
+}): Guard<T> => {
+  const entries = Object.entries(schema)
+  const parsers = entries.map(([key, parser]) => parser)
+  const bodyPre = ['let value', `let guard`]
+  const expr = [`return typeof data === 'object'`, `data !== null`]
+    .concat(
+      entries.map(([key], i) => {
+        const keyStr = JSON.stringify(key)
+        const tempValExpr = `((value = data[${keyStr}]) || true)`
+        const tempGuardExpr = `((guard = parsers[${i}]) || true)`
+        return `${tempValExpr} && ${tempGuardExpr} && (value === undefined && !data.hasOwnProperty(${keyStr}) ? guard[optionalSymbol] === true : guard(value))`
+      }),
+    )
+    .join(' && ')
+  const body = [...bodyPre, expr].join(';')
+  const fun = new Function('data', 'optionalSymbol', 'parsers', body)
+  return (data) => fun(data, optionalSymbol, parsers)
+}
 
 /**
  * Records have a fixed set of keys that all map to the same type. Can be described with the [Record](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) utility type; for example:

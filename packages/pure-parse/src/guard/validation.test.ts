@@ -2,7 +2,7 @@ import { describe, it, expect, test } from 'vitest'
 import {
   array,
   partialRecord,
-  object,
+  objectGuard,
   union,
   literal,
   optional,
@@ -220,7 +220,7 @@ describe('validation', () => {
           const isTreeNode = <T>(
             isData: (data: unknown) => data is T,
           ): Guard<TreeNode<T>> =>
-            object({
+            objectGuard({
               // In v0.0.0-beta.3, this caused a problem with optional properties.
               // Because data can be undefined, it got interpreted as an optional property, which clashed with the
               // definition of `TreeNode` which declares it as required.
@@ -246,7 +246,7 @@ describe('validation', () => {
           expect(optional(isString)(true)).toEqual(false)
         })
         it('represent optional properties', () => {
-          const isObj = object({
+          const isObj = objectGuard({
             a: optional(isString),
           })
           expect(isObj({ a: 'hello' })).toEqual(true)
@@ -254,7 +254,7 @@ describe('validation', () => {
           expect(isObj({})).toEqual(true)
         })
         test('type inference', () => {
-          const isObj = object({
+          const isObj = objectGuard({
             id: isNumber,
             name: optional(isString),
           })
@@ -315,7 +315,7 @@ describe('validation', () => {
           expect(optionalNullable(isString)(true)).toEqual(false)
         })
         it('represent optional properties', () => {
-          const isObj = object({
+          const isObj = objectGuard({
             a: optionalNullable(isString),
           })
           expect(isObj({ a: 'hello' })).toEqual(true)
@@ -416,28 +416,28 @@ describe('validation', () => {
       describe('objects', () => {
         describe('type checking', () => {
           it('returns a guard', () => {
-            object({ a: isString }) satisfies Guard<{ a: string }>
-            object({ a: isNumber }) satisfies Guard<{ a: number }>
-            object({
-              a: object({
+            objectGuard({ a: isString }) satisfies Guard<{ a: string }>
+            objectGuard({ a: isNumber }) satisfies Guard<{ a: number }>
+            objectGuard({
+              a: objectGuard({
                 b: isNumber,
               }),
             }) satisfies Guard<{ a: { b: number } }>
 
             // @ts-expect-error
-            object({ a: isString }) satisfies Guard<{ a: number }>
+            objectGuard({ a: isString }) satisfies Guard<{ a: number }>
             // @ts-expect-error
-            object({ a: isNumber }) satisfies Guard<{ a: string }>
+            objectGuard({ a: isNumber }) satisfies Guard<{ a: string }>
             // @ts-expect-error
-            object({ a: isNumber }) satisfies Guard<{ x: number }>
+            objectGuard({ a: isNumber }) satisfies Guard<{ x: number }>
 
-            object({
-              a: object({ b: isNumber }),
+            objectGuard({
+              a: objectGuard({ b: isNumber }),
               // @ts-expect-error
             }) satisfies Guard<{ a: { b: string } }>
 
-            object({
-              b: object({
+            objectGuard({
+              b: objectGuard({
                 b: isNumber,
               }),
               // @ts-expect-error
@@ -449,11 +449,11 @@ describe('validation', () => {
                 id: number
                 name: string
               }
-              object<User1>({
+              objectGuard<User1>({
                 id: isNumber,
                 name: isString,
               })
-              object<User1>({
+              objectGuard<User1>({
                 id: isNumber,
                 // @ts-expect-error
                 name: optional(isString),
@@ -463,34 +463,34 @@ describe('validation', () => {
                 id: number
                 name: string | undefined
               }
-              object<UserUndefinable>({
+              objectGuard<UserUndefinable>({
                 id: isNumber,
                 // required property, union of string and undefined
                 name: undefineable(isString),
               })
-              object<UserUndefinable>({
+              objectGuard<UserUndefinable>({
                 id: isNumber,
                 // @ts-expect-error - name can be undefined, but it is not optional
                 name: optional(isString),
               })
-              object<UserUndefinable>({
+              objectGuard<UserUndefinable>({
                 id: isNumber,
                 // string is more narrow than string | undefined, which means that if the validation passes for string, it satisfies User2
                 name: isString,
               })
-              object<UserUndefinable>({
+              objectGuard<UserUndefinable>({
                 id: isNumber,
                 // undefined is more narrow than string | undefined, which means that if the validation passes for undefined, it satisfies User2
                 name: isUndefined,
               })
               // @ts-expect-error
-              object<UserUndefinable>({
+              objectGuard<UserUndefinable>({
                 id: isNumber,
                 // If we don't check the property, we have no type information on the field (it's unknown).
                 //  Therefore, the fact that it's optional should not mean that we can skip validation
                 // name: isString,
               })
-              object<UserUndefinable>({
+              objectGuard<UserUndefinable>({
                 id: isNumber,
                 // Similarly to above; the property must have a corresponding validation function
                 // @ts-expect-error
@@ -502,18 +502,18 @@ describe('validation', () => {
                 // This one is optional, not a union with undefined
                 name?: string
               }
-              object<UserOptional>({
+              objectGuard<UserOptional>({
                 id: isNumber,
                 // Similarly to above; the property must have a corresponding validation function
                 // @ts-expect-error
                 name: undefined,
               })
-              object<UserOptional>({
+              objectGuard<UserOptional>({
                 id: isNumber,
                 // @ts-expect-error - requires optional function
                 name: union(isUndefined, isString),
               })
-              object<UserOptional>({
+              objectGuard<UserOptional>({
                 id: isNumber,
                 // As expected; requires the optional function
                 name: optional(isString),
@@ -530,11 +530,11 @@ describe('validation', () => {
                   zipCode: number
                 }
               }
-              object<User1>({
+              objectGuard<User1>({
                 id: isNumber,
                 name: isString,
                 address: optional(
-                  object({
+                  objectGuard({
                     country: isString,
                     city: isString,
                     streetAddress: isString,
@@ -554,12 +554,12 @@ describe('validation', () => {
                 }
               }
 
-              object<User2>({
+              objectGuard<User2>({
                 // @ts-expect-error
                 id: isNumber,
                 name: isString,
                 address: optional(
-                  object({
+                  objectGuard({
                     country: isString,
                     city: isString,
                     streetAddress: isString,
@@ -570,38 +570,44 @@ describe('validation', () => {
             })
           })
           test('explicit generic type annotation', () => {
-            object<{ a: string }>({ a: isString })
-            object<{ a: number }>({ a: isNumber })
-            object<{ a: { b: string } }>({ a: object({ b: isString }) })
+            objectGuard<{ a: string }>({ a: isString })
+            objectGuard<{ a: number }>({ a: isNumber })
+            objectGuard<{ a: { b: string } }>({
+              a: objectGuard({ b: isString }),
+            })
 
             // @ts-expect-error
-            object<{ a: number }>({ a: isString })
+            objectGuard<{ a: number }>({ a: isString })
             // @ts-expect-error
-            object<{ a: string }>({ a: isNumber })
+            objectGuard<{ a: string }>({ a: isNumber })
             // @ts-expect-error
-            object<{ a: { b: string } }>({ a: object({ b: isNumber }) })
+            objectGuard<{ a: { b: string } }>({
+              a: objectGuard({ b: isNumber }),
+            })
             // @ts-expect-error
-            object<{ a: { b: string } }>({ x: object({ y: isNumber }) })
+            objectGuard<{ a: { b: string } }>({
+              x: objectGuard({ y: isNumber }),
+            })
           })
         })
         it('validates null', () => {
-          const isObj = object({})
+          const isObj = objectGuard({})
           expect(isObj(null)).toEqual(false)
         })
         it('validates undefined', () => {
-          const isObj = object({})
+          const isObj = objectGuard({})
           expect(isObj(undefined)).toEqual(false)
         })
         it('validates empty records', () => {
-          const isObj = object({})
+          const isObj = objectGuard({})
           expect(isObj({})).toEqual(true)
         })
         it('allows unknown properties', () => {
-          const isObj = object({})
+          const isObj = objectGuard({})
           expect(isObj({ a: 'unexpected!' })).toEqual(true)
         })
         it('validates required properties', () => {
-          const isObj = object({
+          const isObj = objectGuard({
             a: isString,
           })
           expect(
@@ -613,7 +619,7 @@ describe('validation', () => {
           expect(isObj({ a: undefined })).toEqual(false)
         })
         test('that undefinable properties are required', () => {
-          const isObj = object({
+          const isObj = objectGuard({
             a: undefineable(isString),
           })
           expect(
@@ -625,7 +631,7 @@ describe('validation', () => {
           expect(isObj({ a: undefined })).toEqual(true)
         })
         it('validates optional properties', () => {
-          const isObj = object({
+          const isObj = objectGuard({
             a: optional(isString),
           })
           expect(
@@ -637,12 +643,12 @@ describe('validation', () => {
           expect(isObj({ a: undefined })).toEqual(true)
         })
         it('differentiates between undefined and missing properties', () => {
-          const isOptionalObj = object({
+          const isOptionalObj = objectGuard({
             a: optional(isString),
           })
           expect(isOptionalObj({})).toEqual(true)
           expect(isOptionalObj({ a: undefined })).toEqual(true)
-          const isUnionObj = object({
+          const isUnionObj = objectGuard({
             a: union(isString, isUndefined),
           })
           expect(isUnionObj({})).toEqual(false)
@@ -719,7 +725,7 @@ describe('validation', () => {
           ).toEqual(false)
         })
         test('extra properties in the schema', () => {
-          const isObj = object({
+          const isObj = objectGuard({
             a: isNumber,
             // @ts-expect-error - all properties must be guard functions
             b: 123,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parseJson } from './json'
-import { object, isString, isNumber, isUnknown } from '../guard'
+import { objectGuard, isString, isNumber, isUnknown } from '../guard'
 
 describe('json', () => {
   describe('parseJson', () => {
@@ -17,7 +17,7 @@ describe('json', () => {
       expect(parseJson(isString)(JSON.stringify('abc'))).toEqual('abc')
       expect(parseJson(isNumber)(JSON.stringify(123))).toEqual(123)
       expect(
-        parseJson(object({ a: isNumber }))(JSON.stringify({ a: 1 })),
+        parseJson(objectGuard({ a: isNumber }))(JSON.stringify({ a: 1 })),
       ).toEqual({ a: 1 })
     })
   })

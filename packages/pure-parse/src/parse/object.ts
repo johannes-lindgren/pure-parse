@@ -21,28 +21,26 @@ import { optionalSymbol } from '../internals'
  * @param schema maps keys to validation functions.
  * @return a parser function that validates objects according to `schema`.
  */
-export const object =
-  <T extends Record<string, unknown>>(schema: {
-    // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
-    [K in keyof T]-?: {} extends Pick<T, K>
-      ? OptionalParser<T[K]>
-      : Parser<T[K]>
-  }): Parser<T> =>
-  (data) => {
+export const object = <T extends Record<string, unknown>>(schema: {
+  // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
+  [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
+}): Parser<T> => {
+  const entries = Object.entries(schema)
+  return (data) => {
     if (!isObject(data)) {
       return failure('Not an object')
     }
     const dataOutput = {} as Record<string, unknown>
-    for (const key in schema) {
-      const parser = schema[key]
+    for (let i = 0; i < entries.length; i++) {
+      const [key, parser] = entries[i]!
       const value = (data as Record<string, unknown>)[key]
       // Perf: only check if the property exists the value is undefined => huge performance boost
       if (value === undefined && !data.hasOwnProperty(key)) {
-        if (optionalSymbol in parser) {
+        if (parser[optionalSymbol] === true) {
           // The key is optional, so we can skip it
           continue
         }
-        return failure('Not all properties are valid')
+        return failure('A property is missing')
       }
 
       const parseResult = parser(value)
@@ -54,3 +52,4 @@ export const object =
 
     return success(dataOutput) as ParseResult<T>
   }
+}

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { isJsonValue } from './json'
-import { object, isNumber, isString, isUnknown } from './index'
 
 describe('json', () => {
   describe('validation', () => {
