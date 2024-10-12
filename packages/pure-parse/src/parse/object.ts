@@ -61,37 +61,29 @@ export const object = <T extends Record<string, unknown>>(schema: {
   const schemaEntries = Object.entries(schema)
   const parsers = schemaEntries.map(([_, parser]) => parser)
   const statements = [
-    `if(typeof data !== 'object' || data === null) return failure('Not an object')`,
+    `if(typeof data !== 'object' || data === null) return {tag:'failure', message:'Not an object'}`,
     `const dataOutput = {}`,
-    `let value`,
-    `let parser`,
     `let parseResult`,
     ...schemaEntries.flatMap(([key], i) => {
       const sanitizedKey = JSON.stringify(key)
+      // 2% faster to inline the value and parser, rather than look up once and use a variable
+      // 12% faster to inline failure and success object creations
+      const value = `data[${sanitizedKey}]`
+      const parser = `parsers[${i}]`
       return [
-        `value = data[${sanitizedKey}]`,
-        `parser = parsers[${i}]`,
-        `if(value === undefined && !data.hasOwnProperty(${sanitizedKey})) {`,
-        `if(parser[optionalSymbol] !== true) return failure('A property is missing')`,
+        `if(${value} === undefined && !data.hasOwnProperty(${sanitizedKey})) {`,
+        `if(${parser}[optionalSymbol] !== true) return {tag:'failure', message:'A property is missing'}`,
         `} else {`,
-        `parseResult = parser(value)`,
-        `if(parseResult.tag === 'failure') return failure('Not all properties are valid')`,
+        `parseResult = ${parser}(${value})`,
+        `if(parseResult.tag === 'failure') return {tag:'failure', message:'Not all properties are valid'}`,
         `dataOutput[${sanitizedKey}] = parseResult.value`,
         `}`,
       ]
     }),
-    `return success(dataOutput)`,
+    `return {tag:'success', value:dataOutput}`,
   ]
   const body = statements.join(';')
-  const fun = new Function(
-    'data',
-    'optionalSymbol',
-    'parsers',
-    'success',
-    'failure',
-    body,
-  )
+  const fun = new Function('data', 'optionalSymbol', 'parsers', body)
 
-  return (data: unknown): ParseResult<T> =>
-    fun(data, optionalSymbol, parsers, success, failure)
+  return (data: unknown): ParseResult<T> => fun(data, optionalSymbol, parsers)
 }

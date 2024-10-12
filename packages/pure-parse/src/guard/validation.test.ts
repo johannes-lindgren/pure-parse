@@ -580,12 +580,12 @@ describe('validation', () => {
             objectGuard<{ a: number }>({ a: isString })
             // @ts-expect-error
             objectGuard<{ a: string }>({ a: isNumber })
-            // @ts-expect-error
             objectGuard<{ a: { b: string } }>({
+              // @ts-expect-error
               a: objectGuard({ b: isNumber }),
             })
-            // @ts-expect-error
             objectGuard<{ a: { b: string } }>({
+              // @ts-expect-error
               x: objectGuard({ y: isNumber }),
             })
           })
