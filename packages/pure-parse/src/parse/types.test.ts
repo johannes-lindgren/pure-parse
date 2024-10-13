@@ -2,8 +2,9 @@ import { describe, expect, it, test } from 'vitest'
 import { array } from './array'
 import { object } from './object'
 import { optional, union } from './union'
-import { literal, parseNumber, parseString } from './primitives'
+import { parseNumber, parseString } from './primitives'
 import { fallback } from './fallback'
+import { literal } from './literal'
 
 describe('parsing', () => {
   describe('some use cases', () => {

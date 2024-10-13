@@ -4,7 +4,6 @@ import { isSuccess, Parser } from './types'
 import type { Equals } from '../internals'
 import { nullable, optional, union } from './union'
 import {
-  literal,
   parseBoolean,
   parseNumber,
   parseString,
@@ -12,6 +11,7 @@ import {
 } from './primitives'
 import { fallback } from './fallback'
 import { Infer } from '../common'
+import { literal } from './literal'
 
 const suits = [
   {

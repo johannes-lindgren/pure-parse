@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { literal, parseNumber, parseString } from './primitives'
+import { parseNumber, parseString } from './primitives'
 import {
   nullable,
   optional,
@@ -9,6 +9,7 @@ import {
 } from './union'
 import { object } from './object'
 import { fallback } from './fallback'
+import { literal } from './literal'
 
 describe('unions', () => {
   describe('optional', () => {
