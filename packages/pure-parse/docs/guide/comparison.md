@@ -23,27 +23,32 @@ Loose assertion means that the function checks if the object conforms to the sch
 
 | Function                                              | Mops/s | Relative to PureParse |
 | ----------------------------------------------------- | ------ | --------------------- |
-| [PureParse](https://www.npmjs.com/package/pure-parse) | 75.5   | 100%                  |
+| [PureParse](/api/guard/objectGuard#objectGuard)\*     | 75.5   | 100%                  |
+| [PureParse](/api/guard/objectGuard#objectGuardNoEval) | 5.7    | 7.5%                  |
 | [Zod](https://www.npmjs.com/package/zod)              | 1.12   | 1.4%                  |
-| [Joi](https://www.npmjs.com/package/joi)\*            | —      | —                     |
 | [io-ts](https://www.npmjs.com/package/io-ts)          | 3.5    | 4.7%                  |
-| [Ajv](https://www.npmjs.com/package/ajv)              | 49     | 65%                   |
-| [Yup](https://www.npmjs.com/package/yup)              | 84     | 120%                  |
-| [Typia](https://www.npmjs.com/package/typia)          | 101    | 136%                  |
+| [Ajv](https://www.npmjs.com/package/ajv)\*            | 49     | 65%                   |
+| [Yup](https://www.npmjs.com/package/yup)\*            | 84     | 120%                  |
+| [Typia](https://www.npmjs.com/package/typia)\*\*      | 101    | 136%                  |
+
+\* Just-in-time (JIT) compilation<br>
+\*\* Ahead-of-time compilation<br>
 
 Safe parsing means that a copy of the parsed data is returned, which contains only those properties that were declared. This protects against prototype pollution, and corresponds to PureParse's parsers.
 
-| Function                                              | Mops/s | Relative to PureParse |
-| ----------------------------------------------------- | ------ | --------------------- |
-| [PureParse](https://www.npmjs.com/package/pure-parse) | 28.4   | 100%                  |
-| [Zod](https://www.npmjs.com/package/zod)              | 1.13   | 3.9%                  |
-| [Joi](https://www.npmjs.com/package/joi) \*           | —      | —                     |
-| [io-ts](https://www.npmjs.com/package/io-ts)\*        | —      | —                     |
-| [Ajv](https://www.npmjs.com/package/ajv)\*            | —      | —                     |
-| [Yup](https://www.npmjs.com/package/yup)              | 81.4   | 286%                  |
-| [Typia](https://www.npmjs.com/package/typia)          | 57.7   | 203%                  |
+| Function                                         | Mops/s | Relative to PureParse |
+| ------------------------------------------------ | ------ | --------------------- |
+| [PureParse](/api/parse/object#object)\*          | 28.4   | 100%                  |
+| [PureParse](/api/parse/object#objectNoEval)      | 4.1    | 5.5%                  |
+| [Zod](https://www.npmjs.com/package/zod)         | 1.13   | 3.9%                  |
+| [io-ts](https://www.npmjs.com/package/io-ts)†    | —      | —                     |
+| [Ajv](https://www.npmjs.com/package/ajv)\*†      | —      | —                     |
+| [Yup](https://www.npmjs.com/package/yup)\*       | 81.4   | 286%                  |
+| [Typia](https://www.npmjs.com/package/typia)\*\* | 57.7   | 203%                  |
 
-\*No benchmark data available
+\* Just-in-time (JIT) compilation<br>
+\*\* Ahead-of-time compilation<br>
+†No benchmark data available—the operation might not be supported<br>
 
 ## Size Comparison
 
