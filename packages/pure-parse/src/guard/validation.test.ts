@@ -490,24 +490,21 @@ describe('validation', () => {
                 //  Therefore, the fact that it's optional should not mean that we can skip validation
                 // name: isString,
               })
-              objectGuard<UserUndefinable>({
-                id: isNumber,
-                // Similarly to above; the property must have a corresponding validation function
-                // @ts-expect-error
-                name: undefined,
-              })
 
               type UserOptional = {
                 id: number
                 // This one is optional, not a union with undefined
                 name?: string
               }
-              objectGuard<UserOptional>({
-                id: isNumber,
-                // Similarly to above; the property must have a corresponding validation function
-                // @ts-expect-error
-                name: undefined,
-              })
+              const doNotEvenTry = () => {
+                // May or may not throw an exception. The point is that it should give a type error.
+                objectGuard<UserOptional>({
+                  id: isNumber,
+                  // Similarly to above; the property must have a corresponding validation function
+                  // @ts-expect-error
+                  name: undefined,
+                })
+              }
               objectGuard<UserOptional>({
                 id: isNumber,
                 // @ts-expect-error - requires optional function

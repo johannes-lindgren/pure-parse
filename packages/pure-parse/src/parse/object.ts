@@ -64,20 +64,22 @@ export const object = <T extends Record<string, unknown>>(schema: {
     `if(typeof data !== 'object' || data === null) return {tag:'failure', message:'Not an object'}`,
     `const dataOutput = {}`,
     `let parseResult`,
-    ...schemaEntries.flatMap(([key], i) => {
-      const sanitizedKey = JSON.stringify(key)
+    ...schemaEntries.flatMap(([unsanitizedKey, parserFunction], i) => {
+      const key = JSON.stringify(unsanitizedKey)
       // 2% faster to inline the value and parser, rather than look up once and use a variable
       // 12% faster to inline failure and success object creations
-      const value = `data[${sanitizedKey}]`
+      const value = `data[${key}]`
       const parser = `parsers[${i}]`
+      const isOptional = parserFunction[optionalSymbol] === true
       return [
-        `if(${value} === undefined && !data.hasOwnProperty(${sanitizedKey})) {`,
-        `if(${parser}[optionalSymbol] !== true) return {tag:'failure', message:'A property is missing'}`,
-        `} else {`,
+        ...(!isOptional
+          ? [
+              `if(${value} === undefined && !data.hasOwnProperty(${key}))  return {tag:'failure', message:'A property is missing'}`,
+            ]
+          : []),
         `parseResult = ${parser}(${value})`,
         `if(parseResult.tag === 'failure') return {tag:'failure', message:'Not all properties are valid'}`,
-        `dataOutput[${sanitizedKey}] = parseResult.value`,
-        `}`,
+        `dataOutput[${key}] = parseResult.value`,
       ]
     }),
     `return {tag:'success', value:dataOutput}`,

@@ -23,7 +23,7 @@ Loose assertion means that the function checks if the object conforms to the sch
 
 | Function                                              | Mops/s | Relative to PureParse |
 | ----------------------------------------------------- | ------ | --------------------- |
-| [PureParse](https://www.npmjs.com/package/pure-parse) | 74.4   | 100%                  |
+| [PureParse](https://www.npmjs.com/package/pure-parse) | 75.5   | 100%                  |
 | [Zod](https://www.npmjs.com/package/zod)              | 1.12   | 1.4%                  |
 | [Joi](https://www.npmjs.com/package/joi)\*            | —      | —                     |
 | [io-ts](https://www.npmjs.com/package/io-ts)          | 3.5    | 4.7%                  |

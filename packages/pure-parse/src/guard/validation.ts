@@ -183,11 +183,14 @@ export const objectGuard = <T extends Record<string, unknown>>(schema: {
   const guards = schemaEntries.map(([_, guard]) => guard)
   const body = [`return typeof data === 'object'`, `data !== null`]
     .concat(
-      schemaEntries.map(([key], i) => {
-        const sanitizedKey = JSON.stringify(key)
+      schemaEntries.map(([unsanitizedKey, guardFunction], i) => {
+        const sanitizedKey = JSON.stringify(unsanitizedKey)
         const value = `data[${sanitizedKey}]`
         const guard = `guards[${i}]`
-        return `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) ? ${guard}[optionalSymbol] === true : ${guard}(${value}))`
+        const isOptional = guardFunction[optionalSymbol] === true
+        return isOptional
+          ? `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) || ${guard}(${value}))`
+          : `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) ? false : ${guard}(${value}))`
       }),
     )
     .join(' && ')

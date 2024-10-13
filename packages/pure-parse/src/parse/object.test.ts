@@ -2,8 +2,14 @@ import { describe, expect, it, test } from 'vitest'
 import { object } from './object'
 import { isSuccess, Parser } from './types'
 import type { Equals } from '../internals'
-import { nullable, optional } from './union'
-import { literal, parseBoolean, parseNumber, parseString } from './primitives'
+import { nullable, optional, union } from './union'
+import {
+  literal,
+  parseBoolean,
+  parseNumber,
+  parseString,
+  parseUndefined,
+} from './primitives'
 import { fallback } from './fallback'
 import { Infer } from '../common'
 
@@ -107,6 +113,21 @@ describe('objects', () => {
     })
   })
   describe('optional properties', () => {
+    it('differentiates between undefined and missing properties', () => {
+      const parseOptionalObj = object({
+        a: optional(parseString),
+      })
+      expect(parseOptionalObj({})).toHaveProperty('tag', 'success')
+      expect(parseOptionalObj({ a: undefined })).toHaveProperty(
+        'tag',
+        'success',
+      )
+      const parseUnionObj = object({
+        a: union(parseString, parseUndefined),
+      })
+      expect(parseUnionObj({})).toHaveProperty('tag', 'failure')
+      expect(parseUnionObj({ a: undefined })).toHaveProperty('tag', 'success')
+    })
     test('parsing', () => {
       const parseUser = object({
         id: parseNumber,
