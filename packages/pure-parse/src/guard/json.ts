@@ -1,4 +1,4 @@
-import { array, partialRecord, union } from './validation'
+import { arrayGuard, partialRecord, union } from './validation'
 import { isBoolean, isNull, isNumber, isString } from './guards'
 import { JsonValue } from '../common'
 
@@ -9,5 +9,5 @@ export const isJsonValue = (data: unknown): data is JsonValue =>
     isNumber,
     isString,
     partialRecord(isString, isJsonValue),
-    array(isJsonValue),
+    arrayGuard(isJsonValue),
   )(data)

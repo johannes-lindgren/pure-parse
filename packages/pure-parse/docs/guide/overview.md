@@ -61,9 +61,11 @@ By having a small size, and by being tree-shakable, [PureParse](https://www.npmj
 
 ## Fast
 
-When the document changes raidly over time—such as in a real-time collaborative editor—validation may need to be performed several times per second. As long as the document in question is using immutable data structures, the validation logic can be memoized, which gives a huge performance boost.
+PureParse is [one of the fastest](comparison.md#performance-benchmarks) validators.
 
-[Read more](comparison.md#performance-benchmarks)
+When working with immutable data structures, memoization can help increase performance by orders of magnitude. It is especially useful when the parsed data is being rendered to the screen with a functional UI library like React. For React to be able to skip re-rendering, the references in the parsed result must be stable, which is achieved with memoization.
+
+[Read more](performance)
 
 ## Fail-safe
 

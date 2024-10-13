@@ -1,5 +1,10 @@
 import { describe, it } from 'vitest'
-import { isBoolean, isNumber, isString, object as objectGuard } from '../guard'
+import {
+  isBoolean,
+  isNumber,
+  isString,
+  objectGuard as objectGuard,
+} from '../guard'
 import { Infer } from './Infer'
 import { Equals } from '../internals'
 import { parseBoolean, parseNumber, parseString, object } from '../parse'

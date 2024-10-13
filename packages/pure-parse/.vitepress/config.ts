@@ -24,6 +24,7 @@ export default defineConfig({
           { text: 'Failsafe Parsing', link: '/guide/fallbacks' },
           { text: 'Customizing', link: '/guide/customizing' },
           { text: 'Performance', link: '/guide/performance' },
+          { text: 'Security', link: '/guide/security' },
           {
             text: 'Comparison',
             link: '/guide/comparison',

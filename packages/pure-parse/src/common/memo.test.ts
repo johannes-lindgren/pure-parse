@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { memo } from './memo'
 import { parseNumber, parseString, object } from '../parse'
-import { isNumber, isString, object as objectGuard } from '../guard'
+import { isNumber, isString, objectGuard as objectGuard } from '../guard'
 
 describe('arrays', () => {
   it('works with parsers', () => {

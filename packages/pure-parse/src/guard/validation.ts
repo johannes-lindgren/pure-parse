@@ -1,9 +1,4 @@
-import {
-  hasKey,
-  OptionalKeys,
-  optionalSymbol,
-  RequiredKeys,
-} from '../internals'
+import { OptionalKeys, optionalSymbol, RequiredKeys } from '../internals'
 import { Primitive } from '../common'
 import { isNull, isUndefined } from './guards'
 
@@ -144,6 +139,30 @@ export const tuple =
     guards.every((guard, index) => guard(data[index]))
 
 /**
+ * Same as {@link objectGuard}, but does not perform just-in-time (JIT) compilation with the `Function` constructor. This function is needed as a replacement in environments where `new Function()` is disallowed; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
+ */
+export const objectGuardNoJit =
+  <T extends Record<string, unknown>>(schema: {
+    [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
+  }) =>
+  (
+    data: unknown,
+  ): data is Required<Pick<T, RequiredKeys<T>>> &
+    Partial<Pick<T, OptionalKeys<T>>> =>
+    typeof data === 'object' &&
+    data !== null &&
+    Object.keys(schema).every((key) => {
+      const guard = schema[key]!
+      const value = (data as Record<string, unknown>)[key]
+      if (value === undefined && !data.hasOwnProperty(key)) {
+        // If the key is not present, the guard must represent an optional property
+        return optionalSymbol in guard
+      }
+
+      return guard(value)
+    })
+
+/**
  * Objects have a fixed set of properties that can have different types.
  *
  * ```ts
@@ -155,30 +174,31 @@ export const tuple =
  * ```
  * @param schema maps keys to validation functions.
  */
-export const object =
-  <T extends Record<string, unknown>>(schema: {
-    [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
-  }) =>
-  (
+export const objectGuard = <T extends Record<string, unknown>>(schema: {
+  // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
+  [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
+}) => {
+  const schemaEntries = Object.entries(schema)
+  const guards = schemaEntries.map(([_, guard]) => guard)
+  const body = [`return typeof data === 'object'`, `data !== null`]
+    .concat(
+      schemaEntries.map(([unescapedKey, guardFunction], i) => {
+        const sanitizedKey = JSON.stringify(unescapedKey)
+        const value = `data[${sanitizedKey}]`
+        const guard = `guards[${i}]`
+        const isOptional = guardFunction[optionalSymbol] === true
+        return isOptional
+          ? `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) || ${guard}(${value}))`
+          : `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) ? false : ${guard}(${value}))`
+      }),
+    )
+    .join(' && ')
+  const fun = new Function('data', 'optionalSymbol', 'guards', body)
+  return (
     data: unknown,
   ): data is Required<Pick<T, RequiredKeys<T>>> &
-    Partial<Pick<T, OptionalKeys<T>>> =>
-    typeof data === 'object' &&
-    data !== null &&
-    Object.keys(schema).every((key) => {
-      const guard = schema[key]
-      if (guard === undefined) {
-        // TODO this shouldn't happen, as the type ensures that all properties are guards
-        return false
-      }
-      if (!hasKey(data, key)) {
-        // If the key is not present, the guard must represent an optional property
-        return optionalSymbol in guard
-      }
-      const value = data[key]
-
-      return guard(value)
-    })
+    Partial<Pick<T, OptionalKeys<T>>> => fun(data, optionalSymbol, guards)
+}
 
 /**
  * Records have a fixed set of keys that all map to the same type. Can be described with the [Record](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) utility type; for example:
@@ -240,7 +260,7 @@ export const partialRecord =
  * @param itemGuard validates every item in the array
  * @return a guard function that validates arrays
  */
-export const array =
+export const arrayGuard =
   <T>(itemGuard: Guard<T>): Guard<T[]> =>
   (data: unknown): data is T[] =>
     Array.isArray(data) && data.every(itemGuard)
