@@ -77,7 +77,7 @@ For example, consider an example with a CRTD for real-time collaboration:
 
 In this scenario, the document might be quite large, change frequently over time, and have a large virtual DOM representation. But neither library provides a way to validate the data. By using PureParse, you can parse the data while memoizing the React components.
 
-[memo](/api/common/memo) takes a parser or guard function as an argument and returns a memoized caches the result for a given input, meaning that if it's invoked
+[memo](/api/memoization/memo.html#memo) takes a parser or guard function as an argument and returns a memoized caches the result for a given input, meaning that if it's invoked
 
 ## Pitfalls
 
