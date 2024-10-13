@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { object } from './object'
-import { isSuccess } from './types'
+import { isSuccess, Parser } from './types'
 import type { Equals } from '../internals'
 import { nullable, optional } from './union'
 import { literal, parseBoolean, parseNumber, parseString } from './primitives'
@@ -306,5 +306,21 @@ describe('objects', () => {
       expect(result.value).not.toHaveProperty('__proto__')
     })
   })
-  describe.todo('self-referential objects')
+  describe('self-referential objects', () => {
+    // Type inferrence of recusive types are impossible in TypeScript
+    test('type declaration', () => {
+      type Tree = {
+        name: string
+        left?: Tree
+        right?: Tree
+      }
+
+      const parseTree: Parser<Tree> = (data) =>
+        object({
+          name: parseString,
+          left: optional(parseTree),
+          right: optional(parseTree),
+        })(data)
+    })
+  })
 })
