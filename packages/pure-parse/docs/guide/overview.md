@@ -53,7 +53,7 @@ type User = Infer<typeof parseUser>
 
 ## Lightweight
 
-[PureParse](https://www.npmjs.com/package/pure-parse) is super-lightweight. It is also tree-shakeable, and since it exports individual functions rather than classes, bundlers are able to tree-shake away _all_ the functionality that your app is not using.
+[PureParse](https://www.npmjs.com/package/pure-parse) is super-lightweight and has no dependencies. It is also tree-shakeable, and since it exports individual functions rather than classes, bundlers are able to tree-shake away _all_ the functionality that your app is not using.
 
 By having a small size, and by being tree-shakable, [PureParse](https://www.npmjs.com/package/pure-parse) ensures that the final footprint on the application bundle size is minimal. You can use it alongside other validation libraries without worrying about the bundle size.
 
@@ -95,7 +95,7 @@ The library stays away from object-oriented programming, which means that there 
 
 \*Member functions on classes that are not referenced anywhere in the code cannot be tree-shaken away.
 
-## Other Principles
+## Other Design Goals
 
 Here's an overview of the principles that guide the development of PureParse:
 
@@ -104,3 +104,14 @@ Here's an overview of the principles that guide the development of PureParse:
 - **Documentation** is a must for professionals. Every function must be well documented with type annotations and rich examples.
 - **Easy-to-use**
 - **Safety**—protect against prototype pollution.
+
+## Out of Scope
+
+There are some things that PureParse does not aim to solve:
+
+- Asynchronous validation
+- Structured error messages—error messages that can be parsed by a machine and translated. PureParse is not built to be used as a user-input validation library.
+- Compiled parsers—parsers can be made faster by being compiled from schemas ahead of time.
+- Serializable schemas—schemas than can be transmitted over the wire.
+
+If there's sufficient interest from the public, or if the author needs it, some of these features might be added in the future.
