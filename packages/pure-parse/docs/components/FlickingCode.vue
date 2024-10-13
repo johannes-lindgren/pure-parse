@@ -6,7 +6,7 @@ import Flicking from '@egjs/vue3-flicking'
 
 const plugins = [
   new AutoPlay({
-    duration: 5000,
+    duration: 2500,
     animationDuration: 1500,
     direction: 'NEXT',
     stopOnHover: true,
