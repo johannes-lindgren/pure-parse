@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from 'vitest'
-import { object as objectParseEval, objectNoEval } from './object'
+import { object as objectParseEval, objectNoJit } from './object'
 import { isSuccess, Parser } from './types'
 import type { Equals } from '../internals'
 import { nullable, optional, union } from './union'
@@ -16,7 +16,7 @@ import { Infer } from '../common'
 const suits = [
   {
     name: 'objectNoEval',
-    fn: objectNoEval,
+    fn: objectNoJit,
   },
   {
     name: 'objectEval',

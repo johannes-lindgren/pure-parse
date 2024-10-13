@@ -2,7 +2,7 @@ export * from './common'
 export * from './parse'
 export {
   objectGuard,
-  objectGuardNoEval,
+  objectGuardNoJit,
   isString,
   isBoolean,
   isNumber,

@@ -3,7 +3,7 @@ import {
   array,
   partialRecord,
   objectGuard,
-  objectGuardNoEval,
+  objectGuardNoJit,
   union,
   literal,
   optional,
@@ -411,7 +411,7 @@ describe('tuples', () => {
 const suits = [
   {
     name: 'objectNoEval',
-    fn: objectGuardNoEval,
+    fn: objectGuardNoJit,
   },
   {
     name: 'objectEval',

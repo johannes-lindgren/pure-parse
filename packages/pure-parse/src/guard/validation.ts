@@ -141,7 +141,7 @@ export const tuple =
 /**
  * Same as {@link objectGuard}, but does not perform just-in-time (JIT) compilation with the `Function` constructor. This function is needed as a replacement in environments where `new Function()` is disallowed; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
  */
-export const objectGuardNoEval =
+export const objectGuardNoJit =
   <T extends Record<string, unknown>>(schema: {
     [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
   }) =>
@@ -182,8 +182,8 @@ export const objectGuard = <T extends Record<string, unknown>>(schema: {
   const guards = schemaEntries.map(([_, guard]) => guard)
   const body = [`return typeof data === 'object'`, `data !== null`]
     .concat(
-      schemaEntries.map(([unsanitizedKey, guardFunction], i) => {
-        const sanitizedKey = JSON.stringify(unsanitizedKey)
+      schemaEntries.map(([unescapedKey, guardFunction], i) => {
+        const sanitizedKey = JSON.stringify(unescapedKey)
         const value = `data[${sanitizedKey}]`
         const guard = `guards[${i}]`
         const isOptional = guardFunction[optionalSymbol] === true

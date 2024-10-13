@@ -12,7 +12,7 @@ import { optionalSymbol } from '../internals'
 /**
  * Same as {@link object}, but does not perform just-in-time (JIT) compilation with the `Function` constructor. This function is needed as a replacement in environments where `new Function()` is disallowed; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
  */
-export const objectNoEval = <T extends Record<string, unknown>>(schema: {
+export const objectNoJit = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
 }): Parser<T> => {
@@ -67,8 +67,8 @@ export const object = <T extends Record<string, unknown>>(schema: {
     `if(typeof data !== 'object' || data === null) return {tag:'failure', message:'Not an object'}`,
     `const dataOutput = {}`,
     `let parseResult`,
-    ...schemaEntries.flatMap(([unsanitizedKey, parserFunction], i) => {
-      const key = JSON.stringify(unsanitizedKey)
+    ...schemaEntries.flatMap(([unescapedKey, parserFunction], i) => {
+      const key = JSON.stringify(unescapedKey)
       // 2% faster to inline the value and parser, rather than look up once and use a variable
       // 12% faster to inline failure and success object creations
       const value = `data[${key}]`
