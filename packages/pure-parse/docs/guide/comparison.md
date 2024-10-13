@@ -19,7 +19,9 @@ Here are some results as measured on October, 2024:
 > [!IMPORTANT]
 > Not all parsers in the tables below have the same feature set, so the benchmarks are not entirely comparable.
 
-Loose assertion means that the function checks if the object conforms to the schema, and does not invalidate data that contains unknown properties. This corresponds to PureParse's guard functions:
+### Loose Assertion
+
+_Loose assertion_ means that the function checks if the object conforms to the schema, and does not invalidate data that contains unknown properties. This corresponds to PureParse's guard functions:
 
 | Function                                              | Mops/s | Relative to PureParse |
 | ----------------------------------------------------- | ------ | --------------------- |
@@ -34,7 +36,9 @@ Loose assertion means that the function checks if the object conforms to the sch
 \* Just-in-time (JIT) compilation<br>
 \*\* Ahead-of-time compilation<br>
 
-Safe parsing means that a copy of the parsed data is returned, which contains only those properties that were declared. This protects against prototype pollution, and corresponds to PureParse's parsers.
+### Safe Parsing
+
+_Safe parsing_ means that a copy of the parsed data is returned, which contains only those properties that were declared. This protects against prototype pollution, and corresponds to PureParse's parsers.
 
 | Function                                         | Mops/s | Relative to PureParse |
 | ------------------------------------------------ | ------ | --------------------- |
@@ -48,7 +52,7 @@ Safe parsing means that a copy of the parsed data is returned, which contains on
 
 \* Just-in-time (JIT) compilation<br>
 \*\* Ahead-of-time compilation<br>
-†No benchmark data available—the operation might not be supported<br>
+†No benchmark data available—the operation might not be supported by the library<br>
 
 ## Size Comparison
 
