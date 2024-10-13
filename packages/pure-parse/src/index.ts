@@ -1,6 +1,7 @@
 export * from './common'
 export * from './parse'
 export {
+  arrayGuard,
   objectGuard,
   objectGuardNoJit,
   isString,

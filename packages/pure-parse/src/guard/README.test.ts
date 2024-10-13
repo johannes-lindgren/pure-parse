@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { array, literal, objectGuard, union, Guard } from './validation'
+import { arrayGuard, literal, objectGuard, union, Guard } from './validation'
 import { isString } from './guards'
 
 describe('README examples', () => {
@@ -24,7 +24,7 @@ describe('README examples', () => {
           leaf(guard),
           objectGuard({
             tag: literal('tree'),
-            data: array(union(leaf(guard), tree(guard))),
+            data: arrayGuard(union(leaf(guard), tree(guard))),
           }),
         )(data)
     describe('leaf', () => {

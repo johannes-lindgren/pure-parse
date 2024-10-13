@@ -1,6 +1,6 @@
 import { describe, it, expect, test } from 'vitest'
 import {
-  array,
+  arrayGuard,
   partialRecord,
   objectGuard,
   objectGuardNoJit,
@@ -681,11 +681,11 @@ describe('partial records', () => {
     describe('explicit generic type annotation', () => {
       test('string as key', () => {
         partialRecord<string, string>(isString, isString)
-        partialRecord<string, number[]>(isString, array(isNumber))
+        partialRecord<string, number[]>(isString, arrayGuard(isNumber))
         // @ts-expect-error
         partialRecord<string, string>(isString, isNumber)
         // @ts-expect-error
-        partialRecord<string, number[]>(isString, array(isString))
+        partialRecord<string, number[]>(isString, arrayGuard(isString))
       })
       test('literal union as key', () => {
         partialRecord<'a', string>(literal('a'), isString)
@@ -780,11 +780,11 @@ describe('records', () => {
       test('string as key', () => {})
       test('literal union as key', () => {
         record<['a', 'b'], string>(['a', 'b'], isString)
-        record<['a', 'b'], number[]>(['a', 'b'], array(isNumber))
+        record<['a', 'b'], number[]>(['a', 'b'], arrayGuard(isNumber))
         // @ts-expect-error
         record<['a', 'b'], string>(['a', 'b'], isNumber)
         // @ts-expect-error
-        record<['a', 'b'], number[]>(['a', 'b'], array(isString))
+        record<['a', 'b'], number[]>(['a', 'b'], arrayGuard(isString))
       })
     })
   })
@@ -853,81 +853,83 @@ describe('recursive types', () => {
   describe('isArray', () => {
     describe('types', () => {
       it('returns a guard', () => {
-        array(isString) satisfies Guard<string[]>
+        arrayGuard(isString) satisfies Guard<string[]>
         // @ts-expect-error
-        array(isString) satisfies Guard<number[]>
+        arrayGuard(isString) satisfies Guard<number[]>
       })
       it('infers the exact type', () => {
         // Number
-        const isNumberArray = array((d): d is number => true)
+        const isNumberArray = arrayGuard((d): d is number => true)
         type NumberArray = Infer<typeof isNumberArray>
         const assertionNumber1: Equals<NumberArray, number[]> = true
         const assertionNumber2: Equals<NumberArray, unknown[]> = false
         // String
-        const isStringArray = array(isString)
+        const isStringArray = arrayGuard(isString)
         type StringArray = Infer<typeof isStringArray>
         const assertionString1: Equals<StringArray, string[]> = true
         const assertionString2: Equals<StringArray, unknown[]> = false
       })
       test('explicit generic type annotation', () => {
-        array<number>(isNumber)
-        array<string>(isString)
-        array<string | number>(union(isString, isNumber))
+        arrayGuard<number>(isNumber)
+        arrayGuard<string>(isString)
+        arrayGuard<string | number>(union(isString, isNumber))
         // @ts-expect-error
-        array<number>(union(isString, isNumber))
+        arrayGuard<number>(union(isString, isNumber))
         // @ts-expect-error
-        array<string>(isNumber)
+        arrayGuard<string>(isNumber)
         // @ts-expect-error
-        array<string[]>(isString)
+        arrayGuard<string[]>(isString)
         // @ts-expect-error
-        array<string>(array(isNumber))
+        arrayGuard<string>(arrayGuard(isNumber))
       })
     })
     it('validates null', () => {
-      expect(array(isUnknown)(null)).toEqual(false)
+      expect(arrayGuard(isUnknown)(null)).toEqual(false)
     })
     it('validates undefined', () => {
-      expect(array(isUnknown)(undefined)).toEqual(false)
+      expect(arrayGuard(isUnknown)(undefined)).toEqual(false)
     })
     it('validates unassigned values', () => {
       let data
-      expect(array(isUnknown)(data)).toEqual(false)
+      expect(arrayGuard(isUnknown)(data)).toEqual(false)
     })
     it('validates booleans', () => {
-      expect(array(isUnknown)(false)).toEqual(false)
-      expect(array(isUnknown)(true)).toEqual(false)
+      expect(arrayGuard(isUnknown)(false)).toEqual(false)
+      expect(arrayGuard(isUnknown)(true)).toEqual(false)
     })
     it('validates numbers', () => {
-      expect(array(isUnknown)(NaN)).toEqual(false)
-      expect(array(isUnknown)(Infinity)).toEqual(false)
-      expect(array(isUnknown)(0)).toEqual(false)
-      expect(array(isUnknown)(1)).toEqual(false)
-      expect(array(isUnknown)(3.14159)).toEqual(false)
+      expect(arrayGuard(isUnknown)(NaN)).toEqual(false)
+      expect(arrayGuard(isUnknown)(Infinity)).toEqual(false)
+      expect(arrayGuard(isUnknown)(0)).toEqual(false)
+      expect(arrayGuard(isUnknown)(1)).toEqual(false)
+      expect(arrayGuard(isUnknown)(3.14159)).toEqual(false)
     })
     it('validates strings', () => {
-      expect(array(isUnknown)('')).toEqual(false)
-      expect(array(isUnknown)('hello')).toEqual(false)
+      expect(arrayGuard(isUnknown)('')).toEqual(false)
+      expect(arrayGuard(isUnknown)('hello')).toEqual(false)
     })
     it('validates symbols', () => {
-      expect(array(isUnknown)(Symbol())).toEqual(false)
+      expect(arrayGuard(isUnknown)(Symbol())).toEqual(false)
     })
     it('validates objects', () => {
-      expect(array(isUnknown)({})).toEqual(false)
+      expect(arrayGuard(isUnknown)({})).toEqual(false)
     })
     it('validates empty arrays', () => {
-      expect(array(isUnknown)([])).toEqual(true)
+      expect(arrayGuard(isUnknown)([])).toEqual(true)
     })
     it('always validates empty arrays', () => {
-      expect(array(isUnknown)([])).toEqual(true)
-      expect(array(isString)([])).toEqual(true)
-      expect(array(isBoolean)([])).toEqual(true)
-      expect(array((data: unknown): data is unknown => false)([])).toEqual(true)
+      expect(arrayGuard(isUnknown)([])).toEqual(true)
+      expect(arrayGuard(isString)([])).toEqual(true)
+      expect(arrayGuard(isBoolean)([])).toEqual(true)
+      expect(arrayGuard((data: unknown): data is unknown => false)([])).toEqual(
+        true,
+      )
     })
     it('expects every element to pass the validation', () => {
-      expect(array(union(isNumber))([1, 2, 3, 4])).toEqual(true)
-      expect(array(union(isNumber))([1, 2, 3, 'a', 4])).toEqual(false)
+      expect(arrayGuard(union(isNumber))([1, 2, 3, 4])).toEqual(true)
+      expect(arrayGuard(union(isNumber))([1, 2, 3, 'a', 4])).toEqual(false)
       expect(
-        array(union(isString, isNumber, isBoolean))([1, 'a', false]),
+        arrayGuard(union(isString, isNumber, isBoolean))([1, 'a', false]),
       ).toEqual(true)
     })
   })

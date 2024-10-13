@@ -260,7 +260,7 @@ export const partialRecord =
  * @param itemGuard validates every item in the array
  * @return a guard function that validates arrays
  */
-export const array =
+export const arrayGuard =
   <T>(itemGuard: Guard<T>): Guard<T[]> =>
   (data: unknown): data is T[] =>
     Array.isArray(data) && data.every(itemGuard)
