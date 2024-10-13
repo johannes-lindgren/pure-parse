@@ -6,11 +6,41 @@ For a more detailed comparison, see the [overview](./overview).
 
 ## Performance Benchmarks
 
-PureParse is benchmarked against other validation libraries:
+PureParse is benchmarked against other validation libraries; see https://moltar.github.io/typescript-runtime-type-benchmarks/.
 
-- It's roughtly 4× faster than Zod
-- If not memoized, it is slower than the compiled validation libraries (like Typia and Ajv)
-- If memoized, it is as fast as any JavaScript-based validation library can be.
+Here are some results as measured on October, 2024:
+
+- Chip: Apple M1 Pro
+- Memory: 16 GB
+
+> [!IMPORTANT]
+> The benchmark measures a very specific use case: the performance of parsing/validating a small object with only required properties, of which one is another object. Not all parsers in the table below have the same feature set.
+
+Loose assertion means that the function checks if the object conforms to the schema, and does not invalidate data that contains unknown properties. This corresponds to PureParse's guard functions:
+
+| Function                                              | Mops/s | Relative to PureParse |
+| ----------------------------------------------------- | ------ | --------------------- |
+| [PureParse](https://www.npmjs.com/package/pure-parse) | 74.4   | 100%                  |
+| [Zod](https://www.npmjs.com/package/zod)              | 1.12   | 1.4%                  |
+| [Joi](https://www.npmjs.com/package/joi)\*            | —      | —                     |
+| [io-ts](https://www.npmjs.com/package/io-ts)          | 3.5    | 4.7%                  |
+| [Ajv](https://www.npmjs.com/package/ajv)              | 49     | 65%                   |
+| [Yup](https://www.npmjs.com/package/yup)              | 84     | 120%                  |
+| [Typia](https://www.npmjs.com/package/typia)          | 101    | 136%                  |
+
+Safe parsing means that a copy of the parsed data is returned, which contains only those properties that were declared. This protects against prototype pollution, and corresponds to PureParse's parsers.
+
+| Function                                              | Mops/s | Relative to PureParse |
+| ----------------------------------------------------- | ------ | --------------------- |
+| [PureParse](https://www.npmjs.com/package/pure-parse) | 28.4   | 100%                  |
+| [Zod](https://www.npmjs.com/package/zod)              | 1.13   | 3.9%                  |
+| [Joi](https://www.npmjs.com/package/joi) \*           | —      | —                     |
+| [io-ts](https://www.npmjs.com/package/io-ts)\*        | —      | —                     |
+| [Ajv](https://www.npmjs.com/package/ajv)\*            | —      | —                     |
+| [Yup](https://www.npmjs.com/package/yup)              | 81.4   | 286%                  |
+| [Typia](https://www.npmjs.com/package/typia)          | 57.7   | 203%                  |
+
+\*No benchmark data available
 
 ## Size Comparison
 

@@ -3,7 +3,11 @@
 PureParse is built to be fast. But when dealing with immutable data structures, parsing can be near instantaneous.
 
 > [!TIP]
-> For benchmarks, see the [Comparison > Benchmarks](comparison#benchmarks) section.
+> For performance benchmarks, see the [Comparison > Benchmarks](comparison#benchmarks) section.
+
+## Just-in-Time (JIT) Compilation
+
+PureParse owes its great performance to just-in-time compilation: when constructing a parser, the argument gets compiled at runtime into a function that can be optimized by V8 (and other JavaScript engines). This technique is used by all the fastest validation libraries.
 
 ## Memoization
 
