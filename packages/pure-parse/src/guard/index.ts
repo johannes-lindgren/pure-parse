@@ -1,3 +1,3 @@
 export * from './validation'
-export * from './guards'
+export * from './primitives'
 export * from './json'

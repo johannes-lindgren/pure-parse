@@ -12,7 +12,7 @@ import {
   isSymbol,
   isUndefined,
   isUnknown,
-} from './guards'
+} from './primitives'
 import { Equals } from '../internals'
 import { nonEmptyArray } from './validation'
 import { Infer } from '../common'

@@ -22,7 +22,7 @@ import {
   isString,
   isUndefined,
   isUnknown,
-} from './guards'
+} from './primitives'
 import { Infer } from '../common'
 
 describe('literal types', () => {

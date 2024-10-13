@@ -1,6 +1,6 @@
 import { OptionalKeys, optionalSymbol, RequiredKeys } from '../internals'
 import { Primitive } from '../common'
-import { isNull, isUndefined } from './guards'
+import { isNull, isUndefined } from './primitives'
 
 /**
  * A function that returns a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates) on the argument.

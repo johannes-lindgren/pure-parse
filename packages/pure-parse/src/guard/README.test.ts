@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { arrayGuard, literal, objectGuard, union, Guard } from './validation'
-import { isString } from './guards'
+import { isString } from './primitives'
 
 describe('README examples', () => {
   describe('Tree', () => {
