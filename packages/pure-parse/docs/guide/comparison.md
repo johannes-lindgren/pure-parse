@@ -23,15 +23,15 @@ Here are some results as measured on October, 2024:
 
 _Loose assertion_ means that the function checks if the object conforms to the schema, and does not invalidate data that contains unknown properties. This corresponds to PureParse's guard functions:
 
-| Function                                             | Mops/s | Relative to PureParse |
-| ---------------------------------------------------- | ------ | --------------------- |
-| [PureParse](/api/guard/validation#objectGuard)\*     | 75.5   | 100%                  |
-| [PureParse](/api/guard/validation#objectGuardNoEval) | 5.7    | 7.5%                  |
-| [Zod](https://www.npmjs.com/package/zod)             | 1.12   | 1.4%                  |
-| [io-ts](https://www.npmjs.com/package/io-ts)         | 3.5    | 4.7%                  |
-| [Ajv](https://www.npmjs.com/package/ajv)\*           | 49     | 65%                   |
-| [Yup](https://www.npmjs.com/package/yup)\*           | 84     | 120%                  |
-| [Typia](https://www.npmjs.com/package/typia)\*\*     | 101    | 136%                  |
+| Function                                         | Mops/s | Relative to PureParse |
+| ------------------------------------------------ | ------ | --------------------- |
+| [PureParse](/api/guard/object#objectGuard)\*     | 75.5   | 100%                  |
+| [PureParse](/api/guard/object#objectGuardNoEval) | 5.7    | 7.5%                  |
+| [Zod](https://www.npmjs.com/package/zod)         | 1.12   | 1.4%                  |
+| [io-ts](https://www.npmjs.com/package/io-ts)     | 3.5    | 4.7%                  |
+| [Ajv](https://www.npmjs.com/package/ajv)\*       | 49     | 65%                   |
+| [Yup](https://www.npmjs.com/package/yup)\*       | 84     | 120%                  |
+| [Typia](https://www.npmjs.com/package/typia)\*\* | 101    | 136%                  |
 
 \* Just-in-time (JIT) compilation<br>
 \*\* Ahead-of-time compilation<br>

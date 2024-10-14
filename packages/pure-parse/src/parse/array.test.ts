@@ -2,8 +2,9 @@ import { describe, expect, it, test } from 'vitest'
 import { array } from './array'
 import { failure, success } from './types'
 
-import { literal, parseNumber, parseString } from './primitives'
+import { parseNumber, parseString } from './primitives'
 import { fallback } from './fallback'
+import { literal } from './literal'
 
 describe('arrays', () => {
   it('validates when all elements pass validation', () => {
