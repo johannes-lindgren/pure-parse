@@ -3,7 +3,7 @@ import { Guard } from './types'
 /**
  * @param guards an array of guards. Each guard validates the corresponding element in the data tuple.
  */
-export const tuple =
+export const tupleGuard =
   <T extends readonly [...unknown[]]>(
     guards: [
       ...{

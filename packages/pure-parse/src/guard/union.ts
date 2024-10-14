@@ -22,7 +22,7 @@ import { Guard } from './types'
  * @param guards any of these guard functions must match the data.
  * @return a guard function that validates unions
  */
-export const union =
+export const unionGuard =
   <T extends readonly [...unknown[]]>(
     ...guards: {
       [K in keyof T]: Guard<T[K]>

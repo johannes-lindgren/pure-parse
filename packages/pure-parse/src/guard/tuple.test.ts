@@ -1,54 +1,56 @@
 import { describe, expect, it, test } from 'vitest'
-import { tuple } from './tuple'
+import { tupleGuard } from './tuple'
 import { Guard } from './types'
 import { isBoolean, isNumber, isString } from './primitives'
 
 describe('tuples', () => {
   describe('type checking', () => {
     it('returns a guard', () => {
-      tuple([]) satisfies Guard<[]>
-      tuple([isString]) satisfies Guard<[string]>
-      tuple([isString, isNumber]) satisfies Guard<[string, number]>
-      tuple([isNumber, isNumber, isNumber]) satisfies Guard<
+      tupleGuard([]) satisfies Guard<[]>
+      tupleGuard([isString]) satisfies Guard<[string]>
+      tupleGuard([isString, isNumber]) satisfies Guard<[string, number]>
+      tupleGuard([isNumber, isNumber, isNumber]) satisfies Guard<
         [number, number, number]
       >
 
       // @ts-expect-error
-      tuple([isNumber]) satisfies Guard<[number, number]>
+      tupleGuard([isNumber]) satisfies Guard<[number, number]>
       // @ts-expect-error
-      tuple([isString, isString]) satisfies Guard<[number, number]>
+      tupleGuard([isString, isString]) satisfies Guard<[number, number]>
       // @ts-expect-error
-      tuple([isNumber, isNumber]) satisfies Guard<[string, string]>
+      tupleGuard([isNumber, isNumber]) satisfies Guard<[string, string]>
     })
     test('explicit generic type annotation', () => {
-      tuple<[]>([])
-      tuple<[string]>([isString])
-      tuple<[string, number]>([isString, isNumber])
-      tuple<[number, number, number]>([isNumber, isNumber, isNumber])
+      tupleGuard<[]>([])
+      tupleGuard<[string]>([isString])
+      tupleGuard<[string, number]>([isString, isNumber])
+      tupleGuard<[number, number, number]>([isNumber, isNumber, isNumber])
       // @ts-expect-error
-      tuple<[number, number]>([isNumber])
+      tupleGuard<[number, number]>([isNumber])
       // @ts-expect-error
-      tuple<[number, number]>([isString, isString])
+      tupleGuard<[number, number]>([isString, isString])
       // @ts-expect-error
-      tuple<[string, string]>([isNumber, isNumber])
+      tupleGuard<[string, string]>([isNumber, isNumber])
     })
   })
   it('validates each element', () => {
-    expect(tuple([])([])).toEqual(true)
-    expect(tuple([isString])(['hello'])).toEqual(true)
-    expect(tuple([isString, isNumber])(['hello', 123])).toEqual(true)
+    expect(tupleGuard([])([])).toEqual(true)
+    expect(tupleGuard([isString])(['hello'])).toEqual(true)
+    expect(tupleGuard([isString, isNumber])(['hello', 123])).toEqual(true)
     expect(
-      tuple([isString, isNumber, isBoolean])(['hello', 123, false]),
+      tupleGuard([isString, isNumber, isBoolean])(['hello', 123, false]),
     ).toEqual(true)
   })
   it('does not allow additional elements', () => {
-    expect(tuple([])([1])).toEqual(false)
-    expect(tuple([isString])(['hello', 'hello again'])).toEqual(false)
-    expect(tuple([isString, isNumber])(['hello', 123, true])).toEqual(false)
+    expect(tupleGuard([])([1])).toEqual(false)
+    expect(tupleGuard([isString])(['hello', 'hello again'])).toEqual(false)
+    expect(tupleGuard([isString, isNumber])(['hello', 123, true])).toEqual(
+      false,
+    )
   })
   it('does not allow fewer elements', () => {
-    expect(tuple([isBoolean])([])).toEqual(false)
-    expect(tuple([isString, isString])(['hello'])).toEqual(false)
-    expect(tuple([isString, isNumber])([])).toEqual(false)
+    expect(tupleGuard([isBoolean])([])).toEqual(false)
+    expect(tupleGuard([isString, isString])(['hello'])).toEqual(false)
+    expect(tupleGuard([isString, isNumber])([])).toEqual(false)
   })
 })

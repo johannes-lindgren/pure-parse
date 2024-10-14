@@ -24,7 +24,7 @@ import { Guard } from './types'
  * ```
  * @param constants compared against `data` with the `===` operator.
  */
-export const literal =
+export const literalGuard =
   <const T extends readonly [...Primitive[]]>(
     ...constants: T
   ): Guard<T[number]> =>

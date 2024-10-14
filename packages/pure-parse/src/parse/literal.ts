@@ -1,7 +1,7 @@
 // TODO rename to primitive?
 import { Primitive } from '../common'
 import { failure, ParseFailure, Parser, ParseSuccess, success } from './types'
-import { literal as literal1 } from '../guard'
+import { literalGuard as literal1 } from '../guard'
 
 /**
  * Parse a primitive value .
