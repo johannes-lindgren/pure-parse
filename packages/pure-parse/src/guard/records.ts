@@ -11,7 +11,7 @@ import { Guard } from './types'
  * @param keys validates every key
  * @param valueGuard validates every value
  */
-export const record =
+export const recordGuard =
   <Keys extends readonly [...string[]], Value>(
     keys: Keys,
     valueGuard: Guard<Value>,
@@ -36,7 +36,7 @@ export const record =
  * @param keyGard validates every key
  * @param valueGuard validates every value
  */
-export const partialRecord =
+export const partialRecordGuard =
   <Key extends string, Value>(
     keyGard: Guard<Key>,
     valueGuard: Guard<Value>,

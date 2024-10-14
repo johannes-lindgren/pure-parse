@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from 'vitest'
-import { literal } from './literal'
+import { literalGuard } from './literal'
 import { Guard } from './types'
 
 describe('literal types', () => {
@@ -7,45 +7,45 @@ describe('literal types', () => {
     describe('type inference', () => {
       it('works with literals', () => {
         const symb = Symbol()
-        literal(symb) satisfies Guard<typeof symb>
-        literal('red') satisfies Guard<'red'>
+        literalGuard(symb) satisfies Guard<typeof symb>
+        literalGuard('red') satisfies Guard<'red'>
         // @ts-expect-error
-        literal('red') satisfies Guard<'green'>
-        literal(1) satisfies Guard<1>
+        literalGuard('red') satisfies Guard<'green'>
+        literalGuard(1) satisfies Guard<1>
         // @ts-expect-error
-        literal(1) satisfies Guard<2>
+        literalGuard(1) satisfies Guard<2>
       })
       it('forbids non-literals', () => {
         // @ts-expect-error
-        literal([])
+        literalGuard([])
         // @ts-expect-error
-        literal({})
+        literalGuard({})
       })
     })
     describe('explicit generic type annotation', () => {
       it('works with literals', () => {
-        literal<['red']>('red')
+        literalGuard<['red']>('red')
         // @ts-expect-error
-        literal<['green']>('red')
+        literalGuard<['green']>('red')
 
-        literal<[1]>(1)
+        literalGuard<[1]>(1)
         // @ts-expect-error
-        literal<[1]>(2)
+        literalGuard<[1]>(2)
 
         // @ts-expect-error
-        literal<['1']>(1)
+        literalGuard<['1']>(1)
       })
     })
   })
   describe('unions of literals', () => {
     it('validates unions of literals correctly', () => {
-      const isColor = literal('red', 'green', 'blue')
+      const isColor = literalGuard('red', 'green', 'blue')
       expect(isColor('red')).toEqual(true)
       expect(isColor('green')).toEqual(true)
       expect(isColor('blue')).toEqual(true)
       expect(isColor('music')).toEqual(false)
 
-      const isInUnion = literal('red', 1, true)
+      const isInUnion = literalGuard('red', 1, true)
       expect(isInUnion('red')).toEqual(true)
       expect(isInUnion('green')).toEqual(false)
       expect(isInUnion(1)).toEqual(true)
@@ -54,43 +54,45 @@ describe('literal types', () => {
       expect(isInUnion(false)).toEqual(false)
     })
     it('infers the types of unions of literals', () => {
-      literal('red', 1, true) satisfies Guard<'red' | 1 | true>
-      literal('red', 'green', 'blue') satisfies Guard<'red' | 'green' | 'blue'>
+      literalGuard('red', 1, true) satisfies Guard<'red' | 1 | true>
+      literalGuard('red', 'green', 'blue') satisfies Guard<
+        'red' | 'green' | 'blue'
+      >
       // @ts-expect-error
-      literal('red', 'green', 'blue') satisfies Guard<'red'>
+      literalGuard('red', 'green', 'blue') satisfies Guard<'red'>
     })
     test('explicit type annotation', () => {
-      literal<['red', 'green', 'blue']>('red', 'green', 'blue')
+      literalGuard<['red', 'green', 'blue']>('red', 'green', 'blue')
       // @ts-expect-error
-      literal<['red', 'green', 'blue']>('red')
+      literalGuard<['red', 'green', 'blue']>('red')
       // @ts-expect-error
-      literal<['red', 'green', 'blue']>('red', 'green', 'blue', 'music')
+      literalGuard<['red', 'green', 'blue']>('red', 'green', 'blue', 'music')
     })
   })
   describe('literal', () => {
     it('matches null', () => {
-      expect(literal(null)(null)).toEqual(true)
+      expect(literalGuard(null)(null)).toEqual(true)
     })
     it('matches undefined', () => {
-      expect(literal(undefined)(undefined)).toEqual(true)
+      expect(literalGuard(undefined)(undefined)).toEqual(true)
     })
     it('matches strings', () => {
-      expect(literal('')('')).toEqual(true)
-      expect(literal('a')('a')).toEqual(true)
-      expect(literal('abc')('123')).toEqual(false)
+      expect(literalGuard('')('')).toEqual(true)
+      expect(literalGuard('a')('a')).toEqual(true)
+      expect(literalGuard('abc')('123')).toEqual(false)
     })
     it('matches numbers', () => {
-      expect(literal(-1)(-1)).toEqual(true)
-      expect(literal(0)(0)).toEqual(true)
-      expect(literal(1)(1)).toEqual(true)
+      expect(literalGuard(-1)(-1)).toEqual(true)
+      expect(literalGuard(0)(0)).toEqual(true)
+      expect(literalGuard(1)(1)).toEqual(true)
 
-      expect(literal(123)('123')).toEqual(false)
+      expect(literalGuard(123)('123')).toEqual(false)
     })
     it('matches booleans', () => {
-      expect(literal(true)(true)).toEqual(true)
-      expect(literal(false)(false)).toEqual(true)
-      expect(literal(true)(false)).toEqual(false)
-      expect(literal(false)(true)).toEqual(false)
+      expect(literalGuard(true)(true)).toEqual(true)
+      expect(literalGuard(false)(false)).toEqual(true)
+      expect(literalGuard(true)(false)).toEqual(false)
+      expect(literalGuard(false)(true)).toEqual(false)
     })
   })
 })

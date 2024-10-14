@@ -2,8 +2,8 @@ import { objectGuard, objectGuardNoJit } from './object'
 import { describe, expect, it, test } from 'vitest'
 import { isNumber, isString, isUndefined } from './primitives'
 import { Guard } from './types'
-import { union } from './union'
-import { optional, undefineable } from './optional'
+import { unionGuard } from './union'
+import { optionalGuard, undefineableGuard } from './optional'
 
 const suits = [
   {
@@ -62,7 +62,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             objectGuard<User1>({
               id: isNumber,
               // @ts-expect-error
-              name: optional(isString),
+              name: optionalGuard(isString),
             })
 
             type UserUndefinable = {
@@ -72,12 +72,12 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             objectGuard<UserUndefinable>({
               id: isNumber,
               // required property, union of string and undefined
-              name: undefineable(isString),
+              name: undefineableGuard(isString),
             })
             objectGuard<UserUndefinable>({
               id: isNumber,
               // @ts-expect-error - name can be undefined, but it is not optional
-              name: optional(isString),
+              name: optionalGuard(isString),
             })
             objectGuard<UserUndefinable>({
               id: isNumber,
@@ -114,12 +114,12 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             objectGuard<UserOptional>({
               id: isNumber,
               // @ts-expect-error - requires optional function
-              name: union(isUndefined, isString),
+              name: unionGuard(isUndefined, isString),
             })
             objectGuard<UserOptional>({
               id: isNumber,
               // As expected; requires the optional function
-              name: optional(isString),
+              name: optionalGuard(isString),
             })
           })
           it('works with complex objects', () => {
@@ -136,7 +136,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             objectGuard<User1>({
               id: isNumber,
               name: isString,
-              address: optional(
+              address: optionalGuard(
                 objectGuard({
                   country: isString,
                   city: isString,
@@ -161,7 +161,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
               // @ts-expect-error
               id: isNumber,
               name: isString,
-              address: optional(
+              address: optionalGuard(
                 objectGuard({
                   country: isString,
                   city: isString,
@@ -223,7 +223,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
       })
       test('that undefinable properties are required', () => {
         const isObj = objectGuard({
-          a: undefineable(isString),
+          a: undefineableGuard(isString),
         })
         expect(
           isObj({
@@ -235,7 +235,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
       })
       it('validates optional properties', () => {
         const isObj = objectGuard({
-          a: optional(isString),
+          a: optionalGuard(isString),
         })
         expect(
           isObj({
@@ -247,12 +247,12 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
       })
       it('differentiates between undefined and missing properties', () => {
         const isOptionalObj = objectGuard({
-          a: optional(isString),
+          a: optionalGuard(isString),
         })
         expect(isOptionalObj({})).toEqual(true)
         expect(isOptionalObj({ a: undefined })).toEqual(true)
         const isUnionObj = objectGuard({
-          a: union(isString, isUndefined),
+          a: unionGuard(isString, isUndefined),
         })
         expect(isUnionObj({})).toEqual(false)
         expect(isUnionObj({ a: undefined })).toEqual(true)

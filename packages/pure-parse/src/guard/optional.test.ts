@@ -1,5 +1,10 @@
 import { describe, expect, it, test } from 'vitest'
-import { nullable, optional, optionalNullable, undefineable } from './optional'
+import {
+  nullableGuard,
+  optionalGuard,
+  optionalNullableGuard,
+  undefineableGuard,
+} from './optional'
 import { isBoolean, isNumber, isString } from './primitives'
 import { objectGuard } from './object'
 import { Infer } from '../common'
@@ -7,24 +12,24 @@ import { Equals } from '../internals'
 
 describe('optional', () => {
   it('matches undefined', () => {
-    expect(optional(isString)(undefined)).toEqual(true)
+    expect(optionalGuard(isString)(undefined)).toEqual(true)
   })
   it('mismatches undefined', () => {
-    expect(optional(isString)(null)).toEqual(false)
+    expect(optionalGuard(isString)(null)).toEqual(false)
   })
   it('matches the guard type of the guard argument', () => {
-    expect(optional(isBoolean)(true)).toEqual(true)
-    expect(optional(isNumber)(123)).toEqual(true)
-    expect(optional(isString)('hello')).toEqual(true)
+    expect(optionalGuard(isBoolean)(true)).toEqual(true)
+    expect(optionalGuard(isNumber)(123)).toEqual(true)
+    expect(optionalGuard(isString)('hello')).toEqual(true)
   })
   it('only matches the guard type of the guard argument', () => {
-    expect(optional(isBoolean)(123)).toEqual(false)
-    expect(optional(isNumber)('hello')).toEqual(false)
-    expect(optional(isString)(true)).toEqual(false)
+    expect(optionalGuard(isBoolean)(123)).toEqual(false)
+    expect(optionalGuard(isNumber)('hello')).toEqual(false)
+    expect(optionalGuard(isString)(true)).toEqual(false)
   })
   it('represent optional properties', () => {
     const isObj = objectGuard({
-      a: optional(isString),
+      a: optionalGuard(isString),
     })
     expect(isObj({ a: 'hello' })).toEqual(true)
     expect(isObj({ a: undefined })).toEqual(true)
@@ -33,7 +38,7 @@ describe('optional', () => {
   test('type inference', () => {
     const isObj = objectGuard({
       id: isNumber,
-      name: optional(isString),
+      name: optionalGuard(isString),
     })
     type User = {
       id: number
@@ -58,42 +63,42 @@ describe('optional', () => {
 })
 describe('nullable', () => {
   it('matches undefined', () => {
-    expect(nullable(isString)(undefined)).toEqual(false)
+    expect(nullableGuard(isString)(undefined)).toEqual(false)
   })
   it('mismatches undefined', () => {
-    expect(nullable(isString)(null)).toEqual(true)
+    expect(nullableGuard(isString)(null)).toEqual(true)
   })
   it('matches the guard type of the guard argument', () => {
-    expect(nullable(isBoolean)(true)).toEqual(true)
-    expect(nullable(isNumber)(123)).toEqual(true)
-    expect(nullable(isString)('hello')).toEqual(true)
+    expect(nullableGuard(isBoolean)(true)).toEqual(true)
+    expect(nullableGuard(isNumber)(123)).toEqual(true)
+    expect(nullableGuard(isString)('hello')).toEqual(true)
   })
   it('only matches the guard type of the guard argument', () => {
-    expect(nullable(isBoolean)(123)).toEqual(false)
-    expect(nullable(isNumber)('hello')).toEqual(false)
-    expect(nullable(isString)(true)).toEqual(false)
+    expect(nullableGuard(isBoolean)(123)).toEqual(false)
+    expect(nullableGuard(isNumber)('hello')).toEqual(false)
+    expect(nullableGuard(isString)(true)).toEqual(false)
   })
 })
 describe('optionalNullable', () => {
   it('matches undefined', () => {
-    expect(optionalNullable(isString)(undefined)).toEqual(true)
+    expect(optionalNullableGuard(isString)(undefined)).toEqual(true)
   })
   it('mismatches undefined', () => {
-    expect(optionalNullable(isString)(null)).toEqual(true)
+    expect(optionalNullableGuard(isString)(null)).toEqual(true)
   })
   it('matches the guard type of the guard argument', () => {
-    expect(optionalNullable(isBoolean)(true)).toEqual(true)
-    expect(optionalNullable(isNumber)(123)).toEqual(true)
-    expect(optionalNullable(isString)('hello')).toEqual(true)
+    expect(optionalNullableGuard(isBoolean)(true)).toEqual(true)
+    expect(optionalNullableGuard(isNumber)(123)).toEqual(true)
+    expect(optionalNullableGuard(isString)('hello')).toEqual(true)
   })
   it('only matches the guard type of the guard argument', () => {
-    expect(optionalNullable(isBoolean)(123)).toEqual(false)
-    expect(optionalNullable(isNumber)('hello')).toEqual(false)
-    expect(optionalNullable(isString)(true)).toEqual(false)
+    expect(optionalNullableGuard(isBoolean)(123)).toEqual(false)
+    expect(optionalNullableGuard(isNumber)('hello')).toEqual(false)
+    expect(optionalNullableGuard(isString)(true)).toEqual(false)
   })
   it('represent optional properties', () => {
     const isObj = objectGuard({
-      a: optionalNullable(isString),
+      a: optionalNullableGuard(isString),
     })
     expect(isObj({ a: 'hello' })).toEqual(true)
     expect(isObj({ a: undefined })).toEqual(true)
@@ -103,37 +108,37 @@ describe('optionalNullable', () => {
 })
 describe('nullable', () => {
   it('mismatches undefined', () => {
-    expect(nullable(isString)(undefined)).toEqual(false)
+    expect(nullableGuard(isString)(undefined)).toEqual(false)
   })
   it('matches null', () => {
-    expect(nullable(isString)(null)).toEqual(true)
+    expect(nullableGuard(isString)(null)).toEqual(true)
   })
   it('matches the guard type of the guard argument', () => {
-    expect(nullable(isBoolean)(true)).toEqual(true)
-    expect(nullable(isNumber)(123)).toEqual(true)
-    expect(nullable(isString)('hello')).toEqual(true)
+    expect(nullableGuard(isBoolean)(true)).toEqual(true)
+    expect(nullableGuard(isNumber)(123)).toEqual(true)
+    expect(nullableGuard(isString)('hello')).toEqual(true)
   })
   it('only matches the guard type of the guard argument', () => {
-    expect(nullable(isBoolean)(123)).toEqual(false)
-    expect(nullable(isNumber)('hello')).toEqual(false)
-    expect(nullable(isString)(true)).toEqual(false)
+    expect(nullableGuard(isBoolean)(123)).toEqual(false)
+    expect(nullableGuard(isNumber)('hello')).toEqual(false)
+    expect(nullableGuard(isString)(true)).toEqual(false)
   })
 })
 describe('undefinable', () => {
   it('matches undefined', () => {
-    expect(undefineable(isString)(undefined)).toEqual(true)
+    expect(undefineableGuard(isString)(undefined)).toEqual(true)
   })
   it('mismatches null', () => {
-    expect(undefineable(isString)(null)).toEqual(false)
+    expect(undefineableGuard(isString)(null)).toEqual(false)
   })
   it('matches the guard type of the guard argument', () => {
-    expect(undefineable(isBoolean)(true)).toEqual(true)
-    expect(undefineable(isNumber)(123)).toEqual(true)
-    expect(undefineable(isString)('hello')).toEqual(true)
+    expect(undefineableGuard(isBoolean)(true)).toEqual(true)
+    expect(undefineableGuard(isNumber)(123)).toEqual(true)
+    expect(undefineableGuard(isString)('hello')).toEqual(true)
   })
   it('only matches the guard type of the guard argument', () => {
-    expect(undefineable(isBoolean)(123)).toEqual(false)
-    expect(undefineable(isNumber)('hello')).toEqual(false)
-    expect(undefineable(isString)(true)).toEqual(false)
+    expect(undefineableGuard(isBoolean)(123)).toEqual(false)
+    expect(undefineableGuard(isNumber)('hello')).toEqual(false)
+    expect(undefineableGuard(isString)(true)).toEqual(false)
   })
 })
