@@ -2,7 +2,7 @@ import { describe, expect, it, test } from 'vitest'
 import { object as objectParseEval, objectNoJit } from './object'
 import { isSuccess, Parser } from './types'
 import type { Equals } from '../internals'
-import { nullable, optional, union } from './union'
+import { union } from './union'
 import {
   parseBoolean,
   parseNumber,
@@ -12,6 +12,7 @@ import {
 import { fallback } from './fallback'
 import { Infer } from '../common'
 import { literal } from './literal'
+import { nullable, optional } from './optional'
 
 const suits = [
   {
