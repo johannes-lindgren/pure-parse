@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { arrayGuard } from './validation'
 import { isString } from './primitives'
 import { Guard } from './types'
 import { literal } from './literal'
 import { union } from './union'
 import { objectGuard } from './object'
+import { arrayGuard } from './arrays'
 
 describe('README examples', () => {
   describe('Tree', () => {

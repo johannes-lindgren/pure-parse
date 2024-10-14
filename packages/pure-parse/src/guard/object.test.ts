@@ -2,8 +2,8 @@ import { objectGuard, objectGuardNoJit } from './object'
 import { describe, expect, it, test } from 'vitest'
 import { isNumber, isString, isUndefined } from './primitives'
 import { Guard } from './types'
-import { optional, undefineable } from './validation'
 import { union } from './union'
+import { optional, undefineable } from './optional'
 
 const suits = [
   {
