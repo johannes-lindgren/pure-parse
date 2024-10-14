@@ -73,3 +73,53 @@ const parseUser = object({
 // The inferred type of `User` is `{ name: string, email: string }`
 type User = Infer<typeof parseUser>
 ```
+
+## Recursive Types
+
+Due to a limitation of TypeScript, not all types _can_ be inferred; in particular, recursive types are not inferrable.
+
+For example, attempt to define a tree parser:
+
+```ts:line-numbers
+const parseTree = object({
+  name: parseString,
+  children: array(parseTree), // [!code error]
+})
+```
+
+Yields the following error on line 3:
+
+> TS2448: Block-scoped variable parseTree used before its declaration.
+
+The way to work around this error is to wrap the reference in a function:
+
+```ts:line-numbers
+const parseTree = (data) =>  // [!code error]
+  object({
+    name: parseString,
+    children: array(parseTree),
+  })(data)
+```
+
+But that gives the following errors on line 1:
+
+TS7023: parseTree implicitly has return type any because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions.
+
+TS7006: Parameter data implicitly has an any type.
+
+The way to finally address it is to declare the type explicitly:
+
+```ts:line-numbers
+type Tree = {
+  name: string
+  children: Tree[]
+}
+
+const parseTree: Parser<Tree> = (data) =>
+  object({
+    name: parseString,
+    children: array(parseTree),
+  })(data)
+```
+
+Thus, with recursive types, there is simply no way to avoid type declaration entirely.

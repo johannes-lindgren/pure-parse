@@ -29,7 +29,7 @@ features:
   - title: Fast
     icon:
       src: /guage.svg
-    details: 4 times the speed of Zod. Memoize for even faster validation.
+    details: Among the fastest validators. Memoize for even better performance.
     link: /guide/overview#fast
   - title: Fail-safe
     icon:

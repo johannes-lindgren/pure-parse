@@ -1,13 +1,15 @@
-import { array, partialRecord, union } from './validation'
-import { isBoolean, isNull, isNumber, isString } from './guards'
+import { isBoolean, isNull, isNumber, isString } from './primitives'
 import { JsonValue } from '../common'
+import { unionGuard } from './union'
+import { partialRecordGuard } from './records'
+import { arrayGuard } from './arrays'
 
 export const isJsonValue = (data: unknown): data is JsonValue =>
-  union(
+  unionGuard(
     isNull,
     isBoolean,
     isNumber,
     isString,
-    partialRecord(isString, isJsonValue),
-    array(isJsonValue),
+    partialRecordGuard(isString, isJsonValue),
+    arrayGuard(isJsonValue),
   )(data)

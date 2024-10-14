@@ -22,7 +22,9 @@ export default defineConfig({
           { text: 'Parsers', link: '/guide/parsers' },
           { text: 'Guards', link: '/guide/guards' },
           { text: 'Failsafe Parsing', link: '/guide/fallbacks' },
+          { text: 'Customizing', link: '/guide/customizing' },
           { text: 'Performance', link: '/guide/performance' },
+          { text: 'Security', link: '/guide/security' },
           {
             text: 'Comparison',
             link: '/guide/comparison',

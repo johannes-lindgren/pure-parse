@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { array, literal, object, union, Guard } from './validation'
-import { isString } from './guards'
+import { isString } from './primitives'
+import { Guard } from './types'
+import { literalGuard } from './literal'
+import { unionGuard } from './union'
+import { objectGuard } from './object'
+import { arrayGuard } from './arrays'
 
 describe('README examples', () => {
   describe('Tree', () => {
@@ -12,19 +16,19 @@ describe('README examples', () => {
     const leaf =
       <T>(guard: Guard<T>) =>
       (data: unknown): data is Leaf<T> =>
-        object({
-          tag: literal('leaf'),
+        objectGuard({
+          tag: literalGuard('leaf'),
           data: guard,
         })(data)
 
     const tree =
       <T>(guard: Guard<T>) =>
       (data: unknown): data is Tree<T> =>
-        union(
+        unionGuard(
           leaf(guard),
-          object({
-            tag: literal('tree'),
-            data: array(union(leaf(guard), tree(guard))),
+          objectGuard({
+            tag: literalGuard('tree'),
+            data: arrayGuard(unionGuard(leaf(guard), tree(guard))),
           }),
         )(data)
     describe('leaf', () => {
