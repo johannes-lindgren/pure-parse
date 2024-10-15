@@ -1,5 +1,4 @@
 export * from './primitives'
-export * from './json'
 export * from './types'
 export * from './literal'
 export * from './union'

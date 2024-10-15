@@ -320,12 +320,9 @@ isState({ tag: 'loaded', message: 'Data loaded' }) // -> true
 
 ## Unknown Data
 
-Sometimes, you may want to defer the validation of the parsed value until later. In these instances, use either of these
-functions:
+Sometimes, you may want to defer the validation of the parsed value until later. In these instances, use `isUnknown`:
 
 - `isUnknown`—always returns `true`, which means that the parsed value will be of type `unknown`.
-- `isJsonValue`—validates that the parsed value is of type `JsonValue`, which is a type that describes any
-  JSON-serializable data.
 
 ```ts
 /* {
@@ -335,7 +332,7 @@ functions:
  */
 const isArticle = object({
   id: isNumber,
-  customMetaData: isJsonValue,
+  customMetaData: isUknown,
 })
 isArticle({
   id: 42,
