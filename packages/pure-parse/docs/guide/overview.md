@@ -61,11 +61,12 @@ By having a small size, and by being tree-shakable, [PureParse](https://www.npmj
 
 ## Fast
 
-PureParse is [one of the fastest](comparison.md#performance-benchmarks) validators.
+PureParse is [one of the fastest](comparison.md#performance-benchmarks) validators. PureParse owes its great performance to just-in-time compilation: when constructing a parser, the argument gets compiled at runtime into a function that can be optimized by V8 (and other JavaScript engines). This technique is used by all the fastest validation libraries.
 
-When working with immutable data structures, memoization can help increase performance by orders of magnitude. It is especially useful when the parsed data is being rendered to the screen with a functional UI library like React. For React to be able to skip re-rendering, the references in the parsed result must be stable, which is achieved with memoization.
+> [!NOTE]
+> Content Security Policy (CSP) can prevent JIT compilation from working. See [Security > Content Security Policy](/guide/security.html#content-security-policy) for more information.
 
-[Read more](performance)
+When working with immutable data structures, [memoization](memoization) can help increase performance by orders of magnitude. It is especially useful when the parsed data is being rendered to the screen with a functional UI library like React. For React to be able to skip re-rendering, the references in the parsed result must be stable, which is achieved with memoization.
 
 ## Fail-safe
 
