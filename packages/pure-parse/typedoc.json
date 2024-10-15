@@ -3,7 +3,12 @@
   "out": "./docs/api",
   "basePath": "./src",
   "docsRoot": "./docs",
-  "entryPoints": ["./src/parse", "./src/guard", "./src/common"],
+  "entryPoints": [
+    "./src/common",
+    "./src/parse",
+    "./src/guard",
+    "./src/memoization"
+  ],
   "exclude": ["**/*.test.ts"],
   "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
   "githubPages": false,

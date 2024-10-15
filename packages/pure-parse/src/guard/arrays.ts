@@ -15,7 +15,7 @@ export const arrayGuard =
  * @param itemGuard validates every item in the array
  * @return a guard function that validates non-empty arrays
  */
-export const nonEmptyArray =
+export const nonEmptyArrayGuard =
   <T>(itemGuard: Guard<T>): Guard<[T, ...T[]]> =>
   (data: unknown): data is [T, ...T[]] =>
     Array.isArray(data) && data.length !== 0 && data.every(itemGuard)
