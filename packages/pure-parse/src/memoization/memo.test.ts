@@ -1,7 +1,7 @@
 import { describe, expect, it, test, vi } from 'vitest'
 import { memo, memoizeValidatorConstructor } from './memo'
 import { parseNumber, parseString, object, array, optional } from '../parse'
-import { isNumber, isString, object as objectGuard } from '../guard'
+import { isNumber, isString, objectGuard } from '../guard'
 
 describe('memoization', () => {
   describe('memo', () => {
@@ -93,6 +93,14 @@ describe('memoization', () => {
       expect(parseUser).toHaveBeenCalledTimes(3)
     })
 
+    test('that you can wrap primitive validators in memo, even though memoization does not occur', () => {
+      const primitiveGuard = vi.fn(isString)
+      const memoizedPrimitiveGuard = memo(primitiveGuard)
+      memoizedPrimitiveGuard('hello')
+      memoizedPrimitiveGuard('hello')
+      expect(primitiveGuard).toHaveBeenCalledTimes(2)
+    })
+
     describe('optional properties', () => {
       type User = {
         id: number
@@ -114,6 +122,15 @@ describe('memoization', () => {
         expect(
           parseUser({
             id: 1,
+          }),
+        ).toHaveProperty('tag', 'success')
+        expect(
+          parseUser({
+            id: 1,
+            address: {
+              street: '123 Main St',
+              city: 'Muggleridge',
+            },
           }),
         ).toHaveProperty('tag', 'success')
 

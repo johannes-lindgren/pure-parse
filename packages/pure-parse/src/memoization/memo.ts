@@ -1,10 +1,11 @@
-import { Parser } from '../parse'
-import { Guard } from '../guard'
+import { OptionalParser, Parser } from '../parse'
+import { Guard, isObject, OptionalGuard } from '../guard'
 import { optionalSymbol } from '../internals'
 
 /**
  * Memoizes a validator function—a parser or a guard.
  * Internally, a memoized function uses a [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) to prevent memory leaks.
+ * While you can wrap any validator function within `memo`, primitive values will not be memoized.
  * @example
  * const parseUser = memo(object({
  *  id: parseNumber,
@@ -25,9 +26,13 @@ import { optionalSymbol } from '../internals'
  * @param validator A parser or guard function.
  * @returns A memoized version of `validator`.
  */
-export const memo = <T extends (arg: object) => unknown>(validator: T): T => {
+export const memo = <T extends (arg: unknown) => unknown>(validator: T): T => {
   const cache = new WeakMap()
   const fn = ((arg) => {
+    if (!isObject(arg)) {
+      // Can only memoize objects
+      return validator(arg)
+    }
     if (cache.has(arg)) {
       return cache.get(arg)
     }
@@ -35,15 +40,11 @@ export const memo = <T extends (arg: object) => unknown>(validator: T): T => {
     cache.set(arg, result)
     return result
   }) as T
-  // @ts-expect-error
-  return validator[optionalSymbol]
-    ? Object.assign(
-        {
-          [optionalSymbol]: true,
-        },
-        fn,
-      )
-    : fn
+  if (optionalSymbol in validator && validator[optionalSymbol]) {
+    // @ts-expect-error make the memoized function an optional validator
+    fn[optionalSymbol] = true
+  }
+  return fn
 }
 
 /**
