@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from 'vitest'
-import { arrayGuard, nonEmptyArray } from './arrays'
+import { arrayGuard, nonEmptyArrayGuard } from './arrays'
 import {
   isBoolean,
   isNonEmptyArray,
@@ -109,7 +109,7 @@ describe('nonEmptyArray', () => {
     })
     it('infers the exact type', () => {
       // Number
-      const isNumberArray = nonEmptyArray(isNumber)
+      const isNumberArray = nonEmptyArrayGuard(isNumber)
       type NumberArray = Infer<typeof isNumberArray>
       const assertionNumber1: Equals<NumberArray, [number, ...number[]]> = true
       const assertionNumber2: Equals<NumberArray, number[]> = false
@@ -117,7 +117,7 @@ describe('nonEmptyArray', () => {
       const assertionNumber4: Equals<NumberArray, [unknown, ...unknown[]]> =
         false
       // String
-      const isStringArray = nonEmptyArray(isString)
+      const isStringArray = nonEmptyArrayGuard(isString)
       type StringArray = Infer<typeof isStringArray>
       const assertionString1: Equals<StringArray, [string, ...string[]]> = true
       const assertionString2: Equals<StringArray, string[]> = false
@@ -127,17 +127,17 @@ describe('nonEmptyArray', () => {
     })
   })
   it('validates nonempty arrays', () => {
-    expect(nonEmptyArray(isUnknown)([1])).toEqual(true)
-    expect(nonEmptyArray(isUnknown)([1, 2, 3])).toEqual(true)
+    expect(nonEmptyArrayGuard(isUnknown)([1])).toEqual(true)
+    expect(nonEmptyArrayGuard(isUnknown)([1, 2, 3])).toEqual(true)
   })
   it('invalidates empty arrays', () => {
-    expect(nonEmptyArray(isUnknown)([])).toEqual(false)
+    expect(nonEmptyArrayGuard(isUnknown)([])).toEqual(false)
   })
   it('invalidates non-arrays', () => {
-    expect(nonEmptyArray(isUnknown)({})).toEqual(false)
+    expect(nonEmptyArrayGuard(isUnknown)({})).toEqual(false)
   })
   it('validates each item in the array', () => {
-    expect(nonEmptyArray(isNumber)([1, 2])).toEqual(true)
-    expect(nonEmptyArray(isNumber)(['a', 'b'])).toEqual(false)
+    expect(nonEmptyArrayGuard(isNumber)([1, 2])).toEqual(true)
+    expect(nonEmptyArrayGuard(isNumber)(['a', 'b'])).toEqual(false)
   })
 })

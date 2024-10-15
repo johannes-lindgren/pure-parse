@@ -59,7 +59,7 @@ export const memo = <T extends (arg: unknown) => unknown>(validator: T): T => {
  * @returns A function of the same type of `validatorConstructor`, but when called, the returned function is memoized.
  */
 export const memoizeValidatorConstructor = <
-  T extends (schema: any) => Parser<unknown> | Guard<unknown>,
+  T extends (...schema: never[]) => Parser<unknown> | Guard<unknown>,
 >(
   validatorConstructor: T,
-): T => ((schema) => memo(validatorConstructor(schema))) as T
+): T => ((...schema) => memo(validatorConstructor(...schema))) as T
