@@ -112,9 +112,10 @@ Here's an overview of the principles that guide the development of PureParse:
 
 There are some things that PureParse does not aim to solve:
 
+- Data serialization and deserialization—PureParse does not cover the type of functionality that `JSON.parse`, `JSON.stringify`, or `parseFloat` do; or any of that kind.
 - Asynchronous validation
 - Structured error messages—error messages that can be parsed by a machine and translated. PureParse is not built to be used as a user-input validation library.
 - Compiled parsers—parsers can be made faster by being compiled from schemas ahead of time.
 - Serializable schemas—schemas than can be transmitted over the wire.
 
-If there's sufficient interest from the public, or if the author needs it, some of these features might be added in the future.
+If there is sufficient interest from the public, or if the author needs it, some of these features might be added in the future.
