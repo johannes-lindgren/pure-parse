@@ -1,7 +1,0 @@
-import { describe, expect, it } from 'vitest'
-import { isString } from './primitives'
-import { Parser } from './types'
-import { literal } from './literal'
-import { union } from './union'
-import { object } from './object'
-import { array } from './arrays'

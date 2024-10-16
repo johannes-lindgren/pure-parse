@@ -21,10 +21,10 @@ const parseUsers = memo(
 Nested parsers can be memoized:
 
 ```ts
-import { memo, object, array, parseString, parseNumber } from 'pure-parse'
+import { memo, object, arrays, parseString, parseNumber } from 'pure-parse'
 
 const parseUsers = memo(
-  array(
+  arrays(
     memo(
       object({
         name: parseString,
@@ -38,18 +38,18 @@ const parseUsers = memo(
 > [!TIP]
 > There's no use in memoizing parsers for primitive values: while you _can_ wrap them in `memo`, memoization will not occur.
 
-For convenience, each higher order function (`union`, `object`, `array`, etc.) has a memoized counterpart, which lets you write just as compact code as you would with the non-memoized functions:
+For convenience, each higher order function (`union`, `object`, `arrays`, etc.) has a memoized counterpart, which lets you write just as compact code as you would with the non-memoized functions:
 
 ```ts
 import {
   memo,
   objectMemo as object,
-  arrayMemo as array,
+  arrayMemo as arrays,
   parseString,
   parseNumber,
 } from 'pure-parse'
 
-const parseUsers = array(
+const parseUsers = arrays(
   object({
     name: parseString,
     age: parseNumber,

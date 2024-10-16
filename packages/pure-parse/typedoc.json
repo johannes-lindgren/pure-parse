@@ -5,8 +5,8 @@
   "docsRoot": "./docs",
   "entryPoints": [
     "./src/common",
-    "./src/parse",
-    "./src/guard",
+    "./src/parsers",
+    "./src/guards",
     "./src/memoization"
   ],
   "exclude": ["**/*.test.ts"],

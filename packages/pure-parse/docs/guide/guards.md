@@ -25,7 +25,7 @@ if (isUser(data)) {
 ```
 
 > [!TIP]
-> For a full reference, see the [API documentation on parsers](/api/guard).
+> For a full reference, see the [API documentation on parsers](/api/guards).
 
 ## Overview
 
@@ -33,26 +33,26 @@ PureParse exports two categories of functions related to type guarding.
 
 First, there are type guards. Each primitive value and reference type has a corresponding parser, where the most useful ones are:
 
-- [isNull](/api/guard/primitives#isNull)
-- [isUndefined](/api/guard/primitives#isUndefined)
-- [isBoolean](/api/guard/primitives#isBoolean)
-- [isNumber](/api/guard/primitives#isNumber)
-- [isString](/api/guard/primitives#isString)
-- [isObject](/api/guard/primitives#isObject)
-- [isArray](/api/guard/primitives#isArray)
-- [isFunction](/api/guard/primitives#isFunction)
+- [isNull](/api/guards/primitives#isNull)
+- [isUndefined](/api/guards/primitives#isUndefined)
+- [isBoolean](/api/guards/primitives#isBoolean)
+- [isNumber](/api/guards/primitives#isNumber)
+- [isString](/api/guards/primitives#isString)
+- [isObject](/api/guards/primitives#isObject)
+- [isArray](/api/guards/primitives#isArray)
+- [isFunction](/api/guards/primitives#isFunction)
 
 Secondly, there is a category of higher order functions that constructs new guards based on parameters:
 
-- [literalGuard](/api/guard/literal#literalGuard)
-- [unionGuard](/api/guard/union#unionGuard)
-- [tupleGuard](/api/guard/tuple#tupleGuard)
-- [objectGuard](/api/guard/object#objectGuard)
-- [recordGuard](/api/guard/records#recordGuard)
-- [partialRecordGuard](/api/guard/records#partialRecordGuard)
-- [arrayGuard](/api/guard/arrays#arrayGuard)
-- [nonEmptyArrayGuard](/api/guard/arrays#nonEmptyArrayGuard)
-- [optionalGuard](/api/guard/optional#optionalGuard)–for optional properties. This function is special; only Guard functions constructed with `optional` can describe optional properties.
+- [literalGuard](/api/guards/literal#literalGuard)
+- [unionGuard](/api/guards/union#unionGuard)
+- [tupleGuard](/api/guards/tuple#tupleGuard)
+- [objectGuard](/api/guards/object#objectGuard)
+- [recordGuard](/api/guards/records#recordGuard)
+- [partialRecordGuard](/api/guards/records#partialRecordGuard)
+- [arrayGuard](/api/guards/arrays#arrayGuard)
+- [nonEmptyArrayGuard](/api/guards/arrays#nonEmptyArrayGuard)
+- [optionalGuard](/api/guards/optional#optionalGuard)–for optional properties. This function is special; only Guard functions constructed with `optional` can describe optional properties.
 
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
 
@@ -64,7 +64,7 @@ import {
   optionalGuard as optional,
 } from 'pure-parse'
 
-const isUsers = array(
+const isUsers = arrays(
   object({
     id: isNumber,
     parentId: nullable(isNumber),
@@ -205,7 +205,7 @@ const isUser = objectGuard<User>({
 
 ## Arrays
 
-Arrays are ordered sets of elements of the same type. Use the `arrayGuard()` function to create a validation function for an array type:
+Arrays are ordered sets of elements of the same type. Use the `arrayGuard()` function to create a validation function for an arrays type:
 
 ```ts
 const isBase = literalGuard('A', 'T', 'C', 'G')
@@ -213,7 +213,7 @@ const isDna = arrayGuard(isBase)
 isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
 ```
 
-When explicitly declaring array types, provide type of the item in the array type argument:
+When explicitly declaring arrays types, provide type of the item in the arrays type argument:
 
 ```ts
 // Guard<number[]>

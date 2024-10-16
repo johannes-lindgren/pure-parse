@@ -25,8 +25,8 @@ _Loose assertion_ means that the function checks if the object conforms to the s
 
 | Function                                         | Mops/s | Relative to PureParse |
 | ------------------------------------------------ | ------ | --------------------- |
-| [PureParse](/api/guard/object#objectGuard)\*     | 75.5   | 100%                  |
-| [PureParse](/api/guard/object#objectGuardNoJit)  | 5.7    | 7.5%                  |
+| [PureParse](/api/guards/object#objectGuard)\*    | 75.5   | 100%                  |
+| [PureParse](/api/guards/object#objectGuardNoJit) | 5.7    | 7.5%                  |
 | [Zod](https://www.npmjs.com/package/zod)         | 1.12   | 1.4%                  |
 | [io-ts](https://www.npmjs.com/package/io-ts)     | 3.5    | 4.7%                  |
 | [Ajv](https://www.npmjs.com/package/ajv)\*       | 49     | 65%                   |
@@ -42,8 +42,8 @@ _Safe parsing_ means that a copy of the parsed data is returned, which contains 
 
 | Function                                         | Mops/s | Relative to PureParse |
 | ------------------------------------------------ | ------ | --------------------- |
-| [PureParse](/api/parse/object#object)\*          | 28.4   | 100%                  |
-| [PureParse](/api/parse/object#objectNoJit)       | 4.1    | 5.5%                  |
+| [PureParse](/api/parsers/object#object)\*        | 28.4   | 100%                  |
+| [PureParse](/api/parsers/object#objectNoJit)     | 4.1    | 5.5%                  |
 | [Zod](https://www.npmjs.com/package/zod)         | 1.13   | 3.9%                  |
 | [io-ts](https://www.npmjs.com/package/io-ts)†    | —      | —                     |
 | [Ajv](https://www.npmjs.com/package/ajv)\*†      | —      | —                     |

@@ -38,37 +38,37 @@ switch (result.tag) {
 ```
 
 > [!TIP]
-> For a full reference, see the [API documentation on parsers](/api/parser).
+> For a full reference, see the [API documentation on parsers](/api/parsers).
 
 ## Overview
 
 PureParse exports two categories of functions related to parsing:
 
-First, there are parsers; each [primitive value](/api/parser/primitives) has a corresponding parser, where the most useful ones are:
+First, there are parsers; each [primitive value](/api/parsers/primitives) has a corresponding parser, where the most useful ones are:
 
-- [parseNull](/api/parser/primitives#parseNull)
-- [parseUndefined](/api/parser/primitives#parseUndefined)
-- [parseBoolean](/api/parser/primitives#parseBoolean)
-- [parseNumber](/api/parser/primitives#parseNumber)
-- [parseString](/api/parser/primitives#parseString)
+- [parseNull](/api/parsers/primitives#parseNull)
+- [parseUndefined](/api/parsers/primitives#parseUndefined)
+- [parseBoolean](/api/parsers/primitives#parseBoolean)
+- [parseNumber](/api/parsers/primitives#parseNumber)
+- [parseString](/api/parsers/primitives#parseString)
 
 Secondly, there is a category of higher order functions that constructs new parsers based on parameters:
 
-- [literal](/api/parser/literal#literal)
-- [union](/api/parser/union#union)
-- [tuple](/api/parser/tuple#tuple)
-- [object](/api/parser/object#object)
-- [record](/api/parser/records#record)
-- [partialRecord](/api/parser/records#partialRecord)
-- [array](/api/parser/arrays#array)
-- [optional](/api/parser/optional#optional)
+- [literal](/api/parsers/literal#literal)
+- [union](/api/parsers/union#union)
+- [tuple](/api/parsers/tuple#tuple)
+- [object](/api/parsers/object#object)
+- [record](/api/parsers/records#record)
+- [partialRecord](/api/parsers/records#partialRecord)
+- [arrays](/api/parsers/arrays#arrays)
+- [optional](/api/parsers/optional#optional)
 
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
 
 ```ts
 import { object, parseString, parseNumber, optional } from 'pure-parse'
 
-const isUsers = array(
+const isUsers = arrays(
   object({
     id: parseNumber,
     parentId: nullable(parseNumber),
@@ -211,19 +211,19 @@ const parseUser = object<User>({
 
 ## Arrays
 
-Arrays are ordered set of elements of the same type. Use the `array()` function to create a validation function for an array type:
+Arrays are ordered set of elements of the same type. Use the `arrays()` function to create a validation function for an arrays type:
 
 ```ts
 const parseBase = literal('A', 'T', 'C', 'G')
-const parseDna = array(parseBase)
+const parseDna = arrays(parseBase)
 parseDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> ParseSuccess
 ```
 
-When explicitly declaring array types, provide type of the item in the array type argument:
+When explicitly declaring arrays types, provide type of the item in the arrays type argument:
 
 ```ts
 // Validator<number[]>
-const parseNumberArray = array<number>(parseNumber)
+const parseNumberArray = arrays<number>(parseNumber)
 ```
 
 ## Tagged/Discriminated Unions

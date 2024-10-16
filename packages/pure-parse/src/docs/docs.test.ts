@@ -8,7 +8,7 @@ import {
   parseString,
   success,
   union,
-} from '../parse'
+} from '../parsers'
 import {
   arrayGuard,
   Guard,
@@ -16,7 +16,7 @@ import {
   literalGuard,
   objectGuard,
   unionGuard,
-} from '../guard'
+} from '../guards'
 
 describe('Documentation examples', () => {
   describe('parseNumberFromString', () => {

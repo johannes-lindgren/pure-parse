@@ -39,7 +39,7 @@ const hasWhiteSpace = (str: string): boolean => {
 To create a custom, higher-order parser function, create a generic function that accepts a parser as argument and returns a new parser. Here is a working example with generic trees:
 
 ```ts
-import { Parser, union, object, literal, array } from 'pure-parse'
+import { Parser, union, object, literal, arrays } from 'pure-parse'
 
 type Leaf<T> = { tag: 'leaf'; data: T }
 type Tree<T> = {
@@ -60,7 +60,7 @@ const tree =
   (data) =>
     object({
       tag: literal('tree'),
-      data: array(union(leaf(parser), tree(parser))),
+      data: arrays(union(leaf(parser), tree(parser))),
     })(data)
 ```
 
@@ -99,7 +99,7 @@ import {
   literalGuard as literal,
   objectGuard as object,
   unionGuard as union,
-  arrayGuard as array,
+  arrayGuard as arrays,
 } from 'pure-parse'
 ```
 
@@ -125,7 +125,7 @@ const treeGuard =
   (data) =>
     object({
       tag: literal('tree'),
-      data: array(union(leaf(parser), tree(parser))),
+      data: arrays(union(leaf(parser), tree(parser))),
     })(data)
 ```
 

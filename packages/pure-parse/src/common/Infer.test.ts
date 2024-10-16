@@ -4,10 +4,10 @@ import {
   isNumber,
   isString,
   objectGuard as objectGuard,
-} from '../guard'
+} from '../guards'
 import { Infer } from './Infer'
 import { Equals } from '../internals'
-import { parseBoolean, parseNumber, parseString, object } from '../parse'
+import { parseBoolean, parseNumber, parseString, object } from '../parsers'
 
 describe('Infer', () => {
   it('infers from guards', () => {

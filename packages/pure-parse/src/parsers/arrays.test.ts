@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from 'vitest'
-import { array } from './array'
+import { array } from './arrays'
 import { failure, success } from './types'
 
 import { parseNumber, parseString } from './primitives'

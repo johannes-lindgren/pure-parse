@@ -1,5 +1,5 @@
-import { Parser } from '../parse'
-import { Guard } from '../guard'
+import { Parser } from '../parsers'
+import { Guard } from '../guards'
 
 /**
  * Extract the type from a parser or guards

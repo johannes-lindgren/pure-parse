@@ -6,7 +6,7 @@ import {
   isString,
   isSymbol,
   isUndefined,
-} from '../guard'
+} from '../guards'
 import { failure, ParseFailure, ParseSuccess, success } from './types'
 
 /**
