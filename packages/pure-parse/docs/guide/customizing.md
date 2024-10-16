@@ -9,7 +9,7 @@ To create a custom parser, implement a function of the `Parser<?>` type. For exa
 ```ts
 import { Parser, ParseResult, success, failure, isString } from 'pure-parse'
 
-export const parseNumberFromString: Parser<number> = (data: unknown) => {
+const parseNumberFromString: Parser<number> = (data: unknown) => {
   if (!isString(data)) {
     return failure('Expected a string')
   }
@@ -21,9 +21,13 @@ export const parseNumberFromString: Parser<number> = (data: unknown) => {
     ? success(parsed)
     : failure(
         `The string could not be parsed into a number: got ${JSON.stringify(
-          str,
+          data,
         )}`,
       )
+}
+
+const hasWhiteSpace = (str: string): boolean => {
+  return /\s+/.test(str)
 }
 ```
 
@@ -37,29 +41,27 @@ To create a custom, higher-order parser function, create a generic function that
 ```ts
 import { Parser, union, object, literal, array } from 'pure-parse'
 
-export type Leaf<T> = { tag: 'leaf'; data: T }
-export type Tree<T> = {
+type Leaf<T> = { tag: 'leaf'; data: T }
+type Tree<T> = {
   tag: 'tree'
   data: (Tree<T> | Leaf<T>)[]
 }
-export const leaf =
-  <T>(parser: Parser<T>) =>
-  (data: unknown): data is Leaf<T> =>
+
+const leaf =
+  <T>(parser: Parser<T>): Parser<Leaf<T>> =>
+  (data) =>
     object({
       tag: literal('leaf'),
       data: parser,
     })(data)
 
-export const tree =
-  <T>(parser: Parser<T>) =>
-  (data: unknown): data is Tree<T> =>
-    union(
-      leaf(parser),
-      object({
-        tag: literal('tree'),
-        data: array(union(leaf(parser), tree(parser))),
-      }),
-    )(data)
+const tree =
+  <T>(parser: Parser<T>): Parser<Tree<T>> =>
+  (data) =>
+    object({
+      tag: literal('tree'),
+      data: array(union(leaf(parser), tree(parser))),
+    })(data)
 ```
 
 which will parse (and infer the type of) the following data:
@@ -104,29 +106,27 @@ import {
 The rest of the code becomes the same as if you were implementing a parser:
 
 ```ts
-export type Leaf<T> = { tag: 'leaf'; data: T }
-export type Tree<T> = {
+type Leaf<T> = { tag: 'leaf'; data: T }
+type Tree<T> = {
   tag: 'tree'
   data: (Tree<T> | Leaf<T>)[]
 }
-export const leafGuard =
-  <T>(guard: Guard<T>) =>
-  (data: unknown): data is Leaf<T> =>
+
+const leafGuard =
+  <T>(parser: Parser<T>): Parser<Leaf<T>> =>
+  (data) =>
     object({
       tag: literal('leaf'),
-      data: guard,
+      data: parser,
     })(data)
 
-export const tree =
-  <T>(guard: Guard<T>) =>
-  (data: unknown): data is Tree<T> =>
-    union(
-      leaf(guard),
-      object({
-        tag: literal('tree'),
-        data: array(union(leaf(guard), tree(guard))),
-      }),
-    )(data)
+const treeGuard =
+  <T>(parser: Parser<T>): Parser<Tree<T>> =>
+  (data) =>
+    object({
+      tag: literal('tree'),
+      data: array(union(leaf(parser), tree(parser))),
+    })(data)
 ```
 
 This will validate (and infer the type of) the following data:
