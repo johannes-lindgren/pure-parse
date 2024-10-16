@@ -1,7 +1,7 @@
 import { describe, expect, it, test, vi } from 'vitest'
 import { memo, memoizeValidatorConstructor } from './memo'
-import { parseNumber, parseString, object, array, optional } from '../parse'
-import { isNumber, isString, objectGuard } from '../guard'
+import { parseNumber, parseString, object, array, optional } from '../parsers'
+import { isNumber, isString, objectGuard } from '../guards'
 
 describe('memoization', () => {
   describe('memo', () => {

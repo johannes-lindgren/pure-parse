@@ -7,7 +7,7 @@ import {
   recordGuard,
   tupleGuard,
   unionGuard,
-} from '../guard'
+} from '../guards'
 
 export const unionGuardMemo = memoizeValidatorConstructor(unionGuard)
 export const objectGuardMemo = memoizeValidatorConstructor(objectGuard)

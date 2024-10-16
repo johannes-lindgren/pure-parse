@@ -69,5 +69,10 @@ export default defineConfig({
     search: {
       provider: 'local',
     },
+
+    editLink: {
+      pattern:
+        'https://github.com/johannes-lindgren/pure-parse/edit/main/packages/pure-parse/docs/:path',
+    },
   },
 })

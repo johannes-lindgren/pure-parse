@@ -26,6 +26,7 @@ export const recordGuard =
     Object.values(data).every(valueGuard) &&
     // Either: a) undefined is a valid value, or b) every key is present
     (valueGuard(undefined) || keys.every((key) => key in data))
+
 /**
  * Partial records are records with a known set of keys, but where not all keys map to values.
  * That is, every property is optional. In TypeScript, this can be represented by `Record<string, ?>`, or `Partial<Record<?, ?>>`:

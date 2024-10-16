@@ -7,7 +7,7 @@ import {
   // record,
   // tuple,
   union,
-} from '../parse'
+} from '../parsers'
 
 export const unionMemo = memoizeValidatorConstructor(union)
 export const objectMemo = memoizeValidatorConstructor(object)

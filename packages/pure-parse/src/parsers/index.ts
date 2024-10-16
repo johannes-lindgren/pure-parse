@@ -1,5 +1,5 @@
 export * from './types'
-export * from './array'
+export * from './arrays'
 export * from './object'
 export * from './union'
 export * from './primitives'
