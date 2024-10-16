@@ -76,7 +76,7 @@ Another problem with large documents is that just a tiny change can cause the va
 
 ## Extensible and Easy-to-use
 
-Unlike other validation libraries, PureParse has no concept of a schema: instead, users deal exclusively with [parsers](parsers) [gurard](guards). This makes PureParse very easy to extend: when you need a validation function which is not included in the library, you can easily construct it yourself and seamlessly integrate it with the core functionality. The functions in PureParse are not treated any differently than the ones you write yourself\*.
+Unlike other validation libraries, PureParse has no concept of a schema: instead, users deal exclusively with [parsers](parsers) [gurard](guards). This makes PureParse straightforward to extend: when you need a validation function which is not included in the library, you can easily construct it yourself and seamlessly integrate it with the core functionality. The functions in PureParse are not treated any differently than the ones you write yourself\*.
 
 Due to the small size, by design, the library does _not_ contain every feature under the sun. This library focuses on providing foundational building blocks that you can compose to validate most of your data structures.
 
@@ -115,7 +115,7 @@ There are some things that PureParse does not aim to solve:
 - Data serialization and deserialization—PureParse does not cover the type of functionality that `JSON.parse`, `JSON.stringify`, or `parseFloat` do; or any of that kind.
 - Asynchronous validation
 - Structured error messages—error messages that can be parsed by a machine and translated. PureParse is not built to be used as a user-input validation library.
-- Compiled parsers—parsers can be made faster by being compiled from schemas ahead of time.
-- Serializable schemas—schemas than can be transmitted over the wire.
+- Ahead-of-time compiled parsers—parsers can be made faster by being compiled. PureParse does just-in-time compilation, but ahead-of-time compilation is currently not a goal.
+- Serializable Schemas—schemas than can be transmitted over the wire. PureParse does not have schemas, which makes it easy to extend and easy to work with. The flip side is that the validation logic cannot be serialized.
 
 If there is sufficient interest from the public, or if the author needs it, some of these features might be added in the future.
