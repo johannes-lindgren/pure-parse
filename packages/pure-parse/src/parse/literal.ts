@@ -4,13 +4,29 @@ import { failure, ParseFailure, Parser, ParseSuccess, success } from './types'
 import { literalGuard as literal1 } from '../guard'
 
 /**
- * Parse a primitive value .
+ * Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values.
  * @example
+ * ```ts
  * const parseInfo = literal('info')
  * parseInfo('info') // => ParseSuccess<'info'>
+ * ```
  * @example
+ * ```ts
  * const parseInfo = literal('info')
  * parseInfo('error') // => ParseFailure
+ * ```
+ * @example
+ * Commonly used in discriminated unions:
+ * ```ts
+ * const parseResult = union([
+ *  object({
+ *    tag: literal('success')
+ *  }),
+ *  object({
+ *    tag: literal('error')
+ *   }),
+ * ])
+ * ```
  * @example
  * If you pass in multiple values, the parser will validate a union type:
  *  ```ts
@@ -19,11 +35,11 @@ import { literalGuard as literal1 } from '../guard'
  * parseLogLevel('error') // => ParseSuccess<'debug' | 'info' | 'warning' | 'error'>
  * ```
  * @example
- * Annotating `literal` requires you to wrap it in an array:
+ * When explicitly annotating unions, provide a tuple of the union members as type argument:
  *  ```ts
  * const parseLogLevel = literal<['debug', 'info', 'warning', 'error']>('debug', 'info', 'warning', 'error')
  * ```
- * If you want a type alias, do it like this:
+ * If you want a type alias, do it as such:
  *  ```ts
  *  type LogLevelArray = ['debug', 'info', 'warning', 'error']
  *  type LogLevel = LogLevelArray[number]

@@ -5,6 +5,7 @@ import { union } from './union'
 
 /**
  * Represent an optional property in an object. It is supposed to be used in combination with `object`.
+ * Note that in TypeScript, optional properties may be assigned `undefined` or omitted entirely from the object.
  * This function is special because it is used internally by `object` to differentiate between optional properties from required properties that can be `undefined`.
  * @example
  * Wrap properties in `optional` to make them optional:
@@ -17,9 +18,9 @@ import { union } from './union'
  *   id: parseNumber,
  *   email: optional(parseString),
  * })
- * parseUser({ id: 123 }) // => ParseSuccess
- * parseUser({ id: 123, email: undefined }) // => ParseSuccess
- * parseUser({ id: 123, email: 'abc@test.com' }) // => ParseSuccess
+ * parseUser({ id: 123 }) // -> ParseSuccess
+ * parseUser({ id: 123, email: undefined }) // -> ParseSuccess
+ * parseUser({ id: 123, email: 'abc@test.com' }) // -> ParseSuccess
  * ```
  * If `email` instead was defined as a union of `string` and `undefined`, the first call to `parseUser` would fail.
  * @param parser A parser to parse the property with.

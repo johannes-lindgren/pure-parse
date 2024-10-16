@@ -100,7 +100,7 @@ export const parseSymbol = (
   isSymbol(data) ? success(data) : failure('Not a symbol')
 
 /**
- * Use to skip validation, as it returns `true` for any input.
+ * Use to skip validation, as it results in a success for any input.
  * @example
  * ```ts
  * const parseResponse = object({

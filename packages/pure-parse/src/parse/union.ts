@@ -1,7 +1,7 @@
 import { failure, Parser, success } from './types'
 
 /**
- * Validate union types.
+ * Unions types—or sum types—represent values that can be one of several types.
  * @example
  * const parseNumberOrString = union(parseNumber, parseString)
  * parseNumberOrString(0) // => ParseSuccess<number | string>
@@ -21,7 +21,7 @@ import { failure, Parser, success } from './types'
  * )
  * ```
  * @example
- * Annotating `union` with type arguments requires you to wrap the type in an array:
+ * When explicitly annotating unions, provide a tuple of the union members as type argument:
  *  ```ts
  *  type Success = {
  *    tag: 'success'
@@ -41,6 +41,7 @@ import { failure, Parser, success } from './types'
  *   }),
  * )
  * ```
+ * Due to a limitation of TypeScript, it is not possible to write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
  * @param parsers any of these parser functions must match the data.
  * @return A parser function that validates unions
  */

@@ -18,7 +18,6 @@
   "parametersFormat": "table",
   "useCodeBlocks": true,
   "disableSources": true,
-  "membersWithOwnFile": ["Function", "TypeAlias"],
   "hideGroupHeadings": true,
   "hidePageTitle": true,
   "hideBreadcrumbs": true,
@@ -31,6 +30,6 @@
     "title.memberPage": "{name}"
   },
   "sidebar": {
-    "collapsed": false
+    "collapsed": true
   }
 }

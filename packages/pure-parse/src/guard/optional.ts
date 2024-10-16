@@ -4,7 +4,22 @@ import { isNull, isUndefined } from './primitives'
 import { optionalSymbol } from '../internals'
 
 /**
- * Represent an optional property, which is different from a required property that can be `undefined`.
+ * Represent an optional property. Note that in TypeScript, optional properties may be assigned `undefined` or omitted entirely from the object.
+ * @example
+ * Wrap properties in `optional` to make them optional:
+ * ```ts
+ * type User = {
+ *  id: number
+ *  email?: string
+ * }
+ * const isUser = object<User>({
+ *   id: isNumber,
+ *   email: optionalGuard(isString),
+ * })
+ * isUser({ id: 123 }) // -> true
+ * isUser({ id: 123, email: undefined }) // -> true
+ * isUser({ id: 123, email: 'abc@test.com' }) // -> true
+ * ```
  * @param guard
  */
 export const optionalGuard = <T>(guard: Guard<T>): OptionalGuard<T> =>

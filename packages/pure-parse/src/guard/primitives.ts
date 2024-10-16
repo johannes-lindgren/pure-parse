@@ -1,9 +1,5 @@
-/*
- * Primitive value types
- */
-
 /**
- * Returns true for any input. Use to skip validation.
+ * Returns `true` for any input. Use to skip validation.
  * @param data
  */
 export const isUnknown = (data: unknown): data is unknown => true

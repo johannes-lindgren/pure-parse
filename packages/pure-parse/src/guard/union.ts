@@ -15,10 +15,11 @@ import { Guard } from './types'
  * ])
  * ```
  * @example
- * Annotating a union literal requires you to wrap the types an array:
+ * When explicitly annotating unions, provide a tuple of the union members as type argument:
  * ```ts
  * const isId = union<[string, number]>(isString, isNumber)
  * ```
+ * Due to a limitation of TypeScript, it is not possible to write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
  * @param guards any of these guard functions must match the data.
  * @return a guard function that validates unions
  */
