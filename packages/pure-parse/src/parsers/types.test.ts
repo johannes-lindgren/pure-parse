@@ -3,13 +3,13 @@ import { array } from './arrays'
 import { object } from './object'
 import { union } from './union'
 import { parseNumber, parseString } from './primitives'
-import { fallback } from './fallback'
+import { withDefault } from './fallback'
 import { literal } from './literal'
 import { optional } from './optional'
 
 describe('parsing', () => {
   describe('some use cases', () => {
-    test('parsing objects in an array with fallback', () => {
+    test('parsing objects in an array with fallbackValue', () => {
       /*
        * Type aliases
        */
@@ -50,7 +50,7 @@ describe('parsing', () => {
       const parseDocument = object<Document>({
         title: parseString,
         description: optional(parseString),
-        content: array(fallback(parseContent, { tag: 'unknown' })),
+        content: array(withDefault(parseContent, { tag: 'unknown' })),
       })
       /*
        * Tests

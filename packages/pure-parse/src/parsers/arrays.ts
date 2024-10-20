@@ -35,7 +35,7 @@ export const array =
       return failure('Not all elements are valid')
     }
 
-    // If any element is a fallback, return a new array
+    // If any element is a fallbackValue, return a new array
     return success(
       (results as Array<Exclude<ParseResult<T>, { tag: 'failure' }>>).map(
         (result) => result.value,

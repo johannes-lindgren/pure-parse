@@ -2,6 +2,7 @@ import { failure, Parser, success } from './types'
 
 /**
  * Unions types—or sum types—represent values that can be one of several types.
+ * Tries several different parsers in order. The first successful parsing attempt will be returned, or a failure if all parsing attempts fail.
  * @example
  * const parseNumberOrString = union(parseNumber, parseString)
  * parseNumberOrString(0) // => ParseSuccess<number | string>
@@ -41,9 +42,9 @@ import { failure, Parser, success } from './types'
  *   }),
  * )
  * ```
- * Due to a limitation of TypeScript, it is not possible to write `union<string | number>()` or `literal<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
- * @param parsers any of these parser functions must match the data.
- * @return A parser function that validates unions
+ * Due to a limitation of TypeScript, it is not possible to write `union<string | number>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
+ * @param parsers A list of parsers to be called in order. Any of these parser functions must match the data.
+ * @return A parser function that validates unions. The parser will call the parsers in `parsers` in order and return the result of the first successful parsing attempt, or a failure if all parsing attempts fail.
  */
 export const union =
   <T extends readonly [...unknown[]]>(
