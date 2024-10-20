@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { nullable, optional, optionalNullable, undefineable } from './optional'
-import { fallback } from './fallback'
+import { withDefault } from './fallback'
 import { parseString } from './primitives'
 
 describe('optional', () => {
   it('works with fallbacks', () => {
-    const parseName = optional(fallback(parseString, 'anonymous'))
+    const parseName = optional(withDefault(parseString, 'anonymous'))
     expect(parseName('Johannes')).toEqual(
       expect.objectContaining({
         value: 'Johannes',
@@ -25,7 +25,7 @@ describe('optional', () => {
 })
 describe('nullable', () => {
   it('works with fallbacks', () => {
-    const parseName = nullable(fallback(parseString, 'anonymous'))
+    const parseName = nullable(withDefault(parseString, 'anonymous'))
     expect(parseName('Johannes')).toEqual(
       expect.objectContaining({
         value: 'Johannes',
@@ -45,7 +45,7 @@ describe('nullable', () => {
 })
 describe('undefinable', () => {
   it('works with fallbacks', () => {
-    const parseName = undefineable(fallback(parseString, 'anonymous'))
+    const parseName = undefineable(withDefault(parseString, 'anonymous'))
     expect(parseName('Johannes')).toEqual(
       expect.objectContaining({
         value: 'Johannes',
@@ -65,7 +65,7 @@ describe('undefinable', () => {
 })
 describe('optionalNullable', () => {
   it('works with fallbacks', () => {
-    const parseName = optionalNullable(fallback(parseString, 'anonymous'))
+    const parseName = optionalNullable(withDefault(parseString, 'anonymous'))
     expect(parseName('Johannes')).toEqual(
       expect.objectContaining({
         value: 'Johannes',

@@ -21,7 +21,7 @@ export default defineConfig({
           { text: 'Quick Start', link: '/guide/getting-started' },
           { text: 'Parsers', link: '/guide/parsers' },
           { text: 'Guards', link: '/guide/guards' },
-          { text: 'Failsafe Parsing', link: '/guide/fallbacks' },
+          { text: 'Fallbacks', link: '/guide/fallbacks' },
           { text: 'Customizing', link: '/guide/customizing' },
           { text: 'Memoization', link: '/guide/memoization' },
           { text: 'Security', link: '/guide/security' },
