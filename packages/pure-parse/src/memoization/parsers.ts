@@ -6,10 +6,10 @@ import {
   // partialRecord,
   // record,
   // tuple,
-  union,
+  oneOf,
 } from '../parsers'
 
-export const unionMemo = memoizeValidatorConstructor(union)
+export const unionMemo = memoizeValidatorConstructor(oneOf)
 export const objectMemo = memoizeValidatorConstructor(object)
 // TODO export const recordMemo = memoizeValidatorConstructor(record)
 // TODO export const partialRecordMemo =  memoizeValidatorConstructor(partialRecord)

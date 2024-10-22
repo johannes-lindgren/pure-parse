@@ -1,11 +1,11 @@
 import { describe, expect, it, test } from 'vitest'
 import { array } from './arrays'
 import { object } from './object'
-import { union } from './union'
+import { oneOf } from './oneOf'
 import { parseNumber, parseString } from './primitives'
-import { withDefault } from './fallback'
 import { literal } from './literal'
 import { optional } from './optional'
+import { always } from './always'
 
 describe('parsing', () => {
   describe('some use cases', () => {
@@ -44,13 +44,13 @@ describe('parsing', () => {
       const parseUnknownContent = object<UnknownContent>({
         tag: literal('unknown'),
       })
-      const parseContent = union<
+      const parseContent = oneOf<
         [StringContent, NumberContent, UnknownContent]
       >(parseStringContent, parseNumberContent, parseUnknownContent)
       const parseDocument = object<Document>({
         title: parseString,
         description: optional(parseString),
-        content: array(withDefault(parseContent, { tag: 'unknown' })),
+        content: array(oneOf(parseContent, always({ tag: 'unknown' }))),
       })
       /*
        * Tests

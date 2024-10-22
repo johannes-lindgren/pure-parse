@@ -18,7 +18,7 @@ import { literalGuard as literal1 } from '../guards'
  * @example
  * Commonly used in discriminated unions:
  * ```ts
- * const parseResult = union([
+ * const parseResult = oneOf([
  *  object({
  *    tag: literal('success')
  *  }),

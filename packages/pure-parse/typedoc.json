@@ -24,7 +24,7 @@
   "expandParameters": false,
   "expandObjects": true,
   "readme": "./docs/api-index.md",
-  "blockTagsPreserveOrder": ["@example", "@returns"],
+  "blockTagsPreserveOrder": ["@see", "@returns", "@example"],
   "textContentMappings": {
     "title.indexPage": "API Reference",
     "title.memberPage": "{name}"

@@ -1,6 +1,7 @@
 import { describe, expect, it, test } from 'vitest'
 import { literal } from './literal'
-import { withDefault } from './fallback'
+import { oneOf } from './oneOf'
+import { always } from './always'
 
 describe('literals', () => {
   it('todo', () => {
@@ -11,7 +12,7 @@ describe('literals', () => {
     })
   })
   test('with fallbackValue', () => {
-    const parseLiteral = withDefault(literal('#FF0000'), '#00FF00')
+    const parseLiteral = oneOf(literal('#FF0000'), always('#00FF00'))
     expect(parseLiteral('#XXYYZZ')).toEqual({
       tag: 'success',
       value: '#00FF00',

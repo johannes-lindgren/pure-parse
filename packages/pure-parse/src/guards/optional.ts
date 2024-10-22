@@ -12,7 +12,7 @@ import { optionalSymbol } from '../internals'
  *  id: number
  *  email?: string
  * }
- * const isUser = object<User>({
+ * const isUser = objectGuard<User>({
  *   id: isNumber,
  *   email: optionalGuard(isString),
  * })
@@ -24,24 +24,24 @@ import { optionalSymbol } from '../internals'
  */
 export const optionalGuard = <T>(guard: Guard<T>): OptionalGuard<T> =>
   /*
-   * { [optionalValue]: true } is used at runtime by `object` to check if a guard represents an optional value.
+   * { [optionalValue]: true } is used at runtime by `objectGuard` to check if a guard represents an optional value.
    */
   Object.assign(unionGuard(isUndefined, guard), {
     [optionalSymbol]: true,
   }) as OptionalGuard<T>
 /**
- * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for `optional(union(isNull, guard))`.
+ * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for `optional(unionGuard(isNull, guard))`.
  * @param guard
  */
 export const optionalNullableGuard = <T>(guard: Guard<T>) =>
   optionalGuard(unionGuard(isNull, guard))
 /**
- * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for `union(isNull, guard)`.
+ * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for `unionGuard(isNull, guard)`.
  * @param guard
  */
 export const nullableGuard = <T>(guard: Guard<T>) => unionGuard(isNull, guard)
 /**
- * Create a union with `undefined`, which is different from optional properties. Alias for `union(isUndefined, guard)`.
+ * Create a union with `undefined`, which is different from optional properties. Alias for `unionGuard(isUndefined, guard)`.
  * @param guard
  */
 export const undefineableGuard = <T>(guard: Guard<T>) =>

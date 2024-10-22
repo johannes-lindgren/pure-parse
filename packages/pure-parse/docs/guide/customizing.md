@@ -60,7 +60,7 @@ const tree =
   (data) =>
     object({
       tag: literal('tree'),
-      data: arrays(union(leaf(parser), tree(parser))),
+      data: arrays(oneOf(leaf(parser), tree(parser))),
     })(data)
 ```
 
@@ -125,7 +125,7 @@ const treeGuard =
   (data) =>
     object({
       tag: literal('tree'),
-      data: arrays(union(leaf(parser), tree(parser))),
+      data: arrays(oneOf(leaf(parser), tree(parser))),
     })(data)
 ```
 
