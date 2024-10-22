@@ -55,7 +55,8 @@ First, there are parsers; each [primitive value](/api/parsers/primitives) has a 
 Secondly, there is a category of higher order functions that constructs new parsers based on parameters:
 
 - [literal](/api/parsers/literal#literal)
-- [union](/api/parsers/union#union)
+- [oneOf](/api/parsers/oneOf#always) (for unions and graceful error handling)
+- [always](/api/parsers/always#always) (for default values)
 - [tuple](/api/parsers/tuple#tuple)
 - [object](/api/parsers/object#object)
 - [record](/api/parsers/records#record)
@@ -120,10 +121,10 @@ parseDigit(50) // -> ParseError
 
 ## Unions
 
-Unions types—or sum types—represent values that can be one of several types. Use the `union()` function to create a validation function for a union type:
+Unions types—or sum types—represent values that can be one of several types. Use the `oneOf()` function to create a validation function for a union type:
 
 ```ts
-const parseStringOrNumber = union(parseString, parseNumber)
+const parseStringOrNumber = oneOf(parseString, parseNumber)
 parseStringOrNumber('hello') // -> ParseSuccess
 parseStringOrNumber(123) // -> ParseSuccess
 ```
@@ -231,7 +232,7 @@ const parseNumberArray = arrays<number>(parseNumber)
 Parse discriminated unions with unions of objects with a common tag property:
 
 ```ts
-const parseState = union(
+const parseState = oneOf(
   object({
     tag: literal('loading'),
   }),

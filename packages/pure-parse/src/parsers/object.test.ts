@@ -2,17 +2,17 @@ import { describe, expect, it, test } from 'vitest'
 import { object as objectParseEval, objectNoJit } from './object'
 import { isSuccess, Parser } from './types'
 import type { Equals } from '../internals'
-import { union } from './union'
+import { oneOf } from './oneOf'
 import {
   parseBoolean,
   parseNumber,
   parseString,
   parseUndefined,
 } from './primitives'
-import { fallback } from './fallback'
 import { Infer } from '../common'
 import { literal } from './literal'
 import { nullable, optional } from './optional'
+import { always } from './always'
 
 const suits = [
   {
@@ -144,7 +144,7 @@ suits.forEach(({ name: suiteName, fn: object }) => {
             'success',
           )
           const parseUnionObj = object({
-            a: union(parseString, parseUndefined),
+            a: oneOf(parseString, parseUndefined),
           })
           expect(parseUnionObj({})).toHaveProperty('tag', 'failure')
           expect(parseUnionObj({ a: undefined })).toHaveProperty(
@@ -232,12 +232,12 @@ suits.forEach(({ name: suiteName, fn: object }) => {
         })
       })
       describe('fallback', () => {
-        test('optional fallback', () => {
+        test('optional fallbackValue', () => {
           const defaultEmail = 'default@test.com'
           const parseUser = object({
             id: parseNumber,
             name: parseString,
-            email: optional(fallback(parseString, defaultEmail)),
+            email: optional(oneOf(parseString, always(defaultEmail))),
           })
           // The email can be a omitted -> Success
           expect(parseUser({ id: 1, name: 'Alice' })).toEqual(
@@ -278,12 +278,12 @@ suits.forEach(({ name: suiteName, fn: object }) => {
             }),
           )
         })
-        test('required fallback', () => {
+        test('required fallbackValue', () => {
           const defaultEmail = 'default@test.com'
           const parseUser = object({
             id: parseNumber,
             name: parseString,
-            email: fallback(parseString, defaultEmail),
+            email: oneOf(parseString, always(defaultEmail)),
           })
 
           // The property can be a string -> Success

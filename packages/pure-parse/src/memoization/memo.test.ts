@@ -1,7 +1,14 @@
 import { describe, expect, it, test, vi } from 'vitest'
 import { memo, memoizeValidatorConstructor } from './memo'
-import { parseNumber, parseString, object, array, optional } from '../parsers'
-import { isNumber, isString, objectGuard } from '../guards'
+import {
+  parseNumber,
+  parseString,
+  object,
+  array,
+  optional,
+  withDefault,
+} from '../parsers'
+import { isNumber, isString, objectGuard, tupleGuard } from '../guards'
 
 describe('memoization', () => {
   describe('memo', () => {
@@ -222,6 +229,27 @@ describe('memoization', () => {
       const parseUser3 = objectMemo(schema)
       expect(objectMemo).toHaveBeenCalledTimes(3)
       expect(objectFn).toHaveBeenCalledTimes(3)
+    })
+    it('memoizes validator constructors with multiple arguments', () => {
+      const defaultValue = {
+        fist: 'Anon',
+        last: 'Ymousson',
+      }
+      const parseNameFallible = vi.fn(
+        object({
+          first: parseString,
+          last: parseString,
+        }),
+      )
+      const fallbackValueMemo = memoizeValidatorConstructor(withDefault)
+      const parseName = vi.fn(
+        fallbackValueMemo(parseNameFallible, defaultValue),
+      )
+      const person1 = { first: 'Alice', last: 'Smith' }
+      parseName(person1)
+      parseName(person1)
+      parseName(person1)
+      expect(parseNameFallible).toHaveBeenCalledTimes(1)
     })
   })
 })

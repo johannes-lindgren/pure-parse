@@ -28,7 +28,7 @@ export const objectGuardNoJit =
  * Objects have a fixed set of properties that can have different types.
  *
  * ```ts
- * const isUser = object({
+ * const isUser = objectGuard({
  *   id: isNumber,
  *   uid: isString,
  *   active: isBoolean,

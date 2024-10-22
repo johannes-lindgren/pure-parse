@@ -34,7 +34,7 @@ features:
   - title: Fail-safe
     icon:
       src: /shield.svg
-    details: Recover from errors gracefully when parsing large documents. Tested, failsafe, and secure.
+    details: Recover from errors gracefully when parsing large documents.
     link: /guide/overview#fail-safe
 ---
 

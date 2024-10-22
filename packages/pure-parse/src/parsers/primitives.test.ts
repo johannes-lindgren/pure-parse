@@ -1,5 +1,4 @@
 import { describe, expect, it, test } from 'vitest'
-import { fallback } from './fallback'
 import { literal } from './literal'
 
 describe('primitives', () => {

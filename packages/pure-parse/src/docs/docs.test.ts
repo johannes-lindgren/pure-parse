@@ -7,7 +7,7 @@ import {
   Parser,
   parseString,
   success,
-  union,
+  oneOf,
 } from '../parsers'
 import {
   arrayGuard,
@@ -120,7 +120,7 @@ describe('Documentation examples', () => {
       (data) =>
         object({
           tag: literal('tree'),
-          data: array(union(leaf(parser), tree(parser))),
+          data: array(oneOf(leaf(parser), tree(parser))),
         })(data)
 
     describe('leaf', () => {
