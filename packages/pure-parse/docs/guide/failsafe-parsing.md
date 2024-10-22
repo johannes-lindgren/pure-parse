@@ -1,4 +1,4 @@
-# Fallbacks (Failsafe Parsing)
+# Failsafe Parsing
 
 A benefit of parsing data over of validating data (with guards) is that errors can be handled gracefully with defaults and other fallback mechanisms.
 
