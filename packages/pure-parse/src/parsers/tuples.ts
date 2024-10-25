@@ -1,4 +1,10 @@
-import { failure, Parser, ParseSuccess, success } from './types'
+import {
+  failure,
+  Parser,
+  ParseSuccess,
+  propagateFailure,
+  success,
+} from './types'
 
 /**
  * Construct parsers for tuples.
@@ -36,12 +42,15 @@ export const tuple =
       )
     }
     const dataOutput = []
-    for (let i = 0; i < parsers.length; i++) {
-      const parser = parsers[i]
-      const value = data[i]
+    for (let index = 0; index < parsers.length; index++) {
+      const parser = parsers[index]
+      const value = data[index]
       const parseResult = parser(value)
       if (parseResult.tag === 'failure') {
-        return failure(`failed parsing index ${i}`)
+        return propagateFailure(parseResult, {
+          tag: 'array',
+          index,
+        })
       }
       dataOutput.push(parseResult.value)
     }
