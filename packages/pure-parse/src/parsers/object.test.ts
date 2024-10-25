@@ -13,20 +13,28 @@ import { Infer } from '../common'
 import { literal } from './literal'
 import { nullable, optional } from './optional'
 import { always } from './always'
+import { objectMemo, objectNoJitMemo } from '../memoization'
 
-const suits = [
+const suites = [
   {
-    name: 'objectNoEval',
+    name: 'object without JIT',
     fn: objectNoJit,
   },
   {
-    name: 'objectEval',
+    name: 'object with JIT',
     fn: objectParseEval,
   },
-  //   TODO objectMemo
+  {
+    name: 'memoized object with JIT',
+    fn: objectMemo,
+  },
+  {
+    name: 'memoized object without JIT',
+    fn: objectNoJitMemo,
+  },
 ]
 
-suits.forEach(({ name: suiteName, fn: object }) => {
+suites.forEach(({ name: suiteName, fn: object }) => {
   describe(suiteName, () => {
     describe('objects', () => {
       describe('unknown properties', () => {
@@ -369,6 +377,46 @@ suits.forEach(({ name: suiteName, fn: object }) => {
               left: optional(parseTree),
               right: optional(parseTree),
             })(data)
+        })
+      })
+      describe('nested errors', () => {
+        it('reports errors in properties', () => {
+          const parse = object({
+            a: parseString,
+          })
+          expect(parse({ a: 1 })).toEqual(
+            expect.objectContaining({
+              tag: 'failure',
+              path: [
+                {
+                  tag: 'object',
+                  key: 'a',
+                },
+              ],
+            }),
+          )
+        })
+        it('reports errors in nested properties', () => {
+          const parse = object({
+            a: object({
+              b: parseString,
+            }),
+          })
+          expect(parse({ a: { b: 1 } })).toEqual(
+            expect.objectContaining({
+              tag: 'failure',
+              path: [
+                {
+                  tag: 'object',
+                  key: 'a',
+                },
+                {
+                  tag: 'object',
+                  key: 'b',
+                },
+              ],
+            }),
+          )
         })
       })
     })
