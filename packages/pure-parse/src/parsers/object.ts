@@ -52,6 +52,7 @@ export const objectNoJit = <T extends Record<string, unknown>>(schema: {
 
 /**
  * Objects have a fixed set of properties that can have different types.
+ * If the `data` has more properties than expected, the extra properties are omitted from the result.
  * @example
  * const parseUser = object({
  *   id: parseNumber,

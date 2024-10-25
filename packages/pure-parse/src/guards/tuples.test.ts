@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from 'vitest'
-import { tupleGuard } from './tuple'
+import { tupleGuard } from './tuples'
 import { Guard } from './types'
 import { isBoolean, isNumber, isString } from './primitives'
 
