@@ -380,7 +380,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
         })
       })
       describe('nested errors', () => {
-        it('reports errors in properties', () => {
+        it('reports shallow errors in properties', () => {
           const parse = object({
             a: parseString,
           })
@@ -396,7 +396,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             }),
           )
         })
-        it('reports errors in nested properties', () => {
+        it('reports deep errors in nested properties', () => {
           const parse = object({
             a: object({
               b: parseString,

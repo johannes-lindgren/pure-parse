@@ -14,10 +14,10 @@ export type ParseSuccess<T> = {
 export type ParseFailure = {
   tag: 'failure'
   error: string
-  path: PathSegment[]
+  path: ParseFailurePathSegment[]
 }
 
-type PathSegment =
+export type ParseFailurePathSegment =
   | {
       tag: 'object'
       key: string
@@ -42,7 +42,7 @@ export const failure = (error: string): ParseFailure => ({
 
 export const propagateFailure = (
   failureRes: ParseFailure,
-  pathSegment: PathSegment,
+  pathSegment: ParseFailurePathSegment,
 ): ParseFailure => ({
   tag: 'failure',
   error: failureRes.error,

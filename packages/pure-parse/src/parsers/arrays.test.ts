@@ -5,6 +5,7 @@ import { failure, success } from './types'
 import { literal } from './literal'
 import { oneOf } from './oneOf'
 import { always } from './always'
+import { parseString } from './primitives'
 
 describe('arrays', () => {
   it('validates when all elements pass validation', () => {
@@ -41,5 +42,66 @@ describe('arrays', () => {
       }),
     )
   })
-  describe.todo('self-referential arrays')
+  describe('nested errors', () => {
+    it('reports shallow errors in elements', () => {
+      const parse = array(parseString)
+      expect(parse([1])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          path: [{ tag: 'array', index: 0 }],
+        }),
+      )
+    })
+    it('reports deep errors in nested elements', () => {
+      const parse = array(array(parseString))
+      expect(parse([[1]])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          path: [
+            { tag: 'array', index: 0 },
+            { tag: 'array', index: 0 },
+          ],
+        }),
+      )
+      expect(parse([[], [], [1]])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          path: [
+            { tag: 'array', index: 2 },
+            { tag: 'array', index: 0 },
+          ],
+        }),
+      )
+      expect(parse([[], ['a'], ['a', 'b', 'c', 3], []])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          path: [
+            { tag: 'array', index: 2 },
+            { tag: 'array', index: 3 },
+          ],
+        }),
+      )
+    })
+    test('that the index is accurate', () => {
+      const parse = array(parseString)
+      expect(parse([1, 2, 3])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          path: [{ tag: 'array', index: 0 }],
+        }),
+      )
+      expect(parse(['1', 2, 3])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          path: [{ tag: 'array', index: 1 }],
+        }),
+      )
+      expect(parse(['1', '2', 3])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          path: [{ tag: 'array', index: 2 }],
+        }),
+      )
+    })
+  })
 })

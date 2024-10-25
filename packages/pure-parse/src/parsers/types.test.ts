@@ -6,6 +6,7 @@ import { parseNumber, parseString } from './primitives'
 import { literal } from './literal'
 import { optional } from './optional'
 import { always } from './always'
+import { failure, ParseFailurePathSegment, propagateFailure } from './types'
 
 describe('parsing', () => {
   describe('some use cases', () => {
@@ -75,6 +76,53 @@ describe('parsing', () => {
               { tag: 'number', value: 3 },
             ],
           },
+        }),
+      )
+    })
+  })
+  describe('propagateFailure', () => {
+    const segmentA: ParseFailurePathSegment = { tag: 'object', key: 'a' }
+    const segmentB: ParseFailurePathSegment = { tag: 'object', key: 'b' }
+    const segmentC: ParseFailurePathSegment = { tag: 'object', key: 'c' }
+    it('keeps the original error message', () => {
+      const errorMsg = '094uiroi34f'
+      expect(
+        propagateFailure(failure(errorMsg), { tag: 'object', key: 'a' }),
+      ).toEqual(
+        expect.objectContaining({
+          error: errorMsg,
+        }),
+      )
+    })
+    it('includes the path segment in an error with no path segments', () => {
+      expect(propagateFailure(failure('errorMsg'), segmentA)).toEqual(
+        expect.objectContaining({
+          path: [segmentA],
+        }),
+      )
+    })
+    it('prepends path segments to the path', () => {
+      expect(
+        propagateFailure(
+          propagateFailure(failure('errorMsg'), segmentB),
+          segmentA,
+        ),
+      ).toEqual(
+        expect.objectContaining({
+          path: [segmentA, segmentB],
+        }),
+      )
+      expect(
+        propagateFailure(
+          propagateFailure(
+            propagateFailure(failure('errorMsg'), segmentC),
+            segmentB,
+          ),
+          segmentA,
+        ),
+      ).toEqual(
+        expect.objectContaining({
+          path: [segmentA, segmentB, segmentC],
         }),
       )
     })

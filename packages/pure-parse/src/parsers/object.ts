@@ -46,7 +46,7 @@ export const objectNoJit = <T extends Record<string, unknown>>(schema: {
       dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
     }
 
-    return success(dataOutput) as ParseResult<T>
+    return success(dataOutput as T)
   }
 }
 

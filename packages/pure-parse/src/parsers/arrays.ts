@@ -5,12 +5,8 @@ import {
   Parser,
   ParseResult,
   success,
+  propagateFailure,
 } from './types'
-
-// Local helper function
-const areAllSuccesses = <T>(
-  results: ParseResult<T>[],
-): results is ParseSuccess<T>[] => results.every((result) => isSuccess(result))
 
 /**
  * Validate arrays
@@ -19,26 +15,18 @@ const areAllSuccesses = <T>(
  */
 export const array =
   <T>(parseItem: Parser<T>): Parser<T[]> =>
-  (data: unknown) => {
+  (data) => {
     if (!Array.isArray(data)) {
       return failure('Not an array')
     }
-    const results: ParseResult<T>[] = data.map(parseItem)
 
-    // Imperative programming for performance
-    let allSuccess = true
-    for (const result of results) {
-      allSuccess &&= result.tag !== 'failure'
+    const dataOutput = []
+    for (let i = 0; i < data.length; i++) {
+      const parseResult = parseItem(data[i])
+      if (parseResult.tag === 'failure') {
+        return propagateFailure(parseResult, { tag: 'array', index: i })
+      }
+      dataOutput.push((parseResult as ParseSuccess<unknown>).value)
     }
-
-    if (!allSuccess) {
-      return failure('Not all elements are valid')
-    }
-
-    // If any element is a fallbackValue, return a new array
-    return success(
-      (results as Array<Exclude<ParseResult<T>, { tag: 'failure' }>>).map(
-        (result) => result.value,
-      ),
-    )
+    return success(dataOutput as T[])
   }
