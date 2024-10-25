@@ -1,5 +1,6 @@
 export * from './types'
 export * from './arrays'
+export * from './tuples'
 export * from './object'
 export * from './oneOf'
 export * from './primitives'

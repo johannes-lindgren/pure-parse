@@ -46,7 +46,7 @@ Secondly, there is a category of higher order functions that constructs new guar
 
 - [literalGuard](/api/guards/literal#literalGuard)
 - [unionGuard](/api/guards/union#unionGuard)
-- [tupleGuard](/api/guards/tuple#tupleGuard)
+- [tupleGuard](/api/guards/tuples#tupleGuard)
 - [objectGuard](/api/guards/object#objectGuard)
 - [recordGuard](/api/guards/records#recordGuard)
 - [partialRecordGuard](/api/guards/records#partialRecordGuard)

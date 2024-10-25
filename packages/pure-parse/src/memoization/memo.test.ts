@@ -8,7 +8,7 @@ import {
   optional,
   withDefault,
 } from '../parsers'
-import { isNumber, isString, objectGuard, tupleGuard } from '../guards'
+import { isNumber, isString, objectGuard } from '../guards'
 
 describe('memoization', () => {
   describe('memo', () => {
