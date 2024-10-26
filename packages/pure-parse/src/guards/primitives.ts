@@ -1,9 +1,3 @@
-/**
- * Returns `true` for any input. Use to skip validation.
- * @param data
- */
-export const isUnknown = (data: unknown): data is unknown => true
-
 export const isNull = (data: unknown): data is null => data === null
 
 export const isUndefined = (data: unknown): data is undefined =>

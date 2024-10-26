@@ -5,7 +5,7 @@ import { oneOf } from './oneOf'
 import { parseNumber, parseString } from './primitives'
 import { literal } from './literal'
 import { optional } from './optional'
-import { always } from './always'
+import { succeedWith } from './always'
 import { failure, ParseFailurePathSegment, propagateFailure } from './types'
 
 describe('parsing', () => {
@@ -51,7 +51,7 @@ describe('parsing', () => {
       const parseDocument = object<Document>({
         title: parseString,
         description: optional(parseString),
-        content: array(oneOf(parseContent, always({ tag: 'unknown' }))),
+        content: array(oneOf(parseContent, succeedWith({ tag: 'unknown' }))),
       })
       /*
        * Tests

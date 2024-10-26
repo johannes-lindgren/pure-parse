@@ -10,24 +10,10 @@ import {
   isString,
   isSymbol,
   isUndefined,
-  isUnknown,
 } from './primitives'
 
 describe('guards', () => {
   describe('primitives', () => {
-    describe('isUnknown', () => {
-      it('is always true', () => {
-        expect(isUnknown(null)).toEqual(true)
-        expect(isUnknown(undefined)).toEqual(true)
-        expect(isUnknown(false)).toEqual(true)
-        expect(isUnknown(true)).toEqual(true)
-        expect(isUnknown(123)).toEqual(true)
-        expect(isUnknown(123n)).toEqual(true)
-        expect(isUnknown('aaaaa')).toEqual(true)
-        expect(isUnknown({})).toEqual(true)
-        expect(isUnknown([])).toEqual(true)
-      })
-    })
     describe('isNull', () => {
       it('validates null', () => {
         expect(isNull(null)).toEqual(true)

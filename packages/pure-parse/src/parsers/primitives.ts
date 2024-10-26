@@ -98,21 +98,3 @@ export const parseSymbol = (
   data: unknown,
 ): ParseSuccess<symbol> | ParseFailure =>
   isSymbol(data) ? success(data) : failure('Not a symbol')
-
-/**
- * Use to skip validation, as it results in a success for any input.
- * @example
- * ```ts
- * const parseResponse = object({
- *   status: parseNumber,
- *   data: unknown,
- * })
- * parseResponse({
- *   status: 200,
- *   data: { id: 123, name: 'John' }
- * }) // => ParseSuccess<{ status: number, data: unknown }>
- * ```
- * @param data data to be validated
- */
-export const parseUnknown = (data: unknown): ParseSuccess<unknown> =>
-  success(data)

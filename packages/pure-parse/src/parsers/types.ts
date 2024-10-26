@@ -51,8 +51,6 @@ export const propagateFailure = (
 
 export type Parser<T> = (data: unknown) => ParseResult<T>
 
-export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
-
 /**
  * Special parser to check optional values
  */
