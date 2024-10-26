@@ -14,7 +14,18 @@ export type ParseSuccess<T> = {
 export type ParseFailure = {
   tag: 'failure'
   error: string
+  path: ParseFailurePathSegment[]
 }
+
+export type ParseFailurePathSegment =
+  | {
+      tag: 'object'
+      key: string
+    }
+  | {
+      tag: 'array'
+      index: number
+    }
 
 export type ParseResult<T> = ParseSuccess<T> | ParseFailure
 
@@ -26,6 +37,16 @@ export const success = <T>(value: T): ParseSuccess<T> => ({
 export const failure = (error: string): ParseFailure => ({
   tag: 'failure',
   error,
+  path: [],
+})
+
+export const propagateFailure = (
+  failureRes: ParseFailure,
+  pathSegment: ParseFailurePathSegment,
+): ParseFailure => ({
+  tag: 'failure',
+  error: failureRes.error,
+  path: [pathSegment, ...failureRes.path],
 })
 
 export type Parser<T> = (data: unknown) => ParseResult<T>

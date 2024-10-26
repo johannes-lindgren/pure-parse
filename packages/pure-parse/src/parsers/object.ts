@@ -6,8 +6,12 @@ import {
   Parser,
   ParseResult,
   success,
+  propagateFailure,
 } from './types'
 import { optionalSymbol } from '../internals'
+
+const notAnObjectMsg = 'Not an object'
+const propertyMissingMsg = 'Property is missing'
 
 /**
  * Same as {@link object}, but does not perform just-in-time (JIT) compilation with the `Function` constructor. This function is needed as a replacement in environments where `new Function()` is disallowed; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
@@ -19,7 +23,7 @@ export const objectNoJit = <T extends Record<string, unknown>>(schema: {
   const entries = Object.entries(schema)
   return (data) => {
     if (!isObject(data)) {
-      return failure('Not an object')
+      return failure(notAnObjectMsg)
     }
     const dataOutput = {} as Record<string, unknown>
     for (let i = 0; i < entries.length; i++) {
@@ -31,17 +35,20 @@ export const objectNoJit = <T extends Record<string, unknown>>(schema: {
           // The key is optional, so we can skip it
           continue
         }
-        return failure('A property is missing')
+        return propagateFailure(failure(propertyMissingMsg), {
+          tag: 'object',
+          key,
+        })
       }
 
       const parseResult = parser(value)
       if (parseResult.tag === 'failure') {
-        return failure('Not all properties are valid')
+        return propagateFailure(parseResult, { tag: 'object', key })
       }
       dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
     }
 
-    return success(dataOutput) as ParseResult<T>
+    return success(dataOutput as T)
   }
 }
 
@@ -65,7 +72,9 @@ export const object = <T extends Record<string, unknown>>(schema: {
   const schemaEntries = Object.entries(schema)
   const parsers = schemaEntries.map(([_, parser]) => parser)
   const statements = [
-    `if(typeof data !== 'object' || data === null) return {tag:'failure', message:'Not an object'}`,
+    `if(typeof data !== 'object' || data === null) return {tag:'failure', error: ${JSON.stringify(
+      notAnObjectMsg,
+    )}, path: []}`,
     `const dataOutput = {}`,
     `let parseResult`,
     ...schemaEntries.flatMap(([unescapedKey, parserFunction], i) => {
@@ -78,11 +87,13 @@ export const object = <T extends Record<string, unknown>>(schema: {
       return [
         ...(!isOptional
           ? [
-              `if(${value} === undefined && !data.hasOwnProperty(${key}))  return {tag:'failure', message:'A property is missing'}`,
+              `if(${value} === undefined && !data.hasOwnProperty(${key}))  return {tag:'failure', error:${JSON.stringify(
+                propertyMissingMsg,
+              )}, path: [{tag: 'object', key: ${key}}]}`,
             ]
           : []),
         `parseResult = ${parser}(${value})`,
-        `if(parseResult.tag === 'failure') return {tag:'failure', message:'Not all properties are valid'}`,
+        `if(parseResult.tag === 'failure') return {tag:'failure', error: parseResult.error, path:[{tag:'object', key:${key}}, ...parseResult.path]}`,
         `dataOutput[${key}] = parseResult.value`,
       ]
     }),
