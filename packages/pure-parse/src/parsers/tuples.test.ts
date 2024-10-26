@@ -113,84 +113,95 @@ describe('tuples', () => {
     expect(b).not.toHaveBeenCalled()
   })
 
-  describe('nested errors', () => {
-    it('reports shallow errors in elements', () => {
+  describe('errors', () => {
+    it('reports non-arrays', () => {
       const parse = tuple([parseString])
-      expect(parse([1])).toEqual(
+      expect(parse(1)).toEqual(
         expect.objectContaining({
           tag: 'failure',
-          path: [{ tag: 'array', index: 0 }],
+          path: [],
         }),
       )
     })
-    it('reports deep errors in nested elements', () => {
-      const parse = tuple([
-        tuple([parseString, parseString]),
-        tuple([parseString, parseString]),
-      ])
-      expect(
-        parse([
-          [1, 1],
-          [1, 1],
-        ]),
-      ).toEqual(
-        expect.objectContaining({
-          tag: 'failure',
-          path: [
-            { tag: 'array', index: 0 },
-            { tag: 'array', index: 0 },
-          ],
-        }),
-      )
-      expect(
-        parse([
-          ['1', 1],
-          [1, 1],
-        ]),
-      ).toEqual(
-        expect.objectContaining({
-          tag: 'failure',
-          path: [
-            { tag: 'array', index: 0 },
-            { tag: 'array', index: 1 },
-          ],
-        }),
-      )
-      expect(
-        parse([
-          ['1', '1'],
-          ['1', 1],
-        ]),
-      ).toEqual(
-        expect.objectContaining({
-          tag: 'failure',
-          path: [
-            { tag: 'array', index: 1 },
-            { tag: 'array', index: 1 },
-          ],
-        }),
-      )
-    })
-    test('that the index is accurate', () => {
-      const parse = tuple([parseString, parseString, parseString])
-      expect(parse([1, 2, 3])).toEqual(
-        expect.objectContaining({
-          tag: 'failure',
-          path: [{ tag: 'array', index: 0 }],
-        }),
-      )
-      expect(parse(['1', 2, 3])).toEqual(
-        expect.objectContaining({
-          tag: 'failure',
-          path: [{ tag: 'array', index: 1 }],
-        }),
-      )
-      expect(parse(['1', '2', 3])).toEqual(
-        expect.objectContaining({
-          tag: 'failure',
-          path: [{ tag: 'array', index: 2 }],
-        }),
-      )
+    describe('nested errors', () => {
+      it('reports shallow errors in elements', () => {
+        const parse = tuple([parseString])
+        expect(parse([1])).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            path: [{ tag: 'array', index: 0 }],
+          }),
+        )
+      })
+      it('reports deep errors in nested elements', () => {
+        const parse = tuple([
+          tuple([parseString, parseString]),
+          tuple([parseString, parseString]),
+        ])
+        expect(
+          parse([
+            [1, 1],
+            [1, 1],
+          ]),
+        ).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            path: [
+              { tag: 'array', index: 0 },
+              { tag: 'array', index: 0 },
+            ],
+          }),
+        )
+        expect(
+          parse([
+            ['1', 1],
+            [1, 1],
+          ]),
+        ).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            path: [
+              { tag: 'array', index: 0 },
+              { tag: 'array', index: 1 },
+            ],
+          }),
+        )
+        expect(
+          parse([
+            ['1', '1'],
+            ['1', 1],
+          ]),
+        ).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            path: [
+              { tag: 'array', index: 1 },
+              { tag: 'array', index: 1 },
+            ],
+          }),
+        )
+      })
+      test('that the index is accurate', () => {
+        const parse = tuple([parseString, parseString, parseString])
+        expect(parse([1, 2, 3])).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            path: [{ tag: 'array', index: 0 }],
+          }),
+        )
+        expect(parse(['1', 2, 3])).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            path: [{ tag: 'array', index: 1 }],
+          }),
+        )
+        expect(parse(['1', '2', 3])).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            path: [{ tag: 'array', index: 2 }],
+          }),
+        )
+      })
     })
   })
 })

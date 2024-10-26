@@ -11,8 +11,7 @@ import {
 import { optionalSymbol } from '../internals'
 
 const notAnObjectMsg = 'Not an object'
-const propertyMissingMsg = (key: string): string =>
-  `Property ${JSON.stringify(key)} is missing`
+const propertyMissingMsg = 'Property is missing'
 
 /**
  * Same as {@link object}, but does not perform just-in-time (JIT) compilation with the `Function` constructor. This function is needed as a replacement in environments where `new Function()` is disallowed; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
@@ -36,7 +35,10 @@ export const objectNoJit = <T extends Record<string, unknown>>(schema: {
           // The key is optional, so we can skip it
           continue
         }
-        return failure(propertyMissingMsg(key))
+        return propagateFailure(failure(propertyMissingMsg), {
+          tag: 'object',
+          key,
+        })
       }
 
       const parseResult = parser(value)
@@ -72,7 +74,7 @@ export const object = <T extends Record<string, unknown>>(schema: {
   const statements = [
     `if(typeof data !== 'object' || data === null) return {tag:'failure', error: ${JSON.stringify(
       notAnObjectMsg,
-    )}}`,
+    )}, path: []}`,
     `const dataOutput = {}`,
     `let parseResult`,
     ...schemaEntries.flatMap(([unescapedKey, parserFunction], i) => {
@@ -86,8 +88,8 @@ export const object = <T extends Record<string, unknown>>(schema: {
         ...(!isOptional
           ? [
               `if(${value} === undefined && !data.hasOwnProperty(${key}))  return {tag:'failure', error:${JSON.stringify(
-                propertyMissingMsg(unescapedKey),
-              )}}`,
+                propertyMissingMsg,
+              )}, path: [{tag: 'object', key: ${key}}]}`,
             ]
           : []),
         `parseResult = ${parser}(${value})`,

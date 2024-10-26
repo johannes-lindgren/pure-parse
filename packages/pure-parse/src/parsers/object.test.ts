@@ -379,12 +379,23 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             })(data)
         })
       })
-      describe('nested errors', () => {
-        it('reports shallow errors in properties', () => {
+      describe('errors', () => {
+        it('reports non-objects', () => {
           const parse = object({
             a: parseString,
           })
-          expect(parse({ a: 1 })).toEqual(
+          expect(parse('nonanobj')).toEqual(
+            expect.objectContaining({
+              tag: 'failure',
+              path: [],
+            }),
+          )
+        })
+        it('reports missing properties', () => {
+          const parse = object({
+            a: parseString,
+          })
+          expect(parse({})).toEqual(
             expect.objectContaining({
               tag: 'failure',
               path: [
@@ -396,27 +407,45 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             }),
           )
         })
-        it('reports deep errors in nested properties', () => {
-          const parse = object({
-            a: object({
-              b: parseString,
-            }),
+        describe('nested errors', () => {
+          it('reports shallow errors in properties', () => {
+            const parse = object({
+              a: parseString,
+            })
+            expect(parse({ a: 1 })).toEqual(
+              expect.objectContaining({
+                tag: 'failure',
+                path: [
+                  {
+                    tag: 'object',
+                    key: 'a',
+                  },
+                ],
+              }),
+            )
           })
-          expect(parse({ a: { b: 1 } })).toEqual(
-            expect.objectContaining({
-              tag: 'failure',
-              path: [
-                {
-                  tag: 'object',
-                  key: 'a',
-                },
-                {
-                  tag: 'object',
-                  key: 'b',
-                },
-              ],
-            }),
-          )
+          it('reports deep errors in nested properties', () => {
+            const parse = object({
+              a: object({
+                b: parseString,
+              }),
+            })
+            expect(parse({ a: { b: 1 } })).toEqual(
+              expect.objectContaining({
+                tag: 'failure',
+                path: [
+                  {
+                    tag: 'object',
+                    key: 'a',
+                  },
+                  {
+                    tag: 'object',
+                    key: 'b',
+                  },
+                ],
+              }),
+            )
+          })
         })
       })
     })
