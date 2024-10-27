@@ -25,7 +25,7 @@ const data = [1, '2']
 into:
 
 ```ts
-const data = [1, 2]
+;[1, 2]
 ```
 
 Write a custom parser `parseNumberFromString` that parses stringified numbers into `number`, and use `oneOf` to chain it together with `parseNumber`:
