@@ -2,7 +2,7 @@ import { failure, ParseFailure, Parser, ParseSuccess, success } from './types'
 import { oneOf } from './oneOf'
 
 /**
- * @see {@link always} for a counterpart
+ * @see {@link succeedWith} for a counterpart
  * @param error
  * @return a parser that always fails with `errorMessage`
  */
@@ -66,6 +66,10 @@ export const succeedWith =
  * ```
  * @example
  * Calling `withDefault` is _almost_ the same as:
+ * ```ts
+ * oneOf(parser, succeedWith(fallbackValue))
+ * ```
+ * which is equivalent to
  * ```ts
  * oneOf(parser, () => success(fallbackValue))
  * ```
