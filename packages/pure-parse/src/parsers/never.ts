@@ -1,15 +1,6 @@
 import { failure } from './types'
-import { UnsuccessfulParser } from './always'
 
-/**
- * @see {@link always} for a counterpart
- * @param error
- * @return a parser that always fails with `errorMessage`
- */
-export const failWith =
-  (error: string): UnsuccessfulParser =>
-  () =>
-    failure(error)
+import { UnsuccessfulParser } from './defaults'
 
 /**
  * A parser that always fails. Parsing `never` always fails because no value can be assigned to `never`—`never` corresponds to an empty set of values.

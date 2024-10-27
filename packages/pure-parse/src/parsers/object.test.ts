@@ -12,8 +12,8 @@ import {
 import { Infer } from '../common'
 import { literal } from './literal'
 import { nullable, optional } from './optional'
-import { succeedWith } from './always'
 import { objectMemo, objectNoJitMemo } from '../memoization'
+import { succeedWith } from './defaults'
 
 const suites = [
   {

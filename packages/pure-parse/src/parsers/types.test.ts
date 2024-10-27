@@ -5,8 +5,8 @@ import { oneOf } from './oneOf'
 import { parseNumber, parseString } from './primitives'
 import { literal } from './literal'
 import { optional } from './optional'
-import { succeedWith } from './always'
 import { failure, ParseFailurePathSegment, propagateFailure } from './types'
+import { succeedWith } from './defaults'
 
 describe('parsing', () => {
   describe('some use cases', () => {

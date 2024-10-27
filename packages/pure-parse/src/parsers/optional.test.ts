@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { nullable, optional, optionalNullable, undefineable } from './optional'
 import { parseString } from './primitives'
 import { oneOf } from './oneOf'
-import { succeedWith } from './always'
+
+import { succeedWith } from './defaults'
 
 describe('optional', () => {
   it('works with fallbacks', () => {

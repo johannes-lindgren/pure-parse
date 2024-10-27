@@ -55,8 +55,8 @@ First, there are parsers; each [primitive value](/api/parsers/primitives) has a 
 Secondly, there is a category of higher order functions that constructs new parsers based on parameters:
 
 - [literal](/api/parsers/literal#literal)
-- [oneOf](/api/parsers/oneOf#always) (for unions and graceful error handling)
-- [always](/api/parsers/always#always) (for default values)
+- [oneOf](/api/parsers/oneOf) (for unions and graceful error handling)
+- [succeedWith](/api/parsers/defaults#succeedWith) (for default values)
 - [tuple](/api/parsers/tuples#tuple)
 - [object](/api/parsers/object#object)
 - [record](/api/parsers/records#record)
@@ -85,6 +85,9 @@ const isUsers = arrays(
   }),
 )
 ```
+
+> [!TIP]
+> See the [API Reference documentation](/api/parsers) for a complete inventory.
 
 ## Primitives
 

@@ -1,7 +1,8 @@
 import { describe, expect, it, test } from 'vitest'
 import { literal } from './literal'
 import { oneOf } from './oneOf'
-import { succeedWith } from './always'
+
+import { succeedWith } from './defaults'
 
 describe('literals', () => {
   it('todo', () => {

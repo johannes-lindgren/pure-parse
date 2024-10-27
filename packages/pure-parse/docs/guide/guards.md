@@ -81,6 +81,9 @@ const isUsers = arrays(
 )
 ```
 
+> [!TIP]
+> See the [API Reference documentation](/api/guards) for a complete inventory
+
 ## Primitives
 
 Primitive types represent [primitive values](https://developer.mozilla.org/en-US/docs/Glossary/Primitive), which are immutable and have no properties:

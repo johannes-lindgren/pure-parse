@@ -1,18 +1,17 @@
 import { describe, expect, it, test } from 'vitest'
 import {
-  succeedWith,
+  failWith,
   InfallibleParser,
+  succeedWith,
   UnsuccessfulParser,
-  parseUnknown,
   withDefault,
-} from './always'
+} from './defaults'
+import { Equals } from '../internals'
+import { isSuccess, Parser } from './types'
 import { parseString } from './primitives'
 import { object } from './object'
-import { isSuccess, ParseFailure, Parser, ParseSuccess, success } from './types'
-import { Equals } from '../internals'
-import { Infer } from '../common'
 
-describe('always', () => {
+describe('succeedWith', () => {
   it('always returns the value in the argument', () => {
     expect(succeedWith(0)(0)).toEqual(
       expect.objectContaining({
@@ -95,36 +94,24 @@ describe('withDefault', () => {
   test.todo('on optional properties')
 })
 
-describe('parseUnknown', () => {
-  it('it always succeeds', () => {
-    expect(isSuccess(parseUnknown(''))).toEqual(true)
-    expect(isSuccess(parseUnknown(0))).toEqual(true)
-    expect(isSuccess(parseUnknown(false))).toEqual(true)
-    expect(isSuccess(parseUnknown(true))).toEqual(true)
-    expect(isSuccess(parseUnknown(undefined))).toEqual(true)
-    expect(isSuccess(parseUnknown(null))).toEqual(true)
-    expect(isSuccess(parseUnknown({}))).toEqual(true)
-    expect(isSuccess(parseUnknown([]))).toEqual(true)
-  })
-  it('it always succeeds with the argument data', () => {
-    expect(parseUnknown('')).toEqual(success(''))
-    expect(parseUnknown(0)).toEqual(success(0))
-    expect(parseUnknown(false)).toEqual(success(false))
-    expect(parseUnknown(true)).toEqual(success(true))
-    expect(parseUnknown(undefined)).toEqual(success(undefined))
-    expect(parseUnknown(null)).toEqual(success(null))
-    expect(parseUnknown({})).toEqual(success({}))
-    expect(parseUnknown([])).toEqual(success([]))
+describe('failWith', () => {
+  it('always fails', () => {
+    const parse = failWith('always fail')
+    expect(isSuccess(parse(''))).toEqual(false)
+    expect(isSuccess(parse(0))).toEqual(false)
+    expect(isSuccess(parse(false))).toEqual(false)
+    expect(isSuccess(parse(true))).toEqual(false)
+    expect(isSuccess(parse(undefined))).toEqual(false)
+    expect(isSuccess(parse(null))).toEqual(false)
+    expect(isSuccess(parse({}))).toEqual(false)
+    expect(isSuccess(parse([]))).toEqual(false)
   })
   describe('types', () => {
-    it('infers unknown', () => {
-      const t1: Equals<Infer<typeof parseUnknown>, unknown> = true
-      const t2: Equals<Infer<typeof parseUnknown>, never> = false
-    })
-    it('returns a parse success', () => {
-      const res = parseUnknown('hello')
-      const t1: Equals<typeof res, ParseSuccess<unknown>> = true
-      const t2: Equals<typeof res, ParseFailure> = false
+    it('infers infallible parsers', () => {
+      const parser = failWith('never always fails')
+      const t1: Equals<typeof parser, InfallibleParser<string>> = false
+      const t2: Equals<typeof parser, Parser<string>> = false
+      const t3: Equals<typeof parser, UnsuccessfulParser> = true
     })
   })
 })

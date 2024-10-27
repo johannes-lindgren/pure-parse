@@ -4,8 +4,8 @@ import { failure, success } from './types'
 
 import { literal } from './literal'
 import { oneOf } from './oneOf'
-import { succeedWith } from './always'
 import { parseString } from './primitives'
+import { succeedWith } from './defaults'
 
 describe('arrays', () => {
   it('validates when all elements pass validation', () => {
