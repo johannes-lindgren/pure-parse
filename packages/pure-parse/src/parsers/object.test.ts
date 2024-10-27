@@ -12,8 +12,8 @@ import {
 import { Infer } from '../common'
 import { literal } from './literal'
 import { nullable, optional } from './optional'
-import { always } from './always'
 import { objectMemo, objectNoJitMemo } from '../memoization'
+import { succeedWith } from './defaults'
 
 const suites = [
   {
@@ -245,7 +245,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           const parseUser = object({
             id: parseNumber,
             name: parseString,
-            email: optional(oneOf(parseString, always(defaultEmail))),
+            email: optional(oneOf(parseString, succeedWith(defaultEmail))),
           })
           // The email can be a omitted -> Success
           expect(parseUser({ id: 1, name: 'Alice' })).toEqual(
@@ -291,7 +291,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           const parseUser = object({
             id: parseNumber,
             name: parseString,
-            email: oneOf(parseString, always(defaultEmail)),
+            email: oneOf(parseString, succeedWith(defaultEmail)),
           })
 
           // The property can be a string -> Success

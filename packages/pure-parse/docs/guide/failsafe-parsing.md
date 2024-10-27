@@ -4,14 +4,14 @@ A benefit of parsing data over of validating data (with guards) is that errors c
 
 ### Defaults with Static Values
 
-The [always](/api/parsers/always) function returns a parser that always succeeds; for example, `always(0)` returns a parser that always returns `Success<0>`.
+The [succeedWith](/api/parsers/defaults#succeedWith) function returns a parser that always succeeds; for example, `succeedWith(0)` returns a parser that always returns `Success<0>`.
 
-To fall back to a static value, chain together a parser of your liking and `always` with [oneOf](/api/parsers/oneOf); for example, parsing a number and falling back to `0` when parsing fails:
+To fall back to a static value, chain together a parser of your liking with [oneOf](/api/parsers/oneOf) and [/api/parsers/defaults#succeedWith]; for example, parsing a number and falling back to `0` when parsing fails:
 
 ```ts
-import { oneOf, parseNumber, always } from 'pure-parse'
+import { parseNumber, oneOf, succeedWith } from 'pure-parse'
 
-const parseNum = oneOf(parseNumber, always(0))
+const parseNum = oneOf(parseNumber, succeedWith(0))
 ```
 
 ### Parsing Unions into Non-unions
@@ -25,7 +25,7 @@ const data = [1, '2']
 into:
 
 ```ts
-const data = [1, 2]
+;[1, 2]
 ```
 
 Write a custom parser `parseNumberFromString` that parses stringified numbers into `number`, and use `oneOf` to chain it together with `parseNumber`:
@@ -36,17 +36,17 @@ import { array, oneOf, parseNumber } from 'pure-parse'
 const parseData = array(oneOf(parseNumber, parseNumberFromString))
 ```
 
-To ensure that the result is always a `number`, simply append `always` at the end:
+To ensure that the result is always a `number`, simply append `succeedWith` at the end:
 
 ```ts
-import { oneOf, parseNumber } from 'pure-parse'
+import { parseNumber, array, oneOf, succeedWith } from 'pure-parse'
 
 const parseData = array(
   oneOf(
     parseNumber,
     parseNumberFromString,
     // Default to 0; for example, when the value is `null`, or `"two"`
-    always(0),
+    succeedWith(0),
   ),
 )
 ```
@@ -64,7 +64,8 @@ import {
   literal,
   object,
   array,
-  always,
+  oneOf,
+  succeedWith,
 } from 'pure-parse'
 
 type RichText =
@@ -91,11 +92,13 @@ const parseNumberContent = object({
 })
 
 const parseRichText = array(
-  parseStringContent,
-  parseNumberContent,
-  always({
-    tag: 'empty',
-  }),
+  oneOf(
+    parseStringContent,
+    parseNumberContent,
+    succeedWith({
+      tag: 'empty',
+    }),
+  ),
 )
 ```
 

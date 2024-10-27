@@ -1,5 +1,4 @@
-import { describe, expect, it, test } from 'vitest'
-import { literal } from './literal'
+import { describe } from 'vitest'
 
 describe('primitives', () => {
   describe.todo('null')

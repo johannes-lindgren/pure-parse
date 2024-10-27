@@ -1,16 +1,11 @@
 import { describe, expect, it, test } from 'vitest'
 import { arrayGuard, nonEmptyArrayGuard } from './arrays'
-import {
-  isBoolean,
-  isNonEmptyArray,
-  isNumber,
-  isString,
-  isUnknown,
-} from './primitives'
+import { isBoolean, isNonEmptyArray, isNumber, isString } from './primitives'
 import { Guard } from './types'
 import { Infer } from '../common'
 import { Equals } from '../internals'
 import { unionGuard } from './union'
+import { isUnknown } from './unknown'
 
 describe('arrays', () => {
   describe('types', () => {

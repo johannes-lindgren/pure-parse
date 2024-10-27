@@ -1,4 +1,4 @@
-import { Parser } from '../parsers'
+import { Parser, UnsuccessfulParser } from '../parsers'
 import { Guard } from '../guards'
 
 /**
@@ -13,4 +13,11 @@ import { Guard } from '../guards'
  * @typeParam T — a parser or guard
  */
 export type Infer<T extends Guard<unknown> | Parser<unknown>> =
-  T extends Parser<infer R> ? R : T extends Guard<infer R> ? R : never
+  T extends UnsuccessfulParser
+    ? // The value type of parsers that never succeed will be `never`
+      never
+    : T extends Parser<infer R>
+      ? R
+      : T extends Guard<infer R>
+        ? R
+        : never
