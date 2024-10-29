@@ -8,7 +8,7 @@ To protect your app against prototype pollution, it is generally recommended to 
 
 ## Content Security Policy
 
-The [objectCompiled](/api/parsers/object/#objectcompiled) and [objectGuardCompiled](/api/guards/object/#objectGuardCompiled) functions perform just-in-time (JIT) compilation with the `Function` constructor. This increases parsing performance, but browser pages that enable
+The [objectCompiled](/api/parsers/object#objectCompiled) and [objectGuardCompiled](/api/guards/object#objectGuardCompiled) functions perform just-in-time (JIT) compilation with the `Function` constructor. This increases parsing performance, but browser pages that enable
 [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) (CSP) might block the usage of the `Function` constructor. Enable the `unsafe-eval` directive in the CSP header or stick to [object](/api/parsers/object#object) and [objectGuard](/api/parsers/object#objectGuard) that do not call the `Function` constructor.
 
 > [!TIP]

@@ -17,19 +17,19 @@ import { succeedWith } from './defaults'
 
 const suites = [
   {
-    name: 'object without JIT',
+    name: 'object without JIT compilation',
     fn: object,
   },
   {
-    name: 'object with JIT',
+    name: 'object with JIT compilation',
     fn: objectCompiled,
   },
   {
-    name: 'memoized object with JIT',
+    name: 'memoized object with JIT compilation',
     fn: objectCompiledMemo,
   },
   {
-    name: 'memoized object without JIT',
+    name: 'memoized object without JIT compilation',
     fn: objectMemo,
   },
 ]
