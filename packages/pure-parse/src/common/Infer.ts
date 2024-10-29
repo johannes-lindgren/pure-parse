@@ -9,7 +9,7 @@ import { Guard } from '../guards'
  * type User = Infer<typeof parseUser>
  * @example
  * type User = Infer<typeof isUser>
- * @limitations optional properties will be inferred as required–but undefinable–properties. (This might be due to limitations of TypeScript.) At runtime, the property _is_ optional: only the inferred type has a discrepancy. For most use cases, this is not a problem to worry about. If you are adamant on being correct, consider declaring the type instead of inferring it (see the following section). Future version of this library might provide a solution.
+ * @limitations Optional properties will be inferred as required properties that can be assigned `undefined` (unions with `undefined`). At runtime, the property _is_ optional: only the inferred type has a discrepancy. For most use cases, this is not a problem. If you are adamant on being correct, consider declaring the type instead of inferring it (see the following section). This might be due to limitations of TypeScript; future versions of this library might provide a solution.
  * @typeParam T — a parser or guard
  */
 export type Infer<T extends Guard<unknown> | Parser<unknown>> =

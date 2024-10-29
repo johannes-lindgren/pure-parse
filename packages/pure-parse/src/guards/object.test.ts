@@ -1,20 +1,28 @@
-import { objectGuard, objectGuardNoJit } from './object'
+import { objectGuard, objectGuardCompiled } from './object'
 import { describe, expect, it, test } from 'vitest'
 import { isNumber, isString, isUndefined } from './primitives'
 import { Guard } from './types'
 import { unionGuard } from './union'
 import { optionalGuard, undefineableGuard } from './optional'
+import { objectGuardCompiledMemo, objectGuardMemo } from '../memoization'
 
 const suits = [
   {
-    name: 'objectNoEval',
-    fn: objectGuardNoJit,
-  },
-  {
-    name: 'objectEval',
+    name: 'objectNonCompiled',
     fn: objectGuard,
   },
-  //   TODO objectGuardMemo
+  {
+    name: 'objectCompiled',
+    fn: objectGuardCompiled,
+  },
+  {
+    name: 'objectGuardNonCompiledMemo',
+    fn: objectGuardMemo,
+  },
+  {
+    name: 'objectGuardCompiledMemo',
+    fn: objectGuardCompiledMemo,
+  },
 ]
 
 suits.forEach(({ name: suiteName, fn: objectGuard }) => {

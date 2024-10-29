@@ -3,6 +3,7 @@ import {
   arrayGuard,
   nonEmptyArrayGuard,
   objectGuard,
+  objectGuardCompiled,
   partialRecordGuard,
   recordGuard,
   tupleGuard,
@@ -11,6 +12,8 @@ import {
 
 export const unionGuardMemo = memoizeValidatorConstructor(unionGuard)
 export const objectGuardMemo = memoizeValidatorConstructor(objectGuard)
+export const objectGuardCompiledMemo =
+  memoizeValidatorConstructor(objectGuardCompiled)
 export const recordGuardMemo = memoizeValidatorConstructor(recordGuard)
 export const partialRecordGuardMemo =
   memoizeValidatorConstructor(partialRecordGuard)
