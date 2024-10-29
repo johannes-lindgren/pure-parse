@@ -21,7 +21,7 @@ const createObjectParser = (object) =>
 
 export const compiledSuite = () => {
   b.suite(
-    'Parsing construction',
+    'Parser construction',
 
     b.add('JIT compilation', () => {
       return () => {
