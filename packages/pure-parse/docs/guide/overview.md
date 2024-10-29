@@ -66,7 +66,7 @@ PureParse is [one of the fastest](comparison.md#performance-benchmarks) validato
 > [!NOTE]
 > Content Security Policy (CSP) can prevent JIT compilation from working. See [Security > Content Security Policy](/guide/security.html#content-security-policy) for more information.
 
-When working with immutable data structures, [memoization](memoization) can increase the performance by several orders of magnitude. This technique is especially useful when the parsed data is being rendered to the screen with a functional UI library like React: for React to be able to skip re-rendering, the references in the parsed result must be stable, which is achieved with memoization.
+When working with immutable data structures, [memoization](performance#memoization) can increase the performance by several orders of magnitude. This technique is especially useful when the parsed data is being rendered to the screen with a functional UI library like React: for React to be able to skip re-rendering, the references in the parsed result must be stable, which is achieved with memoization.
 
 ## Fail-safe
 
