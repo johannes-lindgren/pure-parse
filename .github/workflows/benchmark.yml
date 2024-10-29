@@ -18,7 +18,7 @@ jobs:
       - name: Build
         run: npm run build --workspace=pure-parse
       - name: Run Benchmarks
-        run: npm run build --workspace=benchmark
+        run: npm run start --workspace=benchmark
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
