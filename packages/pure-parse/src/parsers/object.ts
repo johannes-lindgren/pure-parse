@@ -9,14 +9,43 @@ import {
   propagateFailure,
 } from './types'
 import { optionalSymbol } from '../internals'
+import { Infer } from '../common'
+import { lazy } from '../common'
 
 const notAnObjectMsg = 'Not an object'
 const propertyMissingMsg = 'Property is missing'
 
 /**
- * Same as {@link object}, but does not perform just-in-time (JIT) compilation with the `Function` constructor. This function is needed as a replacement in environments where `new Function()` is disallowed; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
+ * Objects have a fixed set of properties of different types.
+ * If the `data` has more properties than expected, the extra properties are omitted from the result.
+ * @example
+ * Object with both required and optional properties:
+ * ```ts
+ * const parseUser = object({
+ *   id: parseNumber,
+ *   active: parseBoolean,
+ *   name: parseString,
+ *   email: optional(parseString),
+ * })
+ * ```
+ * Note that optional properties will be inferred as required properties that can be assigned `undefined`. See {@link Infer} > limitations for in-depth information.
+ * @example
+ * Annotate explicitly:
+ * ```ts
+ * type User = {
+ *   id: number
+ *   name: string
+ * }
+ *
+ * const parseUser = object<User>({
+ *   id: parseNumber,
+ *   name: parseString,
+ * })
+ * ```
+ * @param schema maps keys to validation functions.
+ * @return a parser function that validates objects according to `schema`.
  */
-export const objectNoJit = <T extends Record<string, unknown>>(schema: {
+export const object = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
 }): Parser<T> => {
@@ -53,19 +82,22 @@ export const objectNoJit = <T extends Record<string, unknown>>(schema: {
 }
 
 /**
- * Objects have a fixed set of properties that can have different types.
- * If the `data` has more properties than expected, the extra properties are omitted from the result.
+ * Same as {@link object}, but performs just-in-time (JIT) compilation with the `Function` constructor, which greatly increases the execution speed of the validation.
+ * However, the JIT compilation is slow and gets executed at the time when the validation function is constructed.
+ * When invoking this function at the module level, it is recommended to wrap it in {@link lazy} to defer the JIT compilation to when the validation function is called for the first time.
+ * This function will be blocked in environments where the `Function` constructor is blocked; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
  * @example
- * const parseUser = object({
- *   id: parseNumber,
- *   active: parseBoolean,
- *   name: parseString,
- *   email: optional(parseString),
+ * Defer the JIT compilation to when the validation function is called for the first time.
+ * ```ts
+ * const isUser = lazy(() => objectCompiled({
+ *  id: isNumber,
+ *  name: isString,
  * })
+ * ```
+ * @see {@link object} for a non-just-in-time compiled version of this function.
  * @param schema maps keys to validation functions.
- * @return a parser function that validates objects according to `schema`.
  */
-export const object = <T extends Record<string, unknown>>(schema: {
+export const objectCompiled = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
 }): Parser<T> => {

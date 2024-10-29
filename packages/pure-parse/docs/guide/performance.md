@@ -1,11 +1,13 @@
-# Memoization
+# Performance
 
-PureParse is built to be among the fastest validation libraries—but when dealing with immutable data structures, parsing can be near instantaneous.
+PureParse is built to be among the fastest validation libraries. This article outlines some of the techniques to use to speed up the parsing even further.
 
 > [!TIP]
 > For performance benchmarks, see the [Comparison > Benchmarks](comparison#benchmarks) section.
 
-Since PureParse is a pure functional library, it is trivial to memoize parsers and guards:
+## Memoization
+
+When using the structural sharing technique, memoization can be employed to make parsing near instantaneous. Since PureParse is a pure functional library, it is trivial to memoize parsers and guards:
 
 ```ts
 import { memo, object, parseString, parseNumber } from 'pure-parse'
@@ -18,7 +20,7 @@ const parseUsers = memo(
 )
 ```
 
-Nested parsers can be memoized:
+Nested parsers can also be memoized:
 
 ```ts
 import { memo, object, arrays, parseString, parseNumber } from 'pure-parse'
@@ -79,7 +81,7 @@ For example, consider a document shared between several peers in a network: when
 
 Memoization ensures that only the parts of the document that changed are revalidated. Not only does this speed up the parsing time itself, but if other memoizable computations depend on the data, these computations can be memoized as well. For example, if the shared document is rendered on the screen with React, memoized components do not always need to be re-rendered. This can significantly speed up the performance.
 
-## Use Case with Yjs and Immer
+## Memoization Use Case with Yjs and Immer
 
 For example, consider an example with a CRTD for real-time collaboration:
 
@@ -90,7 +92,7 @@ In this scenario, the document might be quite large, change frequently over time
 
 [memo](/api/memoization/memo.html#memo) takes a parser or guard function as an argument and returns a memoized caches the result for a given input, meaning that if it's invoked
 
-## Pitfalls
+## Pitfalls of Memoization
 
 To use memoization effectively, you need to be aware of some principles of pure functional programming. There are many resources available on the topic, but here are some key points:
 
@@ -111,3 +113,52 @@ A pure function is a function that always returns the same output for the same i
 As long as all parsers are pure, memoization is always safe. However, it is not always necessary: if the references that are passed to the parsers are not stable, memoization will not provide any benefit.
 
 For example, an application that every once in a while fetches a JSON via a REST API will always receive a new reference when that JSON string is parsed into a JavaScript value. Even if that value deeply equals the previous value, the reference will be different, which means that the memoization cache will never be hit.
+
+## Compiled Validators
+
+When memoization does not provide any benefits, parsing performance may still be increased by using the just-in-time (JIT) [compiled parsers](/api/parsers/object#objectCompiled):
+
+```ts
+import { objectCompiled, parseNumber, parseString } from 'pure-parse'
+
+const parseUser = objectCompiled({
+  name: parseString,
+  age: parseNumber,
+})
+```
+
+The resulting parser has exactly the same API as the non-compiled version, but parses data _much_ faster.
+
+> [!TIP]
+> See the [performance benchmarks](comparison#safe-parsing) section for more information.
+
+There are two caveats of using compiled parsers:
+
+1. They use the `Function` constructor, which may be disallowed in some environments; for example, in a browser page with a strict Content Security Policy. See the [Security](/guide/security#content-security-policy) article for more information.
+2. While parsing performance is increased, the _construction_ of the parser takes more time. If the parser is constructed at the module level, this can slow down the application startup time. See the [Lazy Construction of Parsers](#lazy-construction-of-parsers) section for more information.
+
+## Lazy Construction of Parsers
+
+Construction of parsers does have a tiny overhead: it takes about half the time to construct a parser as it does to validate a value with that parser.
+
+However, the just-in-time (JIT) [compiled parsers](/api/parsers/object#objectJit) take about 50 times longer to construct than their non-JIT counterparts. If a project defines a lot of JIT-compiled parsers at the module level, it _can_ be worth deferring their initialization with the [lazy](/api/common/lazy) higher-order function:
+
+```ts
+import { lazy, parseString, parseNumber, objectCompiled } from 'pure-parse'
+
+const parseUser = lazy(() =>
+  objectCompiled({
+    name: parseString,
+    age: parseNumber,
+  }),
+)
+
+// The API of the parser does not change
+parseUser({
+  name: 'Alice',
+  age: 42,
+})
+```
+
+> [!TIP]
+> Do not optimize prematurely: only use `lazy` if you have a performance problem.
