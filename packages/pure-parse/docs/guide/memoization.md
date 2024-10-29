@@ -5,6 +5,8 @@ PureParse is built to be among the fastest validation libraries—but when deali
 > [!TIP]
 > For performance benchmarks, see the [Comparison > Benchmarks](comparison#benchmarks) section.
 
+## Memoizing Parsers
+
 Since PureParse is a pure functional library, it is trivial to memoize parsers and guards:
 
 ```ts
@@ -111,3 +113,29 @@ A pure function is a function that always returns the same output for the same i
 As long as all parsers are pure, memoization is always safe. However, it is not always necessary: if the references that are passed to the parsers are not stable, memoization will not provide any benefit.
 
 For example, an application that every once in a while fetches a JSON via a REST API will always receive a new reference when that JSON string is parsed into a JavaScript value. Even if that value deeply equals the previous value, the reference will be different, which means that the memoization cache will never be hit.
+
+## Lazy Construction of Parsers
+
+Construction of parsers does have a small overhead: it takes about half the time to construct a parser as it does to validate a value with that parser.
+
+However, the [just-in-time (JIT) compiled parsers](/api/parsers/object#objectJit) take about 50 times longer to construct than their non-JIT counterparts. If a project defines a lot of JIT-compiled parsers at the module level, it _can_ be worth deferring their initialization with the [lazy](/api/common/lazy) higher-order function:
+
+```ts
+import { lazy, objectJit, parseString, parseNumber } from 'pure-parse'
+
+const parseUser = lazy(() =>
+  objectJit({
+    name: parseString,
+    age: parseNumber,
+  }),
+)
+
+// The API of the parser does not change
+parseUser({
+  name: 'Alice',
+  age: 42,
+})
+```
+
+> [!TIP]
+> Do not optimize prematurely: only use `lazy` if you have a performance problem.
