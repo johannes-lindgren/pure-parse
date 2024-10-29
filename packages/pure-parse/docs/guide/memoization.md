@@ -79,7 +79,7 @@ For example, consider a document shared between several peers in a network: when
 
 Memoization ensures that only the parts of the document that changed are revalidated. Not only does this speed up the parsing time itself, but if other memoizable computations depend on the data, these computations can be memoized as well. For example, if the shared document is rendered on the screen with React, memoized components do not always need to be re-rendered. This can significantly speed up the performance.
 
-## Use Case with Yjs and Immer
+## Memoization Use Case with Yjs and Immer
 
 For example, consider an example with a CRTD for real-time collaboration:
 
@@ -90,7 +90,7 @@ In this scenario, the document might be quite large, change frequently over time
 
 [memo](/api/memoization/memo.html#memo) takes a parser or guard function as an argument and returns a memoized caches the result for a given input, meaning that if it's invoked
 
-## Pitfalls
+## Pitfalls of Memoization
 
 To use memoization effectively, you need to be aware of some principles of pure functional programming. There are many resources available on the topic, but here are some key points:
 

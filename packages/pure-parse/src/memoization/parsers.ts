@@ -3,7 +3,7 @@ import {
   array,
   // nonEmptyArray,
   object,
-  objectNoJit,
+  objectCompiled,
   // partialRecord,
   // record,
   // tuple,
@@ -13,7 +13,7 @@ import {
 
 export const unionMemo = memoizeValidatorConstructor(oneOf)
 export const objectMemo = memoizeValidatorConstructor(object)
-export const objectNoJitMemo = memoizeValidatorConstructor(objectNoJit)
+export const objectCompiledMemo = memoizeValidatorConstructor(objectCompiled)
 // TODO export const recordMemo = memoizeValidatorConstructor(record)
 // TODO export const partialRecordMemo =  memoizeValidatorConstructor(partialRecord)
 export const tupleMemo = memoizeValidatorConstructor(tuple)

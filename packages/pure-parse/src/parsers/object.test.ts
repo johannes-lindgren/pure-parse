@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from 'vitest'
-import { object as objectParseEval, objectNoJit } from './object'
+import { objectCompiled, object } from './object'
 import { isSuccess, Parser } from './types'
 import type { Equals } from '../internals'
 import { oneOf } from './oneOf'
@@ -12,25 +12,25 @@ import {
 import { Infer } from '../common'
 import { literal } from './literal'
 import { nullable, optional } from './optional'
-import { objectMemo, objectNoJitMemo } from '../memoization'
+import { objectMemo, objectCompiledMemo } from '../memoization'
 import { succeedWith } from './defaults'
 
 const suites = [
   {
     name: 'object without JIT',
-    fn: objectNoJit,
+    fn: object,
   },
   {
     name: 'object with JIT',
-    fn: objectParseEval,
+    fn: objectCompiled,
   },
   {
     name: 'memoized object with JIT',
-    fn: objectMemo,
+    fn: objectCompiledMemo,
   },
   {
     name: 'memoized object without JIT',
-    fn: objectNoJitMemo,
+    fn: objectMemo,
   },
 ]
 
@@ -213,30 +213,45 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             email: optional(optional(parseString)),
           })
         })
-        test('type inference', () => {
-          type User = {
-            id: number
-            email?: string
-          }
-          const parseUser = object({
-            id: parseNumber,
-            email: optional(parseString),
+        describe('type inferrence', () => {
+          test('required properties inference', () => {
+            type User = {
+              id: number
+            }
+            const parseUser = object({
+              id: parseNumber,
+            })
+            type InferredUser = Infer<typeof parseUser>
+            const T1: Equals<InferredUser, User> = true
+            const a1: InferredUser = {
+              id: 123,
+            }
+            const a2: InferredUser = {
+              id: 123,
+            }
+            const a3: InferredUser = {
+              id: 123,
+            }
           })
-          type InferredUser = Infer<typeof parseUser>
-          // @ts-expect-error -- TODO can't get this to work
-          const T1: Equals<InferredUser, User> = true
-          const a1: InferredUser = {
-            id: 123,
-            email: '',
-          }
-          const a2: InferredUser = {
-            id: 123,
-            email: undefined,
-          }
-          // @ts-expect-error -- TODO can't get this to work
-          const a3: InferredUser = {
-            id: 123,
-          }
+          test('optional properties inference', () => {
+            type User = {
+              email?: string
+            }
+            const parseUser = object({
+              email: optional(parseString),
+            })
+            type InferredUser = Infer<typeof parseUser>
+            // @ts-expect-error -- TODO can't get this to work
+            const T1: Equals<InferredUser, User> = true
+            const a1: InferredUser = {
+              email: '',
+            }
+            const a2: InferredUser = {
+              email: undefined,
+            }
+            // @ts-expect-error -- TODO can't get this to work
+            const a3: InferredUser = {}
+          })
         })
       })
       describe('fallback', () => {
