@@ -1,0 +1,27 @@
+{
+  "name": "Parser construction + one parse",
+  "date": "2024-10-29T16:01:58.984Z",
+  "version": "1.0.0",
+  "results": [
+    {
+      "name": "JIT compilation",
+      "ops": 128293,
+      "margin": 0.64,
+      "percentSlower": 94.74
+    },
+    {
+      "name": "non-JIT compilation",
+      "ops": 2436883,
+      "margin": 0.32,
+      "percentSlower": 0
+    }
+  ],
+  "fastest": {
+    "name": "non-JIT compilation",
+    "index": 1
+  },
+  "slowest": {
+    "name": "JIT compilation",
+    "index": 0
+  }
+}
