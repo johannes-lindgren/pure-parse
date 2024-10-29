@@ -1,0 +1,26 @@
+name: Benchmark
+on: ['push']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Benchmark
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npm run build --workspace=pure-parse
+      - name: Run Benchmarks
+        run: npm run start --workspace=benchmark
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: packages/benchmark/benchmark/results
