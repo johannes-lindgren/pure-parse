@@ -8,7 +8,7 @@ import {
   success,
   propagateFailure,
 } from './types'
-import { OptionalKeys, optionalSymbol, RequiredKeys } from '../internals'
+import { optionalSymbol } from '../internals'
 import { Infer } from '../common'
 import { lazy } from '../common'
 
@@ -83,6 +83,7 @@ export const object = <T extends Record<string, unknown>>(schema: {
         const value = (data as Record<string, unknown>)[key]
         // Perf: only check if the property exists the value is undefined => huge performance boost
         if (value === undefined && !data.hasOwnProperty(key)) {
+          // Property is absent
           const parseResult = parser(optionalSymbol)
           if (parseResult.tag === 'failure') {
             return propagateFailure(parseResult, {
@@ -92,16 +93,18 @@ export const object = <T extends Record<string, unknown>>(schema: {
           }
           // If the parse result indicates that the parsed result should be an
           // omitted property, this conditional will be skipped
-          if (parseResult.value === optionalSymbol) {
+          if (parseResult.value !== optionalSymbol) {
+            // Can happen in case of withDefault, where parsing an optional property does lead to a value
             dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
           }
+        } else {
+          // Property is present
+          const parseResult = parser(value)
+          if (parseResult.tag === 'failure') {
+            return propagateFailure(parseResult, { tag: 'object', key })
+          }
+          dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
         }
-
-        const parseResult = parser(value)
-        if (parseResult.tag === 'failure') {
-          return propagateFailure(parseResult, { tag: 'object', key })
-        }
-        dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
       }
 
       return success(dataOutput as T)
@@ -144,16 +147,21 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
       const parser = `parsers[${i}]`
       const isOptional = parserFunction[optionalSymbol] === true
       return [
-        ...(!isOptional
-          ? [
-              `if(${value} === undefined && !data.hasOwnProperty(${key}))  return {tag:'failure', error:${JSON.stringify(
-                propertyMissingMsg,
-              )}, path: [{tag: 'object', key: ${key}}]}`,
-            ]
-          : []),
-        `parseResult = ${parser}(${value})`,
-        `if(parseResult.tag === 'failure') return {tag:'failure', error: parseResult.error, path:[{tag:'object', key:${key}}, ...parseResult.path]}`,
-        `dataOutput[${key}] = parseResult.value`,
+        `if(${value} === undefined && !data.hasOwnProperty(${key}))  {
+          const parseResult = ${parser}(optionalSymbol)
+          if(parseResult.tag === 'failure'){
+            return {tag:'failure', error:${JSON.stringify(
+              propertyMissingMsg,
+            )}, path: [{tag: 'object', key: ${key}}]}
+          }
+          if(parseResult.value !== optionalSymbol){
+            dataOutput[${key}] = parseResult.value
+          } 
+        } else {
+          parseResult = ${parser}(${value})
+          if(parseResult.tag === 'failure') return {tag:'failure', error: parseResult.error, path:[{tag:'object', key:${key}}, ...parseResult.path]}
+          dataOutput[${key}] = parseResult.value
+        }`,
       ]
     }),
     `return {tag:'success', value:dataOutput}`,

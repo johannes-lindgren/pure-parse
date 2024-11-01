@@ -20,14 +20,14 @@ const suites = [
     name: 'object without JIT compilation',
     fn: object,
   },
-  // {
-  //   name: 'object with JIT compilation',
-  //   fn: objectCompiled,
-  // },
-  // {
-  //   name: 'memoized object with JIT compilation',
-  //   fn: objectCompiledMemo,
-  // },
+  {
+    name: 'object with JIT compilation',
+    fn: objectCompiled,
+  },
+  {
+    name: 'memoized object with JIT compilation',
+    fn: objectCompiledMemo,
+  },
   {
     name: 'memoized object without JIT compilation',
     fn: objectMemo,
@@ -143,21 +143,42 @@ suites.forEach(({ name: suiteName, fn: object }) => {
       })
       describe('optional properties', () => {
         it('differentiates between undefined and missing properties', () => {
+          // Just to show that toEqual lies about absent proeprties!
+          expect({}).not.toHaveProperty('a')
+          expect({ a: undefined }).toHaveProperty('a')
+          expect({}).toEqual({ a: undefined })
+          expect({ a: undefined }).toEqual({})
+
           const parseOptionalObj = object({
             a: optional(parseString),
           })
+
+          const omittedParseResult = parseOptionalObj({})
           expect(parseOptionalObj({})).toHaveProperty('tag', 'success')
-          expect(parseOptionalObj({ a: undefined })).toHaveProperty(
-            'tag',
-            'success',
-          )
+          if (!isSuccess(omittedParseResult)) {
+            throw new Error('Should be success to continue the test')
+          }
+          expect(omittedParseResult.value).not.toHaveProperty('a')
+
+          // undefined -> Success
+          const undefinedParseResult = parseOptionalObj({ a: undefined })
+          expect(undefinedParseResult).toHaveProperty('tag', 'success')
+          if (!isSuccess(undefinedParseResult)) {
+            throw new Error('Should be success to continue the test')
+          }
+          // undefined -> undefined
+          expect(undefinedParseResult.value).toHaveProperty('a', undefined)
+
           const parseUnionObj = object({
             a: oneOf(parseString, parseUndefined),
           })
+
           expect(parseUnionObj({})).toHaveProperty('tag', 'failure')
-          expect(parseUnionObj({ a: undefined })).toHaveProperty(
-            'tag',
-            'success',
+          expect(parseUnionObj({ a: undefined })).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { a: undefined },
+            }),
           )
         })
         test('parsing', () => {
@@ -165,15 +186,47 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             id: parseNumber,
             email: optional(parseString),
           })
-          expect(isSuccess(parseUser({ id: 1 }))).toEqual(true)
-          expect(parseUser({ id: 1, email: undefined })).toHaveProperty(
-            'tag',
-            'success',
+
+          // Omitted -> Success
+          const absentResult = parseUser({ id: 1 })
+          expect(absentResult).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { id: 1 },
+            }),
           )
-          expect(parseUser({ id: 1, email: 'alice@test.com' })).toHaveProperty(
-            'tag',
-            'success',
+          if (!isSuccess(absentResult)) {
+            throw new Error('The result should be success')
+          }
+          expect(absentResult.value).not.toHaveProperty('email')
+
+          // Undefined -> Success
+          const undefinedResult = parseUser({ id: 1, email: undefined })
+          expect(undefinedResult).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { id: 1, email: undefined },
+            }),
           )
+          if (!isSuccess(undefinedResult)) {
+            throw new Error('The result should be success')
+          }
+          expect(undefinedResult.value).toHaveProperty('email', undefined)
+
+          // String -> Success
+          const stringResult = parseUser({ id: 1, email: 'alice@test.com' })
+          expect(stringResult).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { id: 1, email: 'alice@test.com' },
+            }),
+          )
+          if (!isSuccess(stringResult)) {
+            throw new Error('The result should be success')
+          }
+          expect(stringResult.value).toHaveProperty('email', 'alice@test.com')
+
+          // Number -> Failure
           expect(parseUser({ id: 1, email: 123 })).toHaveProperty(
             'tag',
             'failure',
