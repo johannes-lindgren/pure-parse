@@ -1,5 +1,5 @@
-import { OptionalParser, Parser } from '../parsers'
-import { Guard, isObject, OptionalGuard } from '../guards'
+import { Parser } from '../parsers'
+import { Guard, isObject } from '../guards'
 import { optionalSymbol } from '../internals'
 
 /**

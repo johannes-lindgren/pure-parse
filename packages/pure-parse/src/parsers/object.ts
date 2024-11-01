@@ -8,12 +8,20 @@ import {
   success,
   propagateFailure,
 } from './types'
-import { optionalSymbol } from '../internals'
+import { OptionalKeys, optionalSymbol, RequiredKeys } from '../internals'
 import { Infer } from '../common'
 import { lazy } from '../common'
 
 const notAnObjectMsg = 'Not an object'
 const propertyMissingMsg = 'Property is missing'
+
+// export type OptionalParserKeys<T> = {
+//   [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? K : never
+// }[keyof T]
+//
+// export type RequiredParserKeys<T> = {
+//   [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? never : K
+// }[keyof T]
 
 /**
  * Objects have a fixed set of properties of different types.
@@ -48,38 +56,57 @@ const propertyMissingMsg = 'Property is missing'
 export const object = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<T> => {
-  const entries = Object.entries(schema)
-  return (data) => {
-    if (!isObject(data)) {
-      return failure(notAnObjectMsg)
-    }
-    const dataOutput = {} as Record<string, unknown>
-    for (let i = 0; i < entries.length; i++) {
-      const [key, parser] = entries[i]!
-      const value = (data as Record<string, unknown>)[key]
-      // Perf: only check if the property exists the value is undefined => huge performance boost
-      if (value === undefined && !data.hasOwnProperty(key)) {
-        if (parser[optionalSymbol] === true) {
-          // The key is optional, so we can skip it
-          continue
+}): Parser<T> =>
+  //   Parser<
+  //   {
+  //     [K in RequiredParserKeys<typeof schema>]: Exclude<
+  //       Infer<(typeof schema)[K]>,
+  //       typeof optionalSymbol
+  //     >
+  //   } & {
+  //     [K in OptionalParserKeys<typeof schema>]?: Exclude<
+  //       Infer<(typeof schema)[K]>,
+  //       typeof optionalSymbol
+  //     >
+  //   }
+  // >
+  // Parser<T>
+  {
+    const entries = Object.entries(schema)
+    return (data) => {
+      if (!isObject(data)) {
+        return failure(notAnObjectMsg)
+      }
+      const dataOutput = {} as Record<string, unknown>
+      for (let i = 0; i < entries.length; i++) {
+        const [key, parser] = entries[i]!
+        const value = (data as Record<string, unknown>)[key]
+        // Perf: only check if the property exists the value is undefined => huge performance boost
+        if (value === undefined && !data.hasOwnProperty(key)) {
+          const parseResult = parser(optionalSymbol)
+          if (parseResult.tag === 'failure') {
+            return propagateFailure(parseResult, {
+              tag: 'object',
+              key,
+            })
+          }
+          // If the parse result indicates that the parsed result should be an
+          // omitted property, this conditional will be skipped
+          if (parseResult.value === optionalSymbol) {
+            dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
+          }
         }
-        return propagateFailure(failure(propertyMissingMsg), {
-          tag: 'object',
-          key,
-        })
+
+        const parseResult = parser(value)
+        if (parseResult.tag === 'failure') {
+          return propagateFailure(parseResult, { tag: 'object', key })
+        }
+        dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
       }
 
-      const parseResult = parser(value)
-      if (parseResult.tag === 'failure') {
-        return propagateFailure(parseResult, { tag: 'object', key })
-      }
-      dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
+      return success(dataOutput as T)
     }
-
-    return success(dataOutput as T)
   }
-}
 
 /**
  * Same as {@link object}, but performs just-in-time (JIT) compilation with the `Function` constructor, which greatly increases the execution speed of the validation.

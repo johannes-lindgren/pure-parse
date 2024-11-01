@@ -1,4 +1,4 @@
-import { OptionalParser, Parser } from './types'
+import { failure, OptionalParser, Parser, success } from './types'
 import { parseNull, parseUndefined } from './primitives'
 import { optionalSymbol } from '../internals'
 import { oneOf } from './oneOf'
@@ -7,6 +7,7 @@ import { oneOf } from './oneOf'
  * Represent an optional property in an object. It is supposed to be used in combination with `object`.
  * Note that in TypeScript, optional properties may be assigned `undefined` or omitted entirely from the object.
  * This function is special because it is used internally by `object` to differentiate between optional properties from required properties that can be `undefined`.
+ * Only use this in objects: despite the type signature, it _can_ return {@link optionalSymbol} to indicate that the property was omitted from the object.
  * @example
  * Wrap properties in `optional` to make them optional:
  * ```ts
@@ -30,9 +31,21 @@ export const optional = <T>(parser: Parser<T>): OptionalParser<T> =>
   /*
    * { [optionalValue]: true } is used at runtime by `object` to check if a parser represents an optional value.
    */
-  Object.assign(oneOf(parseUndefined, parser), {
-    [optionalSymbol]: true,
-  }) as unknown as OptionalParser<T>
+  oneOf(parseOptionalSymbol, parseUndefined, parser) as OptionalParser<T>
+
+/**
+ * Special parser to be used for optional properties: object parses passes
+ *  {@link optionalSymbol} for properties that are not present on object, which is
+ *  distinct from properties that have the value `undefined`.
+ * @param data
+ * @return Success of {@link optionalSymbol} if `data` equals {@link optionalSymbol}. This indicates that the property was allowed to be omitted.
+ */
+const parseOptionalSymbol: Parser<typeof optionalSymbol> = (data) => {
+  return data === optionalSymbol
+    ? // This indicates that the property
+      success(optionalSymbol)
+    : failure('not optional')
+}
 
 /**
  * Represents a value that can be `null`. Shorthand for `oneOf(parseNull, parser)`.
