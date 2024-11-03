@@ -66,31 +66,60 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           expect(parseUser({ name: 'Alice' })).toHaveProperty('tag', 'failure')
           expect(parseUser({})).toHaveProperty('tag', 'failure')
         })
-        describe('type annotation', () => {
-          type User = {
-            id: number
-            name: string
-          }
-          it('has a required parser', () => {
-            const parseUser1 = object<User>({
-              id: parseNumber,
-              name: parseString,
-            })
-          })
-          it('does not have an optional parser', () => {
-            const parseUser2 = object<User>({
-              id: parseNumber,
-              // @ts-expect-error -- required prop name must not be optional
-              name: optional(parseString),
-            })
-          })
-          it('must have a parser', () => {
-            const parseUser3 = object<User>(
-              // @ts-expect-error -- required prop name must not be omitted
-              {
+        describe('explicit type annotation', () => {
+          describe('required properties', () => {
+            type User = {
+              id: number
+              name: string
+            }
+            it('has a required parser', () => {
+              const parseUser1 = object<User>({
                 id: parseNumber,
-              },
-            )
+                name: parseString,
+              })
+            })
+            it('does not have an optional parser', () => {
+              const parseUser2 = object<User>({
+                id: parseNumber,
+                // @ts-expect-error -- required prop name must not be optional
+                name: optional(parseString),
+              })
+            })
+            it('must have a parser', () => {
+              const parseUser3 = object<User>(
+                // @ts-expect-error -- required prop name must not be omitted
+                {
+                  id: parseNumber,
+                },
+              )
+            })
+          })
+          describe('undefinable properties', () => {
+            type User = {
+              name: string | undefined
+            }
+            it('cannot be optional', () => {
+              object<User>({
+                // TODO @ts-expect-error -- required prop name must not be optional
+                name: optional(parseString),
+              })
+            })
+          })
+          describe('optional properties', () => {
+            type User = {
+              name?: string
+            }
+            it('cannot be required', () => {
+              object<User>({
+                // TODO @ts-expect-error -- required prop name must not be optional
+                name: parseString,
+              })
+            })
+            it('must be optional', () => {
+              object<User>({
+                name: optional(parseString),
+              })
+            })
           })
         })
         test('type inference', () => {

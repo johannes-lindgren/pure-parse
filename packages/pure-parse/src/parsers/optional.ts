@@ -28,16 +28,13 @@ import { oneOf } from './oneOf'
  * @return a special parser that represents an optional value. If invoked directly, it behaves the same as `oneOf(parseUndefined, parser)`. If invoked by `object`, `object` will treat the property as optional.
  */
 export const optional = <T>(parser: Parser<T>): OptionalParser<T> =>
-  /*
-   * { [optionalValue]: true } is used at runtime by `object` to check if a parser represents an optional value.
-   */
+  // Note that the type of parseOptionalSymbol is not taken into account
   oneOf(parseOptionalSymbol, parseUndefined, parser) as OptionalParser<T>
 
 /**
- * Special parser to be used for optional properties: object parses passes
- *  {@link optionalSymbol} for properties that are not present on object, which is
- *  distinct from properties that have the value `undefined`.
- * @param data
+ * Non-exported function to check if a value is the optional symbol.
+ * The type predicate is deliberately inaccurate to provide more accurate type inference in object validators.
+ * @param data To represent optional properties in objects, pass {@link optionalSymbol} as argument.
  * @return Success of {@link optionalSymbol} if `data` equals {@link optionalSymbol}. This indicates that the property was allowed to be omitted.
  */
 const parseOptionalSymbol: Parser<typeof optionalSymbol> = (data) => {

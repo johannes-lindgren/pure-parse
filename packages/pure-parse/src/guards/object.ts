@@ -34,11 +34,8 @@ import { lazy } from '../common'
 export const objectGuard =
   <T extends Record<string, unknown>>(schema: {
     [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
-  }) =>
-  (
-    data: unknown,
-  ): data is Required<Pick<T, RequiredKeys<T>>> &
-    Partial<Pick<T, OptionalKeys<T>>> =>
+  }): Guard<T> =>
+  (data): data is T =>
     typeof data === 'object' &&
     data !== null &&
     Object.keys(schema).every((key) => {
@@ -46,7 +43,7 @@ export const objectGuard =
       const value = (data as Record<string, unknown>)[key]
       if (value === undefined && !data.hasOwnProperty(key)) {
         // If the key is not present, the guard must represent an optional property
-        return optionalSymbol in guard
+        return guard(optionalSymbol)
       }
 
       return guard(value)
@@ -79,16 +76,10 @@ export const objectGuardCompiled = <T extends Record<string, unknown>>(schema: {
         const sanitizedKey = JSON.stringify(unescapedKey)
         const value = `data[${sanitizedKey}]`
         const guard = `guards[${i}]`
-        const isOptional = guardFunction[optionalSymbol] === true
-        return isOptional
-          ? `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) || ${guard}(${value}))`
-          : `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) ? false : ${guard}(${value}))`
+        return `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) ? ${guard}(optionalSymbol) :  ${guard}(${value}))`
       }),
     )
     .join(' && ')
   const fun = new Function('data', 'optionalSymbol', 'guards', body)
-  return (
-    data: unknown,
-  ): data is Required<Pick<T, RequiredKeys<T>>> &
-    Partial<Pick<T, OptionalKeys<T>>> => fun(data, optionalSymbol, guards)
+  return (data: unknown): data is T => fun(data, optionalSymbol, guards)
 }

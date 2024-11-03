@@ -139,15 +139,14 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
     )}, path: []}`,
     `const dataOutput = {}`,
     `let parseResult`,
-    ...schemaEntries.flatMap(([unescapedKey, parserFunction], i) => {
+    ...schemaEntries.map(([unescapedKey, parserFunction], i) => {
       const key = JSON.stringify(unescapedKey)
       // 2% faster to inline the value and parser, rather than look up once and use a variable
       // 12% faster to inline failure and success object creations
       const value = `data[${key}]`
       const parser = `parsers[${i}]`
-      const isOptional = parserFunction[optionalSymbol] === true
-      return [
-        `if(${value} === undefined && !data.hasOwnProperty(${key}))  {
+      return `
+        if(${value} === undefined && !data.hasOwnProperty(${key}))  {
           const parseResult = ${parser}(optionalSymbol)
           if(parseResult.tag === 'failure'){
             return {tag:'failure', error:${JSON.stringify(
@@ -161,8 +160,7 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
           parseResult = ${parser}(${value})
           if(parseResult.tag === 'failure') return {tag:'failure', error: parseResult.error, path:[{tag:'object', key:${key}}, ...parseResult.path]}
           dataOutput[${key}] = parseResult.value
-        }`,
-      ]
+        }`
     }),
     `return {tag:'success', value:dataOutput}`,
   ]

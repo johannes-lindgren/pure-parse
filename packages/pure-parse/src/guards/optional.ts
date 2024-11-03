@@ -23,12 +23,18 @@ import { optionalSymbol } from '../internals'
  * @param guard
  */
 export const optionalGuard = <T>(guard: Guard<T>): OptionalGuard<T> =>
-  /*
-   * { [optionalValue]: true } is used at runtime by `objectGuard` to check if a guard represents an optional value.
-   */
-  Object.assign(unionGuard(isUndefined, guard), {
-    [optionalSymbol]: true,
-  }) as OptionalGuard<T>
+  // Note that the type of isOptionalSymbol is not taken into account
+  unionGuard(isOptionalSymbol, isUndefined, guard) as OptionalGuard<T>
+
+/**
+ * Non-exported function to check if a value is the optional symbol.
+ * The type predicate is deliberately inaccurate to provide more accurate type inference in object validators
+ * @param data To represent optional properties in objects, pass {@link optionalSymbol} as argument.
+ * @return `true` if `data` equals {@link optionalSymbol}. This indicates that the property was allowed to be omitted.
+ */
+const isOptionalSymbol = (data: unknown): data is undefined =>
+  data === optionalSymbol
+
 /**
  * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for `optional(unionGuard(isNull, guard))`.
  * @param guard

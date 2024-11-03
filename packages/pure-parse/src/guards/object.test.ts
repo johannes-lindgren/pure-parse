@@ -5,6 +5,8 @@ import { Guard } from './types'
 import { unionGuard } from './union'
 import { optionalGuard, undefineableGuard } from './optional'
 import { objectGuardCompiledMemo, objectGuardMemo } from '../memoization'
+import { Equals, optionalSymbol } from '../internals'
+import { Infer } from '../common'
 
 const suits = [
   {
@@ -51,10 +53,10 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
           }) satisfies Guard<{ a: { b: string } }>
 
           objectGuard({
+            // @ts-expect-error
             b: objectGuard({
               b: isNumber,
             }),
-            // @ts-expect-error
           }) satisfies Guard<{ x: { y: number } }>
         })
         describe('explicit generic type annotation', () => {
@@ -84,7 +86,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             })
             objectGuard<UserUndefinable>({
               id: isNumber,
-              // @ts-expect-error - name can be undefined, but it is not optional
+              // TODO @ts-expect-error - name can be undefined, but it is not optional
               name: optionalGuard(isString),
             })
             objectGuard<UserUndefinable>({
@@ -121,7 +123,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             }
             objectGuard<UserOptional>({
               id: isNumber,
-              // @ts-expect-error - requires optional function
+              // The type with the optional property is a superset of the undefineable type
               name: unionGuard(isUndefined, isString),
             })
             objectGuard<UserOptional>({
@@ -178,6 +180,46 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
                 }),
               ),
             })
+          })
+        })
+        describe('type inference', () => {
+          test('optional properties', () => {
+            type User = {
+              email?: string
+            }
+            type RequiredUser = {
+              email: string | undefined
+            }
+            const isUser = objectGuard({
+              email: optionalGuard(isString),
+            })
+
+            type InferredUser = Infer<typeof isUser>
+
+            // TODO make inference of optional properties to work
+            const t1: Equals<InferredUser, RequiredUser> = true
+            const t2: InferredUser = { email: 'a@test.com' }
+            const t3: InferredUser = { email: undefined }
+            // @ts-expect-error -- the property is required
+            const t4: InferredUser = {}
+            const t5: InferredUser = {
+              // @ts-expect-error `optionalSymbol` is not included in the inferred type
+              email: optionalSymbol,
+            }
+          })
+          test('required properties', () => {
+            type User = {
+              id: number
+              email: string
+            }
+            const parseUser = objectGuard({
+              id: isNumber,
+              email: isString,
+            })
+
+            type InferredUser = Infer<typeof parseUser>
+
+            const t1: Equals<InferredUser, User> = true
           })
         })
         test('explicit generic type annotation', () => {
