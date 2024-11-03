@@ -1,5 +1,10 @@
 import { describe, expect, it, test } from 'vitest'
-import { objectCompiled, object } from './object'
+import {
+  objectCompiled,
+  object,
+  OptionalParserKeys,
+  RequiredParserKeys,
+} from './object'
 import { isSuccess, Parser } from './types'
 import { Equals, optionalSymbol } from '../internals'
 import { oneOf } from './oneOf'
@@ -14,6 +19,7 @@ import { literal } from './literal'
 import { nullable, optional } from './optional'
 import { objectMemo, objectCompiledMemo } from '../memoization'
 import { succeedWith, withDefault } from './defaults'
+import { parseUnknown } from './unknown'
 
 const suites = [
   {
@@ -100,7 +106,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             }
             it('cannot be optional', () => {
               object<User>({
-                // TODO @ts-expect-error -- required prop name must not be optional
+                // @ts-expect-error -- required prop name must not be optional
                 name: optional(parseString),
               })
             })
@@ -111,7 +117,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             }
             it('cannot be required', () => {
               object<User>({
-                // TODO @ts-expect-error -- required prop name must not be optional
+                // Object with optional properties is a superset of object with undefinable properties
                 name: parseString,
               })
             })
@@ -326,16 +332,13 @@ suites.forEach(({ name: suiteName, fn: object }) => {
               email: optional(parseString),
             })
             type InferredUser = Infer<typeof parseUser>
-            // TODO email should be inferred as optional
-            const t1: Equals<InferredUser, RequiredUser> = true
+            const t1: Equals<InferredUser, User> = true
             const a1: InferredUser = {
               email: '',
             }
             const a2: InferredUser = {
               email: undefined,
             }
-            // TODO email should be inferred as optional
-            // @ts-expect-error -- unable to correctly infer optional properties
             const a3: InferredUser = {}
 
             const a4: InferredUser = {
@@ -596,6 +599,42 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           })
         })
       })
+    })
+  })
+})
+describe('utility types', () => {
+  describe('RequiredParserKeys', () => {
+    it('extract required keys', () => {
+      const schema = {
+        a: parseString,
+        b: optional(parseString),
+      } as const
+      const t0: Equals<RequiredParserKeys<typeof schema>, 'a'> = true
+    })
+  })
+  describe('OptionalParserKeys', () => {
+    it('extract optional keys', () => {
+      const schema = {
+        a: parseString,
+        b: optional(parseString),
+      } as const
+      const t0: Equals<OptionalParserKeys<typeof schema>, 'b'> = true
+    })
+    it('handles required unknown', () => {
+      const schema1 = {
+        a: parseUnknown,
+      } as const
+      const t1: Equals<OptionalParserKeys<typeof schema1>, never> = true
+      const schema2 = {
+        a: optional(parseUnknown),
+      } as const
+      const t2: Equals<OptionalParserKeys<typeof schema2>, 'a'> = true
+    })
+    it('handles generic parsers', () => {
+      const p = <T>(parser: Parser<T>) =>
+        object({
+          data: parser,
+        })
     })
   })
 })

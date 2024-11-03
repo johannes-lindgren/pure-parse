@@ -4,7 +4,6 @@ import {
   OptionalParser,
   ParseSuccess,
   Parser,
-  ParseResult,
   success,
   propagateFailure,
 } from './types'
@@ -22,6 +21,18 @@ export type OptionalParserKeys<T> = {
 export type RequiredParserKeys<T> = {
   [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? never : K
 }[keyof T]
+
+export type ObjectFromSchema<Schema extends Record<string, Parser<unknown>>> = {
+  [K in RequiredParserKeys<Schema>]: Exclude<
+    Infer<Schema[K]>,
+    typeof optionalSymbol
+  >
+} & {
+  [K in OptionalParserKeys<Schema>]?: Exclude<
+    Infer<Schema[K]>,
+    typeof optionalSymbol
+  >
+}
 
 /**
  * Objects have a fixed set of properties of different types.
@@ -56,19 +67,7 @@ export type RequiredParserKeys<T> = {
 export const object = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<
-  {
-    [K in RequiredParserKeys<typeof schema>]: Exclude<
-      Infer<(typeof schema)[K]>,
-      typeof optionalSymbol
-    >
-  } & {
-    [K in OptionalParserKeys<typeof schema>]?: Exclude<
-      Infer<(typeof schema)[K]>,
-      typeof optionalSymbol
-    >
-  }
-> => {
+}): Parser<ObjectFromSchema<typeof schema>> => {
   const entries = Object.entries(schema)
   return (data) => {
     if (!isObject(data)) {
@@ -104,7 +103,7 @@ export const object = <T extends Record<string, unknown>>(schema: {
       }
     }
 
-    return success(dataOutput as T)
+    return success(dataOutput as ObjectFromSchema<typeof schema>)
   }
 }
 
@@ -127,7 +126,7 @@ export const object = <T extends Record<string, unknown>>(schema: {
 export const objectCompiled = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<T> => {
+}): Parser<ObjectFromSchema<typeof schema>> => {
   const schemaEntries = Object.entries(schema)
   const parsers = schemaEntries.map(([_, parser]) => parser)
   const statements = [
@@ -164,5 +163,5 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
   const body = statements.join(';')
   const fun = new Function('data', 'optionalSymbol', 'parsers', body)
 
-  return (data: unknown): ParseResult<T> => fun(data, optionalSymbol, parsers)
+  return (data) => fun(data, optionalSymbol, parsers)
 }
