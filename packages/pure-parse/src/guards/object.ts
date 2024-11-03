@@ -1,5 +1,5 @@
 import { Guard, OptionalGuard } from './types'
-import { OptionalKeys, optionalSymbol, RequiredKeys } from '../internals'
+import { optionalSymbol } from '../internals'
 import { lazy } from '../common'
 
 /**
@@ -67,7 +67,7 @@ export const objectGuard =
 export const objectGuardCompiled = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
-}) => {
+}): Guard<T> => {
   const schemaEntries = Object.entries(schema)
   const guards = schemaEntries.map(([_, guard]) => guard)
   const body = [`return typeof data === 'object'`, `data !== null`]
