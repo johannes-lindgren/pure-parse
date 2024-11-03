@@ -15,13 +15,13 @@ import { lazy } from '../common'
 const notAnObjectMsg = 'Not an object'
 const propertyMissingMsg = 'Property is missing'
 
-// export type OptionalParserKeys<T> = {
-//   [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? K : never
-// }[keyof T]
-//
-// export type RequiredParserKeys<T> = {
-//   [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? never : K
-// }[keyof T]
+export type OptionalParserKeys<T> = {
+  [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? K : never
+}[keyof T]
+
+export type RequiredParserKeys<T> = {
+  [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? never : K
+}[keyof T]
 
 /**
  * Objects have a fixed set of properties of different types.
@@ -56,60 +56,57 @@ const propertyMissingMsg = 'Property is missing'
 export const object = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<T> =>
-  //   Parser<
-  //   {
-  //     [K in RequiredParserKeys<typeof schema>]: Exclude<
-  //       Infer<(typeof schema)[K]>,
-  //       typeof optionalSymbol
-  //     >
-  //   } & {
-  //     [K in OptionalParserKeys<typeof schema>]?: Exclude<
-  //       Infer<(typeof schema)[K]>,
-  //       typeof optionalSymbol
-  //     >
-  //   }
-  // >
-  // Parser<T>
+}): Parser<
   {
-    const entries = Object.entries(schema)
-    return (data) => {
-      if (!isObject(data)) {
-        return failure(notAnObjectMsg)
-      }
-      const dataOutput = {} as Record<string, unknown>
-      for (let i = 0; i < entries.length; i++) {
-        const [key, parser] = entries[i]!
-        const value = (data as Record<string, unknown>)[key]
-        // Perf: only check if the property exists the value is undefined => huge performance boost
-        if (value === undefined && !data.hasOwnProperty(key)) {
-          // Property is absent
-          const parseResult = parser(optionalSymbol)
-          if (parseResult.tag === 'failure') {
-            return propagateFailure(parseResult, {
-              tag: 'object',
-              key,
-            })
-          }
-          // If the parse result indicates that the parsed result should be an
-          // omitted property, this conditional will be skipped
-          if (parseResult.value !== optionalSymbol) {
-            // Can happen in case of withDefault, where parsing an optional property does lead to a value
-            dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
-          }
-        } else {
-          // Property is present
-          const parseResult = parser(value)
-          if (parseResult.tag === 'failure') {
-            return propagateFailure(parseResult, { tag: 'object', key })
-          }
+    [K in RequiredParserKeys<typeof schema>]: Exclude<
+      Infer<(typeof schema)[K]>,
+      typeof optionalSymbol
+    >
+  } & {
+    [K in OptionalParserKeys<typeof schema>]?: Exclude<
+      Infer<(typeof schema)[K]>,
+      typeof optionalSymbol
+    >
+  }
+> => {
+  const entries = Object.entries(schema)
+  return (data) => {
+    if (!isObject(data)) {
+      return failure(notAnObjectMsg)
+    }
+    const dataOutput = {} as Record<string, unknown>
+    for (let i = 0; i < entries.length; i++) {
+      const [key, parser] = entries[i]!
+      const value = (data as Record<string, unknown>)[key]
+      // Perf: only check if the property exists the value is undefined => huge performance boost
+      if (value === undefined && !data.hasOwnProperty(key)) {
+        // Property is absent
+        const parseResult = parser(optionalSymbol)
+        if (parseResult.tag === 'failure') {
+          return propagateFailure(parseResult, {
+            tag: 'object',
+            key,
+          })
+        }
+        // If the parse result indicates that the parsed result should be an
+        // omitted property, this conditional will be skipped
+        if (parseResult.value !== optionalSymbol) {
+          // Can happen in case of withDefault, where parsing an optional property does lead to a value
           dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
         }
+      } else {
+        // Property is present
+        const parseResult = parser(value)
+        if (parseResult.tag === 'failure') {
+          return propagateFailure(parseResult, { tag: 'object', key })
+        }
+        dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
       }
-
-      return success(dataOutput as T)
     }
+
+    return success(dataOutput as T)
   }
+}
 
 /**
  * Same as {@link object}, but performs just-in-time (JIT) compilation with the `Function` constructor, which greatly increases the execution speed of the validation.
