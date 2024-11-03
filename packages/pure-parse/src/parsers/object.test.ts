@@ -1,7 +1,7 @@
 import { describe, expect, it, test } from 'vitest'
 import { objectCompiled, object } from './object'
 import { isSuccess, Parser } from './types'
-import type { Equals } from '../internals'
+import { Equals, optionalSymbol } from '../internals'
 import { oneOf } from './oneOf'
 import {
   parseBoolean,
@@ -13,7 +13,7 @@ import { Infer } from '../common'
 import { literal } from './literal'
 import { nullable, optional } from './optional'
 import { objectMemo, objectCompiledMemo } from '../memoization'
-import { succeedWith } from './defaults'
+import { succeedWith, withDefault } from './defaults'
 
 const suites = [
   {
@@ -66,31 +66,60 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           expect(parseUser({ name: 'Alice' })).toHaveProperty('tag', 'failure')
           expect(parseUser({})).toHaveProperty('tag', 'failure')
         })
-        describe('type annotation', () => {
-          type User = {
-            id: number
-            name: string
-          }
-          it('has a required parser', () => {
-            const parseUser1 = object<User>({
-              id: parseNumber,
-              name: parseString,
-            })
-          })
-          it('does not have an optional parser', () => {
-            const parseUser2 = object<User>({
-              id: parseNumber,
-              // @ts-expect-error -- required prop name must not be optional
-              name: optional(parseString),
-            })
-          })
-          it('must have a parser', () => {
-            const parseUser3 = object<User>(
-              // @ts-expect-error -- required prop name must not be omitted
-              {
+        describe('explicit type annotation', () => {
+          describe('required properties', () => {
+            type User = {
+              id: number
+              name: string
+            }
+            it('has a required parser', () => {
+              const parseUser1 = object<User>({
                 id: parseNumber,
-              },
-            )
+                name: parseString,
+              })
+            })
+            it('does not have an optional parser', () => {
+              const parseUser2 = object<User>({
+                id: parseNumber,
+                // @ts-expect-error -- required prop name must not be optional
+                name: optional(parseString),
+              })
+            })
+            it('must have a parser', () => {
+              const parseUser3 = object<User>(
+                // @ts-expect-error -- required prop name must not be omitted
+                {
+                  id: parseNumber,
+                },
+              )
+            })
+          })
+          describe('undefinable properties', () => {
+            type User = {
+              name: string | undefined
+            }
+            it('cannot be optional', () => {
+              object<User>({
+                // TODO @ts-expect-error -- required prop name must not be optional
+                name: optional(parseString),
+              })
+            })
+          })
+          describe('optional properties', () => {
+            type User = {
+              name?: string
+            }
+            it('cannot be required', () => {
+              object<User>({
+                // TODO @ts-expect-error -- required prop name must not be optional
+                name: parseString,
+              })
+            })
+            it('must be optional', () => {
+              object<User>({
+                name: optional(parseString),
+              })
+            })
           })
         })
         test('type inference', () => {
@@ -143,21 +172,42 @@ suites.forEach(({ name: suiteName, fn: object }) => {
       })
       describe('optional properties', () => {
         it('differentiates between undefined and missing properties', () => {
+          // Just to show that toEqual lies about absent proeprties!
+          expect({}).not.toHaveProperty('a')
+          expect({ a: undefined }).toHaveProperty('a')
+          expect({}).toEqual({ a: undefined })
+          expect({ a: undefined }).toEqual({})
+
           const parseOptionalObj = object({
             a: optional(parseString),
           })
+
+          const omittedParseResult = parseOptionalObj({})
           expect(parseOptionalObj({})).toHaveProperty('tag', 'success')
-          expect(parseOptionalObj({ a: undefined })).toHaveProperty(
-            'tag',
-            'success',
-          )
+          if (!isSuccess(omittedParseResult)) {
+            throw new Error('Should be success to continue the test')
+          }
+          expect(omittedParseResult.value).not.toHaveProperty('a')
+
+          // undefined -> Success
+          const undefinedParseResult = parseOptionalObj({ a: undefined })
+          expect(undefinedParseResult).toHaveProperty('tag', 'success')
+          if (!isSuccess(undefinedParseResult)) {
+            throw new Error('Should be success to continue the test')
+          }
+          // undefined -> undefined
+          expect(undefinedParseResult.value).toHaveProperty('a', undefined)
+
           const parseUnionObj = object({
             a: oneOf(parseString, parseUndefined),
           })
+
           expect(parseUnionObj({})).toHaveProperty('tag', 'failure')
-          expect(parseUnionObj({ a: undefined })).toHaveProperty(
-            'tag',
-            'success',
+          expect(parseUnionObj({ a: undefined })).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { a: undefined },
+            }),
           )
         })
         test('parsing', () => {
@@ -165,15 +215,47 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             id: parseNumber,
             email: optional(parseString),
           })
-          expect(isSuccess(parseUser({ id: 1 }))).toEqual(true)
-          expect(parseUser({ id: 1, email: undefined })).toHaveProperty(
-            'tag',
-            'success',
+
+          // Omitted -> Success
+          const absentResult = parseUser({ id: 1 })
+          expect(absentResult).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { id: 1 },
+            }),
           )
-          expect(parseUser({ id: 1, email: 'alice@test.com' })).toHaveProperty(
-            'tag',
-            'success',
+          if (!isSuccess(absentResult)) {
+            throw new Error('The result should be success')
+          }
+          expect(absentResult.value).not.toHaveProperty('email')
+
+          // Undefined -> Success
+          const undefinedResult = parseUser({ id: 1, email: undefined })
+          expect(undefinedResult).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { id: 1, email: undefined },
+            }),
           )
+          if (!isSuccess(undefinedResult)) {
+            throw new Error('The result should be success')
+          }
+          expect(undefinedResult.value).toHaveProperty('email', undefined)
+
+          // String -> Success
+          const stringResult = parseUser({ id: 1, email: 'alice@test.com' })
+          expect(stringResult).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: { id: 1, email: 'alice@test.com' },
+            }),
+          )
+          if (!isSuccess(stringResult)) {
+            throw new Error('The result should be success')
+          }
+          expect(stringResult.value).toHaveProperty('email', 'alice@test.com')
+
+          // Number -> Failure
           expect(parseUser({ id: 1, email: 123 })).toHaveProperty(
             'tag',
             'failure',
@@ -226,31 +308,40 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             const a1: InferredUser = {
               id: 123,
             }
-            const a2: InferredUser = {
-              id: 123,
-            }
+            // @ts-expect-error -- the property is required
+            const a2: InferredUser = {}
             const a3: InferredUser = {
-              id: 123,
+              // @ts-expect-error `optionalSymbol` is not included in the inferred type
+              id: optionalSymbol,
             }
           })
           test('optional properties inference', () => {
             type User = {
               email?: string
             }
+            type RequiredUser = {
+              email: string | undefined
+            }
             const parseUser = object({
               email: optional(parseString),
             })
             type InferredUser = Infer<typeof parseUser>
-            // @ts-expect-error -- TODO can't get this to work
-            const T1: Equals<InferredUser, User> = true
+            // TODO email should be inferred as optional
+            const t1: Equals<InferredUser, RequiredUser> = true
             const a1: InferredUser = {
               email: '',
             }
             const a2: InferredUser = {
               email: undefined,
             }
-            // @ts-expect-error -- TODO can't get this to work
+            // TODO email should be inferred as optional
+            // @ts-expect-error -- unable to correctly infer optional properties
             const a3: InferredUser = {}
+
+            const a4: InferredUser = {
+              // @ts-expect-error `optionalSymbol` is not included in the inferred type
+              email: optionalSymbol,
+            }
           })
         })
       })
@@ -306,7 +397,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           const parseUser = object({
             id: parseNumber,
             name: parseString,
-            email: oneOf(parseString, succeedWith(defaultEmail)),
+            email: withDefault(parseString, defaultEmail),
           })
 
           // The property can be a string -> Success
@@ -328,7 +419,49 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           // The property is required -> Fails
           expect(parseUser({ id: 1, name: 'Alice' })).toHaveProperty(
             'tag',
-            'failure',
+            'success',
+          )
+        })
+        test('fallback on optional', () => {
+          const fallbackValue = 'Anonymous'
+          const providedName = 'Johannes'
+
+          type User = {
+            name: string
+          }
+
+          const parse = object<User>({
+            name: withDefault(parseString, fallbackValue),
+          })
+
+          const parseInfer = object({
+            name: withDefault(parseString, fallbackValue),
+          })
+
+          // Infers all properties as required
+          const t1: Equals<Infer<typeof parseInfer>, User> = true
+
+          expect(
+            parse({
+              name: providedName,
+            }),
+          ).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: {
+                name: providedName,
+              },
+            }),
+          )
+
+          // Fall back if required property was missing
+          expect(parse({})).toEqual(
+            expect.objectContaining({
+              tag: 'success',
+              value: {
+                name: fallbackValue,
+              },
+            }),
           )
         })
       })
@@ -378,7 +511,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
         })
       })
       describe('self-referential objects', () => {
-        // Type inferrence of recusive types are impossible in TypeScript
+        // Type inference of recursive types are impossible in TypeScript
         test('type declaration', () => {
           type Tree = {
             name: string

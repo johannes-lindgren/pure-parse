@@ -1,5 +1,5 @@
-import { OptionalParser, Parser } from '../parsers'
-import { Guard, isObject, OptionalGuard } from '../guards'
+import { Parser } from '../parsers'
+import { Guard, isObject } from '../guards'
 import { optionalSymbol } from '../internals'
 
 /**
@@ -28,7 +28,7 @@ import { optionalSymbol } from '../internals'
  */
 export const memo = <T extends (arg: unknown) => unknown>(validator: T): T => {
   const cache = new WeakMap()
-  const fn = ((arg) => {
+  return ((arg) => {
     if (!isObject(arg)) {
       // Can only memoize objects
       return validator(arg)
@@ -40,11 +40,6 @@ export const memo = <T extends (arg: unknown) => unknown>(validator: T): T => {
     cache.set(arg, result)
     return result
   }) as T
-  if (optionalSymbol in validator && validator[optionalSymbol]) {
-    // @ts-expect-error make the memoized function an optional validator
-    fn[optionalSymbol] = true
-  }
-  return fn
 }
 
 /**

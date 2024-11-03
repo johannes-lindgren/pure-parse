@@ -54,9 +54,7 @@ export type Parser<T> = (data: unknown) => ParseResult<T>
 /**
  * Special parser to check optional values
  */
-export type OptionalParser<T> = {
-  [optionalSymbol]?: true
-} & ((data: unknown) => ParseResult<T | undefined>)
+export type OptionalParser<T> = (data: unknown) => ParseResult<T | undefined>
 
 /*
  * Utility functions

@@ -1,4 +1,4 @@
-import { OptionalParser, Parser } from './types'
+import { failure, OptionalParser, Parser, success } from './types'
 import { parseNull, parseUndefined } from './primitives'
 import { optionalSymbol } from '../internals'
 import { oneOf } from './oneOf'
@@ -7,6 +7,7 @@ import { oneOf } from './oneOf'
  * Represent an optional property in an object. It is supposed to be used in combination with `object`.
  * Note that in TypeScript, optional properties may be assigned `undefined` or omitted entirely from the object.
  * This function is special because it is used internally by `object` to differentiate between optional properties from required properties that can be `undefined`.
+ * Only use this in objects: despite the type signature, it _can_ return {@link optionalSymbol} to indicate that the property was omitted from the object.
  * @example
  * Wrap properties in `optional` to make them optional:
  * ```ts
@@ -27,12 +28,21 @@ import { oneOf } from './oneOf'
  * @return a special parser that represents an optional value. If invoked directly, it behaves the same as `oneOf(parseUndefined, parser)`. If invoked by `object`, `object` will treat the property as optional.
  */
 export const optional = <T>(parser: Parser<T>): OptionalParser<T> =>
-  /*
-   * { [optionalValue]: true } is used at runtime by `object` to check if a parser represents an optional value.
-   */
-  Object.assign(oneOf(parseUndefined, parser), {
-    [optionalSymbol]: true,
-  }) as unknown as OptionalParser<T>
+  // Note that the type of parseOptionalSymbol is not taken into account
+  oneOf(parseOptionalSymbol, parseUndefined, parser) as OptionalParser<T>
+
+/**
+ * Non-exported function to check if a value is the optional symbol.
+ * The type predicate is deliberately inaccurate to provide more accurate type inference in object validators.
+ * @param data To represent optional properties in objects, pass {@link optionalSymbol} as argument.
+ * @return Success of {@link optionalSymbol} if `data` equals {@link optionalSymbol}. This indicates that the property was allowed to be omitted.
+ */
+const parseOptionalSymbol: Parser<typeof optionalSymbol> = (data) => {
+  return data === optionalSymbol
+    ? // This indicates that the property
+      success(optionalSymbol)
+    : failure('not optional')
+}
 
 /**
  * Represents a value that can be `null`. Shorthand for `oneOf(parseNull, parser)`.
