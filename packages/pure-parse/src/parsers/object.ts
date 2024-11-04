@@ -14,30 +14,25 @@ import { lazy } from '../common'
 const notAnObjectMsg = 'Not an object'
 const propertyMissingMsg = 'Property is missing'
 
-export type OptionalParserKeys<T> = {
-  [K in keyof T]: OptionalParser<never> extends T[K] ? K : never
-}[keyof T]
+export type Values<T> = keyof T extends never ? never : T[keyof T]
 
-export type RequiredParserKeys<T> = {
-  [K in keyof T]: OptionalParser<never> extends T[K] ? never : K
-}[keyof T]
+export type OptionalKeys<T> = Values<{
+  [K in keyof T]: typeof optionalSymbol extends T[K] ? K : never
+}>
 
-export type ObjectFromSchema<Schema extends Record<string, Parser<unknown>>> =
-  Simplify<
-    {
-      [K in RequiredParserKeys<Schema>]: Exclude<
-        Infer<Schema[K]>,
-        typeof optionalSymbol
-      >
-    } & {
-      [K in OptionalParserKeys<Schema>]?: Exclude<
-        Infer<Schema[K]>,
-        typeof optionalSymbol
-      >
-    }
-  >
+export type RequiredKeys<T> = Values<{
+  [K in keyof T]: typeof optionalSymbol extends T[K] ? never : K
+}>
 
-type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
+export type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
+
+export type WithOptionalFields<T> = Simplify<
+  {
+    [K in RequiredKeys<T>]: Exclude<T[K], typeof optionalSymbol>
+  } & {
+    [K in OptionalKeys<T>]?: Exclude<T[K], typeof optionalSymbol>
+  }
+>
 
 /**
  * Objects have a fixed set of properties of different types.
@@ -72,7 +67,7 @@ type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
 export const object = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<ObjectFromSchema<typeof schema>> => {
+}): Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
   const entries = Object.entries(schema)
   return (data) => {
     if (!isObject(data)) {
@@ -108,7 +103,11 @@ export const object = <T extends Record<string, unknown>>(schema: {
       }
     }
 
-    return success(dataOutput as ObjectFromSchema<typeof schema>)
+    return success(
+      dataOutput as OptionalKeys<T> extends undefined
+        ? T
+        : WithOptionalFields<T>,
+    )
   }
 }
 
@@ -131,7 +130,7 @@ export const object = <T extends Record<string, unknown>>(schema: {
 export const objectCompiled = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<ObjectFromSchema<typeof schema>> => {
+}): Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
   const schemaEntries = Object.entries(schema)
   const parsers = schemaEntries.map(([_, parser]) => parser)
   const statements = [

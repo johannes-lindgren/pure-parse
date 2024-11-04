@@ -2,11 +2,13 @@ import { describe, expect, it, test } from 'vitest'
 import {
   objectCompiled,
   object,
-  OptionalParserKeys,
-  RequiredParserKeys,
+  Values,
+  Simplify,
+  OptionalKeys,
+  RequiredKeys,
 } from './object'
 import { isSuccess, Parser } from './types'
-import { Equals, optionalSymbol } from '../internals'
+import { Equals, OptionalSymbol, optionalSymbol } from '../internals'
 import { oneOf } from './oneOf'
 import {
   parseBoolean,
@@ -128,30 +130,38 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             })
           })
         })
-        test('type inference', () => {
-          type User = {
-            id: number
-            email: string
-          }
-          const parseUser = object({
-            id: parseNumber,
-            email: parseString,
+        describe('type inference', () => {
+          test('non-unknown', () => {
+            type User = {
+              id: number
+              email: string
+            }
+            const parseUser = object({
+              id: parseNumber,
+              email: parseString,
+            })
+            type InferredUser = Infer<typeof parseUser>
+            const T1: Equals<InferredUser, User> = true
+            const a1: InferredUser = {
+              id: 123,
+              email: '',
+            }
+            const a2: InferredUser = {
+              id: 123,
+              // @ts-expect-error -- wrong type of property
+              email: undefined,
+            }
+            // @ts-expect-error -- property is required
+            const a3: InferredUser = {
+              id: 123,
+            }
           })
-          type InferredUser = Infer<typeof parseUser>
-          const T1: Equals<InferredUser, User> = true
-          const a1: InferredUser = {
-            id: 123,
-            email: '',
-          }
-          const a2: InferredUser = {
-            id: 123,
-            // @ts-expect-error -- wrong type of property
-            email: undefined,
-          }
-          // @ts-expect-error -- property is required
-          const a3: InferredUser = {
-            id: 123,
-          }
+        })
+        test('unknown value types', () => {
+          const parseUser = object({
+            data: parseUnknown,
+          })
+          const t1: Equals<Infer<typeof parseUser>, { data: unknown }> = true
         })
       })
       describe('required union properties', () => {
@@ -662,6 +672,40 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           })
         })
       })
+      describe('types', () => {
+        test('that the return type is the same for explicit and inferred types', () => {
+          type OptionalUser = {
+            id: number
+            email?: string
+          }
+          const exp1 = object<OptionalUser>({
+            id: parseNumber,
+            email: optional(parseString),
+          })
+
+          const inf1 = object({
+            id: parseNumber,
+            email: optional(parseString),
+          })
+
+          const t1: Equals<typeof exp1, typeof inf1> = true
+
+          type RequiredUser = {
+            id: number
+            email: string | undefined
+          }
+          const exp2 = object<RequiredUser>({
+            id: parseNumber,
+            email: parseString,
+          })
+          const inf2 = object({
+            id: parseNumber,
+            email: undefineable(parseString),
+          })
+
+          const t2: Equals<typeof exp2, typeof inf2> = true
+        })
+      })
     })
   })
   it('handles generic parsers', () => {
@@ -677,43 +721,67 @@ suites.forEach(({ name: suiteName, fn: object }) => {
     }
   })
 })
+
 describe('utility types', () => {
-  describe('RequiredParserKeys', () => {
+  describe('RequiredKeys', () => {
     it('extract required keys', () => {
-      const schema = {
-        a: parseString,
-        b: optional(parseString),
-      } as const
-      const t0: Equals<RequiredParserKeys<typeof schema>, 'a'> = true
+      const t0: Equals<
+        RequiredKeys<{
+          a: string
+          b: string | typeof optionalSymbol
+        }>,
+        'a'
+      > = true
     })
     it('handles required unknown', () => {
-      const schema1 = {
-        a: parseUnknown,
-      }
-      const t1: Equals<RequiredParserKeys<typeof schema1>, 'a'> = true
-      const schema2 = {
-        a: optional(parseUnknown),
-      }
-      const t2: Equals<RequiredParserKeys<typeof schema2>, never> = true
+      const t1: Equals<RequiredKeys<{ a: unknown }>, 'a'> = true
+      const t2: Equals<
+        RequiredKeys<{ a: unknown | OptionalSymbol }>,
+        never
+      > = true
     })
   })
-  describe('OptionalParserKeys', () => {
+  describe('OptionalKeys', () => {
     it('extract optional keys', () => {
-      const schema = {
-        a: parseString,
-        b: optional(parseString),
-      } as const
-      const t0: Equals<OptionalParserKeys<typeof schema>, 'b'> = true
+      const t0: Equals<
+        OptionalKeys<{
+          a: string
+          b: string | OptionalSymbol
+        }>,
+        'b'
+      > = true
     })
-    it('handles required unknown', () => {
-      const schema1 = {
-        a: parseUnknown,
-      }
-      const t1: Equals<OptionalParserKeys<typeof schema1>, never> = true
-      const schema2 = {
-        a: optional(parseUnknown),
-      }
-      const t2: Equals<OptionalParserKeys<typeof schema2>, 'a'> = true
+    it('handles optional unknown', () => {
+      const t1: Equals<
+        OptionalKeys<{
+          a: unknown
+        }>,
+        never
+      > = true
+      const t2: Equals<
+        OptionalKeys<{ a: OptionalSymbol | unknown }>,
+        'a'
+      > = true
+    })
+  })
+
+  describe('Values', () => {
+    it('handles empty objects', () => {
+      const t1: Equals<Values<{}>, never> = true
+    })
+    it('handles non-empty objects', () => {
+      const t1: Equals<Values<{ a: 1 }>, 1> = true
+      const t2: Equals<Values<{ a: 1; b: 2 }>, 1 | 2> = true
+    })
+    it('handles duplicate values', () => {
+      const t1: Equals<Values<{ a: 1; b: 1 }>, 1> = true
+    })
+  })
+  describe('Simplify', () => {
+    it('does not transform the type', () => {
+      const t1: Equals<Simplify<{}>, {}> = true
+      const t2: Equals<Simplify<{ a: string }>, { a: string }> = true
+      const t3: Equals<Simplify<string>, string> = true
     })
   })
 })
