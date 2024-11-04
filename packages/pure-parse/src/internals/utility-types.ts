@@ -1,4 +1,4 @@
-import { OmitProperty } from '../../internals'
+import { OmitProperty } from './optionalSymbol'
 
 /**
  * Used to index an object. The benefit of this over `T[keyof T]` is that `T[keyof {}]` gives `undefined`, while `Values<{}>` gives `never`.

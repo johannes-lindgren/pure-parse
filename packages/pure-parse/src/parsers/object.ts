@@ -1,4 +1,4 @@
-import { isObject } from '../../guards'
+import { isObject } from '../guards'
 import {
   failure,
   OptionalParser,
@@ -6,10 +6,10 @@ import {
   ParseSuccess,
   propagateFailure,
   success,
-} from '../types'
-import { omitProperty, propertyAbsent } from '../../internals'
-import { Infer, lazy } from '../../common'
-import { OptionalKeys, WithOptionalFields } from './utility-types'
+} from './types'
+import { omitProperty, propertyAbsent } from '../internals'
+import { Infer, lazy } from '../common'
+import { OptionalKeys, WithOptionalFields } from '../internals/utility-types'
 
 const notAnObjectMsg = 'Not an object'
 

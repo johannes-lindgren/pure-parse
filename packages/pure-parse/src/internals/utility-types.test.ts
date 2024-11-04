@@ -1,5 +1,5 @@
 import { describe, it } from 'vitest'
-import { Equals, OmitProperty } from '../../internals'
+import { Equals, OmitProperty } from '../internals'
 import { OptionalKeys, RequiredKeys, Simplify, Values } from './utility-types'
 
 describe('utility types', () => {

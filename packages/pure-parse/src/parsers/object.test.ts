@@ -1,20 +1,20 @@
 import { describe, expect, it, test } from 'vitest'
 import { objectCompiled, object } from './object'
-import { isSuccess, Parser } from '../types'
-import { Equals, omitProperty } from '../../internals'
-import { oneOf } from '../oneOf'
+import { isSuccess, Parser } from './types'
+import { Equals, omitProperty } from '../internals'
+import { oneOf } from './oneOf'
 import {
   parseBoolean,
   parseNumber,
   parseString,
   parseUndefined,
-} from '../primitives'
-import { Infer } from '../../common'
-import { literal } from '../literal'
-import { nullable, optional, undefineable } from '../optional'
-import { objectMemo, objectCompiledMemo } from '../../memoization'
-import { succeedWith, withDefault } from '../defaults'
-import { parseUnknown } from '../unknown'
+} from './primitives'
+import { Infer } from '../common'
+import { literal } from './literal'
+import { nullable, optional, undefineable } from './optional'
+import { objectMemo, objectCompiledMemo } from '../memoization'
+import { succeedWith, withDefault } from './defaults'
+import { parseUnknown } from './unknown'
 
 const suites = [
   {
