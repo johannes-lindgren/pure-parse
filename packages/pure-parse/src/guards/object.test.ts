@@ -2,7 +2,7 @@ import { objectGuard, objectGuardCompiled } from './object'
 import { describe, expect, it, test } from 'vitest'
 import { isNumber, isString, isUndefined } from './primitives'
 import { Guard } from './types'
-import { unionGuard } from './union'
+import { oneOfGuard } from './oneOf'
 import { optionalGuard, undefineableGuard } from './optional'
 import { objectGuardCompiledMemo, objectGuardMemo } from '../memoization'
 import { Equals, optionalSymbol } from '../internals'
@@ -125,7 +125,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             objectGuard<UserOptional>({
               id: isNumber,
               // The type with the optional property is a superset of the undefineable type
-              name: unionGuard(isUndefined, isString),
+              name: oneOfGuard(isUndefined, isString),
             })
             objectGuard<UserOptional>({
               id: isNumber,
@@ -301,7 +301,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
         expect(isOptionalObj({})).toEqual(true)
         expect(isOptionalObj({ a: undefined })).toEqual(true)
         const isUnionObj = objectGuard({
-          a: unionGuard(isString, isUndefined),
+          a: oneOfGuard(isString, isUndefined),
         })
         expect(isUnionObj({})).toEqual(false)
         expect(isUnionObj({ a: undefined })).toEqual(true)

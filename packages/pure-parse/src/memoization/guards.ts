@@ -7,10 +7,10 @@ import {
   partialRecordGuard,
   recordGuard,
   tupleGuard,
-  unionGuard,
+  oneOfGuard,
 } from '../guards'
 
-export const unionGuardMemo = memoizeValidatorConstructor(unionGuard)
+export const unionGuardMemo = memoizeValidatorConstructor(oneOfGuard)
 export const objectGuardMemo = memoizeValidatorConstructor(objectGuard)
 export const objectGuardCompiledMemo =
   memoizeValidatorConstructor(objectGuardCompiled)

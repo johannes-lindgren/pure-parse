@@ -11,7 +11,7 @@ import { Guard } from './types'
  * @example
  * Commonly used in discriminated unions:
  * ```ts
- * const isResult = unionGuard([
+ * const isResult = oneOfGuard([
  *  objectGuard({
  *    tag: literalGuard('success')
  *  }),

@@ -4,7 +4,7 @@ import { isBoolean, isNumber, isString } from './primitives'
 import { Guard } from './types'
 import { literalGuard } from './literal'
 import { objectGuard } from './object'
-import { unionGuard } from './union'
+import { oneOfGuard } from './oneOf'
 import { arrayGuard } from './arrays'
 import { optionalGuard } from './optional'
 
@@ -90,7 +90,7 @@ describe('partial records', () => {
       expect(partialRecordGuard(isString, isString)({})).toEqual(true)
     })
     it('does not allow extra keys', () => {
-      const isKey = unionGuard(literalGuard('a'), literalGuard('b'))
+      const isKey = oneOfGuard(literalGuard('a'), literalGuard('b'))
       expect(
         partialRecordGuard(isKey, isString)({ a: 'hello', b: 'hello2' }),
       ).toEqual(true)
@@ -102,7 +102,7 @@ describe('partial records', () => {
       ).toEqual(false)
     })
     it('allows each key to be omitted', () => {
-      const isKey = unionGuard(literalGuard('a'), literalGuard('b'))
+      const isKey = oneOfGuard(literalGuard('a'), literalGuard('b'))
       expect(
         partialRecordGuard(isKey, isString)({ a: 'hello', b: 'hello2' }),
       ).toEqual(true)
