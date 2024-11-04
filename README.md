@@ -2,7 +2,7 @@
   <h1 align="center">PureParse</h1>
   <h3>Typesafe, lightweight parsers</h3>
   <p align="center">
-    Decouple type aliases from validation logic with explicit type declarations
+    Lightweight validation library that decouples type aliases from validation logic
   </p>
   <p align="center">
     <a href="https://pure-parse.vercel.app">Documentation</a>

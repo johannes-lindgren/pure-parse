@@ -1,8 +1,8 @@
 {
   "name": "pure-parse",
-  "version": "0.0.0-beta.4",
+  "version": "0.0.0-beta.5",
   "private": false,
-  "description": "Minimalistic validation library with 100% type inference",
+  "description": "Lightweight validation library that decouples type aliases from validation logic",
   "author": {
     "name": "Johannes Lindgren"
   },
