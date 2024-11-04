@@ -4,7 +4,7 @@ layout: home
 hero:
   name: PureParse
   text: Typesafe, lightweight parsers
-  tagline: Decouple type aliases from validation logic with explicit type declarations
+  tagline: Lightweight validation library that decouples type aliases from validation logic
   actions:
     - theme: brand
       text: Quick Start
