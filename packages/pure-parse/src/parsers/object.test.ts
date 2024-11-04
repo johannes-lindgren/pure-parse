@@ -129,6 +129,32 @@ suites.forEach(({ name: suiteName, fn: object }) => {
               })
             })
           })
+          describe('unknown properties', () => {
+            test('unknown value types', () => {
+              type User = {
+                data: unknown
+              }
+              const parseUser = object<User>({
+                data: parseUnknown,
+              })
+              const t1: Equals<
+                Infer<typeof parseUser>,
+                { data: unknown }
+              > = true
+            })
+            test('optional unknown value types', () => {
+              type User = {
+                data?: unknown
+              }
+              const parseUser = object<User>({
+                data: optional(parseUnknown),
+              })
+              const t1: Equals<
+                Infer<typeof parseUser>,
+                { data?: unknown }
+              > = true
+            })
+          })
         })
         describe('type inference', () => {
           test('non-unknown', () => {
@@ -163,6 +189,13 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           })
           const t1: Equals<Infer<typeof parseUser>, { data: unknown }> = true
         })
+        test('optional unknown value types', () => {
+          const parseUser = object({
+            data: optional(parseUnknown),
+          })
+          // @ts-expect-error -- cannot make unknown optional due to a compromise between API ergonomy and type safety
+          const t1: Equals<Infer<typeof parseUser>, { data?: unknown }> = true
+        })
       })
       describe('required union properties', () => {
         test('parsing', () => {
@@ -188,7 +221,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
       })
       describe('optional properties', () => {
         it('differentiates between undefined and missing properties', () => {
-          // Just to show that toEqual lies about absent proeprties!
+          // Just to show that toEqual lies about absent properties!
           expect({}).not.toHaveProperty('a')
           expect({ a: undefined }).toHaveProperty('a')
           expect({}).toEqual({ a: undefined })
@@ -309,6 +342,40 @@ suites.forEach(({ name: suiteName, fn: object }) => {
           const parseUser = object({
             id: parseNumber,
             email: optional(optional(parseString)),
+          })
+        })
+        describe('unknown properties', () => {
+          test('required unknown properties', () => {
+            const parse = object({
+              email: parseUnknown,
+            })
+            expect(parse({})).toHaveProperty('tag', 'failure')
+            expect(
+              parse({
+                email: undefined,
+              }),
+            ).toHaveProperty('tag', 'success')
+            expect(
+              parse({
+                email: '',
+              }),
+            ).toHaveProperty('tag', 'success')
+          })
+          test('optional unknown properties', () => {
+            const parse = object({
+              email: optional(parseUnknown),
+            })
+            expect(parse({})).toHaveProperty('tag', 'success')
+            expect(
+              parse({
+                email: undefined,
+              }),
+            ).toHaveProperty('tag', 'success')
+            expect(
+              parse({
+                email: '',
+              }),
+            ).toHaveProperty('tag', 'success')
           })
         })
         describe('type inference', () => {

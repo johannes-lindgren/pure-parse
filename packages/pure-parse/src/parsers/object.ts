@@ -17,11 +17,19 @@ const propertyMissingMsg = 'Property is missing'
 export type Values<T> = keyof T extends never ? never : T[keyof T]
 
 export type OptionalKeys<T> = Values<{
-  [K in keyof T]: typeof optionalSymbol extends T[K] ? K : never
+  [K in keyof T]: unknown extends T[K]
+    ? never
+    : typeof optionalSymbol extends T[K]
+      ? K
+      : never
 }>
 
 export type RequiredKeys<T> = Values<{
-  [K in keyof T]: typeof optionalSymbol extends T[K] ? never : K
+  [K in keyof T]: unknown extends T[K]
+    ? K
+    : typeof optionalSymbol extends T[K]
+      ? never
+      : K
 }>
 
 export type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
@@ -47,7 +55,6 @@ export type WithOptionalFields<T> = Simplify<
  *   email: optional(parseString),
  * })
  * ```
- * Note that optional properties will be inferred as required properties that can be assigned `undefined`. See {@link Infer} > limitations for in-depth information.
  * @example
  * Annotate explicitly:
  * ```ts
@@ -61,6 +68,7 @@ export type WithOptionalFields<T> = Simplify<
  *   name: parseString,
  * })
  * ```
+ * @limitations Optional `unknown` properties will be inferred as required. See {@link Infer} > limitations for in-depth information.
  * @param schema maps keys to validation functions.
  * @return a parser function that validates objects according to `schema`.
  */
