@@ -1,6 +1,4 @@
-import { failure } from './types'
-
-import { UnsuccessfulParser } from './defaults'
+import { failure, UnsuccessfulParser } from './types'
 
 /**
  * A parser that always fails. Parsing `never` always fails because no value can be assigned to `never`—`never` corresponds to an empty set of values.
