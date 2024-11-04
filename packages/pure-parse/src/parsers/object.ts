@@ -7,7 +7,7 @@ import {
   success,
   propagateFailure,
 } from './types'
-import { optionalSymbol } from '../internals'
+import { OptionalSymbol, optionalSymbol } from '../internals'
 import { Infer } from '../common'
 import { lazy } from '../common'
 
@@ -19,7 +19,7 @@ export type Values<T> = keyof T extends never ? never : T[keyof T]
 export type OptionalKeys<T> = Values<{
   [K in keyof T]: unknown extends T[K]
     ? never
-    : typeof optionalSymbol extends T[K]
+    : OptionalSymbol extends T[K]
       ? K
       : never
 }>
@@ -27,7 +27,7 @@ export type OptionalKeys<T> = Values<{
 export type RequiredKeys<T> = Values<{
   [K in keyof T]: unknown extends T[K]
     ? K
-    : typeof optionalSymbol extends T[K]
+    : OptionalSymbol extends T[K]
       ? never
       : K
 }>
@@ -36,15 +36,16 @@ export type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
 
 export type WithOptionalFields<T> = Simplify<
   {
-    [K in RequiredKeys<T>]: Exclude<T[K], typeof optionalSymbol>
+    [K in RequiredKeys<T>]: Exclude<T[K], OptionalSymbol>
   } & {
-    [K in OptionalKeys<T>]?: Exclude<T[K], typeof optionalSymbol>
+    [K in OptionalKeys<T>]?: Exclude<T[K], OptionalSymbol>
   }
 >
 
 /**
  * Objects have a fixed set of properties of different types.
- * If the `data` has more properties than expected, the extra properties are omitted from the result.
+ * If the `data` received has properties that are not declared in the parser,
+ * the extra properties are omitted from the result.
  * @example
  * Object with both required and optional properties:
  * ```ts
@@ -60,15 +61,16 @@ export type WithOptionalFields<T> = Simplify<
  * ```ts
  * type User = {
  *   id: number
- *   name: string
+ *   name?: string
  * }
  *
  * const parseUser = object<User>({
  *   id: parseNumber,
- *   name: parseString,
+ *   name: optional(parseString),
  * })
  * ```
- * @limitations Optional `unknown` properties will be inferred as required. See {@link Infer} > limitations for in-depth information.
+ * @limitations Optional `unknown` properties will be inferred as required.
+ * See {@link Infer} > limitations for in-depth information.
  * @param schema maps keys to validation functions.
  * @return a parser function that validates objects according to `schema`.
  */

@@ -1,6 +1,6 @@
 import { failure, OptionalParser, Parser, success } from './types'
 import { parseNull, parseUndefined } from './primitives'
-import { optionalSymbol } from '../internals'
+import { OptionalSymbol, optionalSymbol } from '../internals'
 import { oneOf } from './oneOf'
 
 /**
@@ -37,7 +37,7 @@ export const optional = <T>(parser: Parser<T>): OptionalParser<T> =>
  * @param data To represent optional properties in objects, pass {@link optionalSymbol} as argument.
  * @return Success of {@link optionalSymbol} if `data` equals {@link optionalSymbol}. This indicates that the property was allowed to be omitted.
  */
-const parseOptionalSymbol: Parser<typeof optionalSymbol> = (data) => {
+const parseOptionalSymbol: Parser<OptionalSymbol> = (data) => {
   return data === optionalSymbol
     ? // This indicates that the property
       success(optionalSymbol)

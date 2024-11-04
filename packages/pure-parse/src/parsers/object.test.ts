@@ -795,7 +795,7 @@ describe('utility types', () => {
       const t0: Equals<
         RequiredKeys<{
           a: string
-          b: string | typeof optionalSymbol
+          b: string | OptionalSymbol
         }>,
         'a'
       > = true

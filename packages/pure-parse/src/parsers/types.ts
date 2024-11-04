@@ -1,4 +1,4 @@
-import { optionalSymbol } from '../internals'
+import { OptionalSymbol } from '../internals'
 
 /**
  * The data adheres to the schema. The `value` is equal to the parsed data
@@ -56,14 +56,14 @@ export type Parser<T> = (data: unknown) => ParseResult<T>
  */
 export type OptionalParser<T> = (
   data: unknown,
-) => ParseResult<T | undefined | typeof optionalSymbol>
+) => ParseResult<T | undefined | OptionalSymbol>
 
 /**
  * A parser that does not represent an optional property.
  */
 export type RequiredParser<T> = (
   data: unknown,
-) => ParseResult<Exclude<T, typeof optionalSymbol>>
+) => ParseResult<Exclude<T, OptionalSymbol>>
 
 /*
  * Utility functions
