@@ -8,7 +8,7 @@ import {
   RequiredKeys,
 } from './object'
 import { isSuccess, Parser } from './types'
-import { Equals, OptionalSymbol, optionalSymbol } from '../internals'
+import { Equals, OmitProperty, omitProperty } from '../internals'
 import { oneOf } from './oneOf'
 import {
   parseBoolean,
@@ -394,8 +394,8 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             // @ts-expect-error -- the property is required
             const a2: InferredUser = {}
             const a3: InferredUser = {
-              // @ts-expect-error `optionalSymbol` is not included in the inferred type
-              id: optionalSymbol,
+              // @ts-expect-error `omitProperty` is not included in the inferred type
+              id: omitProperty,
             }
           })
           test('optional properties inference', () => {
@@ -416,8 +416,8 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             const a3: InferredUser = {}
 
             const a4: InferredUser = {
-              // @ts-expect-error `optionalSymbol` is not included in the inferred type
-              email: optionalSymbol,
+              // @ts-expect-error `omitProperty` is not included in the inferred type
+              email: omitProperty,
             }
           })
           it('differentiates between undefined and missing properties', () => {
@@ -482,8 +482,8 @@ suites.forEach(({ name: suiteName, fn: object }) => {
 
             const a4: InferredUser = {
               id: 123,
-              // @ts-expect-error `optionalSymbol` is not included in the inferred type
-              email: optionalSymbol,
+              // @ts-expect-error `omitProperty` is not included in the inferred type
+              email: omitProperty,
             }
           })
         })
@@ -795,15 +795,16 @@ describe('utility types', () => {
       const t0: Equals<
         RequiredKeys<{
           a: string
-          b: string | OptionalSymbol
+          b: string | OmitProperty
         }>,
         'a'
       > = true
     })
     it('handles required unknown', () => {
       const t1: Equals<RequiredKeys<{ a: unknown }>, 'a'> = true
+      // @ts-expect-error -- the library cannot correctly infer optional unknowns. This is a compromise.
       const t2: Equals<
-        RequiredKeys<{ a: unknown | OptionalSymbol }>,
+        RequiredKeys<{ a: unknown | OmitProperty }>,
         never
       > = true
     })
@@ -813,7 +814,7 @@ describe('utility types', () => {
       const t0: Equals<
         OptionalKeys<{
           a: string
-          b: string | OptionalSymbol
+          b: string | OmitProperty
         }>,
         'b'
       > = true
@@ -825,10 +826,8 @@ describe('utility types', () => {
         }>,
         never
       > = true
-      const t2: Equals<
-        OptionalKeys<{ a: OptionalSymbol | unknown }>,
-        'a'
-      > = true
+      // @ts-expect-error -- the library cannot correctly infer optional unknowns. This is a compromise.
+      const t2: Equals<OptionalKeys<{ a: OmitProperty | unknown }>, 'a'> = true
     })
   })
 

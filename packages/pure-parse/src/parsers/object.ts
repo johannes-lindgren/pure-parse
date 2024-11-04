@@ -7,19 +7,24 @@ import {
   success,
   propagateFailure,
 } from './types'
-import { OptionalSymbol, optionalSymbol } from '../internals'
+import { OmitProperty, omitProperty, propertyAbsent } from '../internals'
 import { Infer } from '../common'
 import { lazy } from '../common'
 
 const notAnObjectMsg = 'Not an object'
-const propertyMissingMsg = 'Property is missing'
+
+const missingPropertyError = (key: string) =>
+  propagateFailure(failure('Property is missing'), {
+    tag: 'object',
+    key,
+  })
 
 export type Values<T> = keyof T extends never ? never : T[keyof T]
 
 export type OptionalKeys<T> = Values<{
   [K in keyof T]: unknown extends T[K]
     ? never
-    : OptionalSymbol extends T[K]
+    : OmitProperty extends T[K]
       ? K
       : never
 }>
@@ -27,7 +32,7 @@ export type OptionalKeys<T> = Values<{
 export type RequiredKeys<T> = Values<{
   [K in keyof T]: unknown extends T[K]
     ? K
-    : OptionalSymbol extends T[K]
+    : OmitProperty extends T[K]
       ? never
       : K
 }>
@@ -36,9 +41,9 @@ export type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
 
 export type WithOptionalFields<T> = Simplify<
   {
-    [K in RequiredKeys<T>]: Exclude<T[K], OptionalSymbol>
+    [K in RequiredKeys<T>]: Exclude<T[K], OmitProperty>
   } & {
-    [K in OptionalKeys<T>]?: Exclude<T[K], OptionalSymbol>
+    [K in OptionalKeys<T>]?: Exclude<T[K], OmitProperty>
   }
 >
 
@@ -90,16 +95,17 @@ export const object = <T extends Record<string, unknown>>(schema: {
       // Perf: only check if the property exists the value is undefined => huge performance boost
       if (value === undefined && !data.hasOwnProperty(key)) {
         // Property is absent
-        const parseResult = parser(optionalSymbol)
-        if (parseResult.tag === 'failure') {
-          return propagateFailure(parseResult, {
-            tag: 'object',
-            key,
-          })
+        const parseResult = parser(propertyAbsent)
+        if (
+          parseResult.tag === 'failure' ||
+          // parseUnknown could return the same value as it received
+          parseResult.value === propertyAbsent
+        ) {
+          return missingPropertyError(key)
         }
         // If the parse result indicates that the parsed result should be an
         // omitted property, this conditional will be skipped
-        if (parseResult.value !== optionalSymbol) {
+        if (parseResult.value !== omitProperty) {
           // Can happen in case of withDefault, where parsing an optional property does lead to a value
           dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
         }
@@ -157,13 +163,11 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
       const parser = `parsers[${i}]`
       return `
         if(${value} === undefined && !data.hasOwnProperty(${key}))  {
-          const parseResult = ${parser}(optionalSymbol)
-          if(parseResult.tag === 'failure'){
-            return {tag:'failure', error:${JSON.stringify(
-              propertyMissingMsg,
-            )}, path: [{tag: 'object', key: ${key}}]}
+          const parseResult = ${parser}(propertyAbsent)
+          if(parseResult.tag === 'failure' || parseResult.value === propertyAbsent){
+            return ${JSON.stringify(missingPropertyError(unescapedKey))}
           }
-          if(parseResult.value !== optionalSymbol){
+          if(parseResult.value !== omitProperty){
             dataOutput[${key}] = parseResult.value
           } 
         } else {
@@ -175,7 +179,13 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
     `return {tag:'success', value:dataOutput}`,
   ]
   const body = statements.join(';')
-  const fun = new Function('data', 'optionalSymbol', 'parsers', body)
+  const fun = new Function(
+    'data',
+    'propertyAbsent',
+    'omitProperty',
+    'parsers',
+    body,
+  )
 
-  return (data) => fun(data, optionalSymbol, parsers)
+  return (data) => fun(data, propertyAbsent, omitProperty, parsers)
 }
