@@ -1,6 +1,8 @@
 import { Guard, OptionalGuard } from './types'
 import { optionalSymbol } from '../internals'
 import { lazy } from '../common'
+import { Parser } from '../parsers'
+import { OptionalKeys, WithOptionalFields } from '../internals/utility-types'
 
 /**
  * Objects have a fixed set of properties of different types.
@@ -31,11 +33,10 @@ import { lazy } from '../common'
  * @see {@link objectGuardCompiled} for just-in-time compiled version of this function.
  * @param schema maps keys to validation functions.
  */
-export const objectGuard =
-  <T extends Record<string, unknown>>(schema: {
-    [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
-  }): Guard<T> =>
-  (data): data is T =>
+export const objectGuard = <T extends Record<string, unknown>>(schema: {
+  [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
+}): Guard<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> =>
+  ((data) =>
     typeof data === 'object' &&
     data !== null &&
     Object.keys(schema).every((key) => {
@@ -47,7 +48,8 @@ export const objectGuard =
       }
 
       return guard(value)
-    })
+      // Must be cast to the correct type because TypeScript does not infer the type predicate correctly
+    })) as Guard<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>>
 /**
  * Same as {@link objectGuard}, but performs just-in-time (JIT) compilation with the `Function` constructor, which greatly increases the execution speed of the validation.
  * However, the JIT compilation is slow and gets executed at the time when the validation function is constructed.
@@ -67,7 +69,7 @@ export const objectGuard =
 export const objectGuardCompiled = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalGuard<T[K]> : Guard<T[K]>
-}): Guard<T> => {
+}): Guard<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
   const schemaEntries = Object.entries(schema)
   const guards = schemaEntries.map(([_, guard]) => guard)
   const body = [`return typeof data === 'object'`, `data !== null`]
@@ -81,5 +83,7 @@ export const objectGuardCompiled = <T extends Record<string, unknown>>(schema: {
     )
     .join(' && ')
   const fun = new Function('data', 'optionalSymbol', 'guards', body)
-  return (data: unknown): data is T => fun(data, optionalSymbol, guards)
+  return ((data) => fun(data, optionalSymbol, guards)) as Guard<
+    OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>
+  >
 }

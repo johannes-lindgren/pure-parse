@@ -118,7 +118,7 @@ describe('Documentation examples', () => {
       <T>(parser: RequiredParser<T>): Parser<Leaf<T>> =>
       (data) =>
         // @ts-expect-error TypeScript gives a false error for the `data` property:
-        //  we have already guaranteed that `parser` does not represent an optional property, yet TypeScript complains
+        //  `RequiredParser` guarantees that `parser` does not represent an optional property, yet TypeScript complains
         object({
           tag: literal('leaf'),
           data: parser,
@@ -261,8 +261,11 @@ describe('Documentation examples', () => {
       tag: 'tree'
       data: (Tree<T> | Leaf<T>)[]
     }
+
     const leafGuard =
       <T>(guard: Guard<T>): Guard<Leaf<T>> =>
+      // @ts-expect-error TypeScript gives a false error for the `data` property:
+      //  `RequiredGuard` guarantees that `parser` does not represent an optional property, yet TypeScript complains
       (data) =>
         objectGuard({
           tag: literalGuard('leaf'),

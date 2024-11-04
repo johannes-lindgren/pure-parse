@@ -1,5 +1,5 @@
 import { it } from 'vitest'
-import { Guard } from './types'
+import { Guard, RequiredGuard } from './types'
 import { objectGuard } from './object'
 
 it('allows for generic, higher-order validation function', () => {
@@ -7,9 +7,9 @@ it('allows for generic, higher-order validation function', () => {
     data: T
   }
 
-  const isTreeNode = <T>(
-    isData: (data: unknown) => data is T,
-  ): Guard<TreeNode<T>> =>
+  const isTreeNode = <T>(isData: RequiredGuard<T>): Guard<TreeNode<T>> =>
+    // @ts-expect-error TypeScript gives a false error for the `data` property:
+    //  `RequiredGuard` guarantees that `parser` does not represent an optional property yet TypeScript complains
     objectGuard({
       data: isData,
     })
