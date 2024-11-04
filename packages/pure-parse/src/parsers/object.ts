@@ -37,7 +37,7 @@ export type ObjectFromSchema<Schema extends Record<string, Parser<unknown>>> =
     }
   >
 
-type Simplify<T> = T extends infer U ? { [K in keyof T]: T[K] } : never
+type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
 
 /**
  * Objects have a fixed set of properties of different types.
