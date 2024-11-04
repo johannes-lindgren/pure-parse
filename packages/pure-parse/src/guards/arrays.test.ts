@@ -4,7 +4,7 @@ import { isBoolean, isNonEmptyArray, isNumber, isString } from './primitives'
 import { Guard } from './types'
 import { Infer } from '../common'
 import { Equals } from '../internals'
-import { unionGuard } from './union'
+import { oneOfGuard } from './oneOf'
 import { isUnknown } from './unknown'
 
 describe('arrays', () => {
@@ -29,9 +29,9 @@ describe('arrays', () => {
     test('explicit generic type annotation', () => {
       arrayGuard<number>(isNumber)
       arrayGuard<string>(isString)
-      arrayGuard<string | number>(unionGuard(isString, isNumber))
+      arrayGuard<string | number>(oneOfGuard(isString, isNumber))
       // @ts-expect-error
-      arrayGuard<number>(unionGuard(isString, isNumber))
+      arrayGuard<number>(oneOfGuard(isString, isNumber))
       // @ts-expect-error
       arrayGuard<string>(isNumber)
       // @ts-expect-error
@@ -83,10 +83,10 @@ describe('arrays', () => {
     )
   })
   it('expects every element to pass the validation', () => {
-    expect(arrayGuard(unionGuard(isNumber))([1, 2, 3, 4])).toEqual(true)
-    expect(arrayGuard(unionGuard(isNumber))([1, 2, 3, 'a', 4])).toEqual(false)
+    expect(arrayGuard(oneOfGuard(isNumber))([1, 2, 3, 4])).toEqual(true)
+    expect(arrayGuard(oneOfGuard(isNumber))([1, 2, 3, 'a', 4])).toEqual(false)
     expect(
-      arrayGuard(unionGuard(isString, isNumber, isBoolean))([1, 'a', false]),
+      arrayGuard(oneOfGuard(isString, isNumber, isBoolean))([1, 'a', false]),
     ).toEqual(true)
   })
 })

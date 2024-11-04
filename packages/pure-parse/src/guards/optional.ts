@@ -1,5 +1,5 @@
 import { Guard, OptionalGuard } from './types'
-import { unionGuard } from './union'
+import { oneOfGuard } from './oneOf'
 import { isNull, isUndefined } from './primitives'
 import { optionalSymbol } from '../internals'
 
@@ -24,7 +24,7 @@ import { optionalSymbol } from '../internals'
  */
 export const optionalGuard = <T>(guard: Guard<T>): OptionalGuard<T> =>
   // Note that the type of isOptionalSymbol is not taken into account
-  unionGuard(isOptionalSymbol, isUndefined, guard) as OptionalGuard<T>
+  oneOfGuard(isOptionalSymbol, isUndefined, guard) as OptionalGuard<T>
 
 /**
  * Non-exported function to check if a value is the optional symbol.
@@ -36,19 +36,19 @@ const isOptionalSymbol = (data: unknown): data is undefined =>
   data === optionalSymbol
 
 /**
- * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for `optional(unionGuard(isNull, guard))`.
+ * Create an optional property that also can be `null`. Convenient when creating optional nullable properties in objects. Alias for `optional(oneOfGuard(isNull, guard))`.
  * @param guard
  */
 export const optionalNullableGuard = <T>(guard: Guard<T>) =>
-  optionalGuard(unionGuard(isNull, guard))
+  optionalGuard(oneOfGuard(isNull, guard))
 /**
  * Create a union with `null`. Convenient when creating nullable properties in objects. Alias for `unionGuard(isNull, guard)`.
  * @param guard
  */
-export const nullableGuard = <T>(guard: Guard<T>) => unionGuard(isNull, guard)
+export const nullableGuard = <T>(guard: Guard<T>) => oneOfGuard(isNull, guard)
 /**
  * Create a union with `undefined`, which is different from optional properties. Alias for `unionGuard(isUndefined, guard)`.
  * @param guard
  */
 export const undefineableGuard = <T>(guard: Guard<T>) =>
-  unionGuard(isUndefined, guard)
+  oneOfGuard(isUndefined, guard)

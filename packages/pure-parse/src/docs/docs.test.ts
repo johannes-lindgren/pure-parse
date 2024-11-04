@@ -17,7 +17,7 @@ import {
   isString,
   literalGuard,
   objectGuard,
-  unionGuard,
+  oneOfGuard,
 } from '../guards'
 
 describe('Documentation examples', () => {
@@ -277,7 +277,7 @@ describe('Documentation examples', () => {
       (data) =>
         objectGuard({
           tag: literalGuard('tree'),
-          data: arrayGuard(unionGuard(leafGuard(guard), treeGuard(guard))),
+          data: arrayGuard(oneOfGuard(leafGuard(guard), treeGuard(guard))),
         })(data)
 
     describe('leaf', () => {

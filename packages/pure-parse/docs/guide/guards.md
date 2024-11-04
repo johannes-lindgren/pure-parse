@@ -45,7 +45,7 @@ First, there are type guards. Each primitive value and reference type has a corr
 Secondly, there is a category of higher order functions that constructs new guards based on parameters:
 
 - [literalGuard](/api/guards/literal#literalGuard)
-- [unionGuard](/api/guards/union#unionGuard)
+- [oneOfGuard](/api/guards/oneOf#oneOfGuard)
 - [tupleGuard](/api/guards/tuples#tupleGuard)
 - [objectGuard](/api/guards/object#objectGuard)
 - [recordGuard](/api/guards/records#recordGuard)
@@ -119,7 +119,7 @@ isDigit(5) // -> true
 
 ## Unions
 
-Unions types—or sum types—represent values that can be one of several types. Use the `unionGuard()` function to create a validation function for a union type:
+Unions types—or sum types—represent values that can be one of several types. Use the `oneOfGuard()` function to create a validation function for a union type:
 
 ```ts
 const isStringOrNumber = unionGuard(isString, isNumber)
