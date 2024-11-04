@@ -16,7 +16,7 @@ import {
 } from './primitives'
 import { Infer } from '../common'
 import { literal } from './literal'
-import { nullable, optional } from './optional'
+import { nullable, optional, undefineable } from './optional'
 import { objectMemo, objectCompiledMemo } from '../memoization'
 import { succeedWith, withDefault } from './defaults'
 import { parseUnknown } from './unknown'
@@ -342,6 +342,39 @@ suites.forEach(({ name: suiteName, fn: object }) => {
               // @ts-expect-error `optionalSymbol` is not included in the inferred type
               email: optionalSymbol,
             }
+          })
+          it('differentiates between undefined and missing properties', () => {
+            const parseOptional = object({
+              email: optional(parseString),
+            })
+            const tOptional0: Equals<
+              Infer<typeof parseOptional>,
+              {
+                email?: string
+              }
+            > = true
+            const tOptional01: Equals<
+              Infer<typeof parseOptional>,
+              {
+                email: string | undefined
+              }
+            > = false
+
+            const parseUndefinable = object({
+              email: undefineable(parseString),
+            })
+            const tReq0: Equals<
+              Infer<typeof parseUndefinable>,
+              {
+                email?: string
+              }
+            > = false
+            const tReq1: Equals<
+              Infer<typeof parseUndefinable>,
+              {
+                email: string | undefined
+              }
+            > = true
           })
           test('mix of required and optional properties', () => {
             type User = {
