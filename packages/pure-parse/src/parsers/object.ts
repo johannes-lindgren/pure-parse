@@ -2,22 +2,27 @@ import { isObject } from '../guards'
 import {
   failure,
   OptionalParser,
-  ParseSuccess,
   Parser,
-  ParseResult,
-  success,
+  ParseSuccess,
   propagateFailure,
+  success,
 } from './types'
-import { optionalSymbol } from '../internals'
-import { Infer } from '../common'
-import { lazy } from '../common'
+import { omitProperty, propertyAbsent } from '../internals'
+import { Infer, lazy } from '../common'
+import { OptionalKeys, WithOptionalFields } from '../internals/utility-types'
 
 const notAnObjectMsg = 'Not an object'
-const propertyMissingMsg = 'Property is missing'
+
+const missingPropertyError = (key: string) =>
+  propagateFailure(failure('Property is missing'), {
+    tag: 'object',
+    key,
+  })
 
 /**
  * Objects have a fixed set of properties of different types.
- * If the `data` has more properties than expected, the extra properties are omitted from the result.
+ * If the `data` received has properties that are not declared in the parser,
+ * the extra properties are omitted from the result.
  * @example
  * Object with both required and optional properties:
  * ```ts
@@ -28,27 +33,33 @@ const propertyMissingMsg = 'Property is missing'
  *   email: optional(parseString),
  * })
  * ```
- * Note that optional properties will be inferred as required properties that can be assigned `undefined`. See {@link Infer} > limitations for in-depth information.
  * @example
  * Annotate explicitly:
  * ```ts
  * type User = {
  *   id: number
- *   name: string
+ *   name?: string
  * }
  *
  * const parseUser = object<User>({
  *   id: parseNumber,
- *   name: parseString,
+ *   name: optional(parseString),
  * })
  * ```
+ * @limitations Optional `unknown` properties will be inferred as required.
+ * See {@link Infer} > limitations for in-depth information.
  * @param schema maps keys to validation functions.
  * @return a parser function that validates objects according to `schema`.
  */
 export const object = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<T> => {
+}): /* The reason for the conditional is twofold:
+ * 1. When inferring `T` from a schema with optional properties, `T` gets inferred with required properties, where the property values instead are union with `omitProperty`.
+ * 2. When `T` is explicitly declared, we do not want to use the expression because we want the return type to be printed in the IDE as `Parser<T>`.
+ *    For example, `object<User>(...)` should return `Parser<User>`, not `Parser<{ id: number; name?: string; }>`.
+ */
+Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
   const entries = Object.entries(schema)
   return (data) => {
     if (!isObject(data)) {
@@ -61,16 +72,17 @@ export const object = <T extends Record<string, unknown>>(schema: {
       // Perf: only check if the property exists the value is undefined => huge performance boost
       if (value === undefined && !data.hasOwnProperty(key)) {
         // Property is absent
-        const parseResult = parser(optionalSymbol)
-        if (parseResult.tag === 'failure') {
-          return propagateFailure(parseResult, {
-            tag: 'object',
-            key,
-          })
+        const parseResult = parser(propertyAbsent)
+        if (
+          parseResult.tag === 'failure' ||
+          // parseUnknown could return the same value as it received
+          parseResult.value === propertyAbsent
+        ) {
+          return missingPropertyError(key)
         }
         // If the parse result indicates that the parsed result should be an
         // omitted property, this conditional will be skipped
-        if (parseResult.value !== optionalSymbol) {
+        if (parseResult.value !== omitProperty) {
           // Can happen in case of withDefault, where parsing an optional property does lead to a value
           dataOutput[key] = (parseResult as ParseSuccess<unknown>).value
         }
@@ -84,7 +96,11 @@ export const object = <T extends Record<string, unknown>>(schema: {
       }
     }
 
-    return success(dataOutput as T)
+    return success(
+      dataOutput as OptionalKeys<T> extends undefined
+        ? T
+        : WithOptionalFields<T>,
+    )
   }
 }
 
@@ -107,7 +123,7 @@ export const object = <T extends Record<string, unknown>>(schema: {
 export const objectCompiled = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<T> => {
+}): Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
   const schemaEntries = Object.entries(schema)
   const parsers = schemaEntries.map(([_, parser]) => parser)
   const statements = [
@@ -124,13 +140,11 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
       const parser = `parsers[${i}]`
       return `
         if(${value} === undefined && !data.hasOwnProperty(${key}))  {
-          const parseResult = ${parser}(optionalSymbol)
-          if(parseResult.tag === 'failure'){
-            return {tag:'failure', error:${JSON.stringify(
-              propertyMissingMsg,
-            )}, path: [{tag: 'object', key: ${key}}]}
+          const parseResult = ${parser}(propertyAbsent)
+          if(parseResult.tag === 'failure' || parseResult.value === propertyAbsent){
+            return ${JSON.stringify(missingPropertyError(unescapedKey))}
           }
-          if(parseResult.value !== optionalSymbol){
+          if(parseResult.value !== omitProperty){
             dataOutput[${key}] = parseResult.value
           } 
         } else {
@@ -142,7 +156,13 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
     `return {tag:'success', value:dataOutput}`,
   ]
   const body = statements.join(';')
-  const fun = new Function('data', 'optionalSymbol', 'parsers', body)
+  const fun = new Function(
+    'data',
+    'propertyAbsent',
+    'omitProperty',
+    'parsers',
+    body,
+  )
 
-  return (data: unknown): ParseResult<T> => fun(data, optionalSymbol, parsers)
+  return (data) => fun(data, propertyAbsent, omitProperty, parsers)
 }

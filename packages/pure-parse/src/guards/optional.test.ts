@@ -45,13 +45,11 @@ describe('optional', () => {
       name?: string
     }
     type InferredUser = Infer<typeof isObj>
-    // @ts-expect-error -- TODO can't get this to work
     const t1: Equals<User, InferredUser> = true
     const t2: InferredUser = {
       id: 0,
       name: 'Johannes',
     }
-    // @ts-expect-error -- TODO can't get this to work
     const t3: InferredUser = {
       id: 0,
     }

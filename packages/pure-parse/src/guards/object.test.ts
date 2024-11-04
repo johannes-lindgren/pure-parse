@@ -7,6 +7,7 @@ import { optionalGuard, undefineableGuard } from './optional'
 import { objectGuardCompiledMemo, objectGuardMemo } from '../memoization'
 import { Equals, optionalSymbol } from '../internals'
 import { Infer } from '../common'
+import { isUnknown } from './unknown'
 
 const suits = [
   {
@@ -86,7 +87,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
             })
             objectGuard<UserUndefinable>({
               id: isNumber,
-              // TODO @ts-expect-error - name can be undefined, but it is not optional
+              // @ts-expect-error - name can be undefined, but it is not optional
               name: optionalGuard(isString),
             })
             objectGuard<UserUndefinable>({
@@ -196,11 +197,9 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
 
             type InferredUser = Infer<typeof isUser>
 
-            // TODO make inference of optional properties to work
-            const t1: Equals<InferredUser, RequiredUser> = true
+            const t1: Equals<InferredUser, User> = true
             const t2: InferredUser = { email: 'a@test.com' }
             const t3: InferredUser = { email: undefined }
-            // @ts-expect-error -- the property is required
             const t4: InferredUser = {}
             const t5: InferredUser = {
               // @ts-expect-error `optionalSymbol` is not included in the inferred type
@@ -306,6 +305,74 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
         })
         expect(isUnionObj({})).toEqual(false)
         expect(isUnionObj({ a: undefined })).toEqual(true)
+      })
+      describe('properties with unknown types', () => {
+        test('required unknown with type annotation', () => {
+          type Obj = {
+            a: unknown
+          }
+          const isObj = objectGuard<Obj>({
+            a: isUnknown,
+          })
+          const t0: Equals<Infer<typeof isObj>, Obj> = true
+          expect(isObj({ a: 1 })).toEqual(true)
+          expect(isObj({ a: undefined })).toEqual(true)
+          // False warning :(
+          // For parsers, we can solve it because the parser can return more rich information,
+          // but for guards, we only have a boolean
+          expect(isObj({})).toEqual(true)
+        })
+        test('optional unknown with type annotation', () => {
+          type Obj = {
+            a?: unknown
+          }
+          const isObj = objectGuard<Obj>({
+            a: optionalGuard(isUnknown),
+          })
+          const t0: Equals<Infer<typeof isObj>, Obj> = true
+          expect(isObj({})).toEqual(true)
+          expect(isObj({ a: 1 })).toEqual(true)
+          expect(isObj({ a: undefined })).toEqual(true)
+          expect(isObj({})).toEqual(true)
+        })
+        test('optional unknown', () => {
+          const isObj = objectGuard({
+            a: optionalGuard(isUnknown),
+          })
+          type InferredObj = Infer<typeof isObj>
+          const t0: Equals<
+            InferredObj,
+            {
+              a: string
+            }
+          > = false
+          // @ts-expect-error -- cannot make unknown optional due to a compromise between API ergonomy and type safety
+          const t1: Equals<
+            InferredObj,
+            {
+              a?: string
+            }
+          > = true
+        })
+        test('required unknown', () => {
+          const isObj = objectGuard({
+            a: isUnknown,
+          })
+          type InferredObj = Infer<typeof isObj>
+          // @ts-expect-error -- cannot make unknown optional due to a compromise between API ergonomy and type safety
+          const t0: Equals<
+            InferredObj,
+            {
+              a: string
+            }
+          > = true
+          const t1: Equals<
+            InferredObj,
+            {
+              a?: string
+            }
+          > = false
+        })
       })
     })
   })

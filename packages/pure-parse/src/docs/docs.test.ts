@@ -8,6 +8,8 @@ import {
   parseString,
   success,
   oneOf,
+  optional,
+  RequiredParser,
 } from '../parsers'
 import {
   arrayGuard,
@@ -102,21 +104,28 @@ describe('Documentation examples', () => {
      * Code snippet from guides/parsers.md
      */
 
-    type Leaf<T> = { tag: 'leaf'; data: T }
+    type Leaf<T> = {
+      tag: 'leaf'
+      data: T
+    }
     type Tree<T> = {
       tag: 'tree'
       data: (Tree<T> | Leaf<T>)[]
     }
+
+    // `RequiredParser` means that the user gets an error if they pass an optional parser; for example, `leaf(optional(parseString))`
     const leaf =
-      <T>(parser: Parser<T>): Parser<Leaf<T>> =>
+      <T>(parser: RequiredParser<T>): Parser<Leaf<T>> =>
       (data) =>
+        // @ts-expect-error TypeScript gives a false error for the `data` property:
+        //  `RequiredParser` guarantees that `parser` does not represent an optional property, yet TypeScript complains
         object({
           tag: literal('leaf'),
           data: parser,
         })(data)
 
     const tree =
-      <T>(parser: Parser<T>): Parser<Tree<T>> =>
+      <T>(parser: RequiredParser<T>): Parser<Tree<T>> =>
       (data) =>
         object({
           tag: literal('tree'),
@@ -252,8 +261,11 @@ describe('Documentation examples', () => {
       tag: 'tree'
       data: (Tree<T> | Leaf<T>)[]
     }
+
     const leafGuard =
       <T>(guard: Guard<T>): Guard<Leaf<T>> =>
+      // @ts-expect-error TypeScript gives a false error for the `data` property:
+      //  `RequiredGuard` guarantees that `parser` does not represent an optional property, yet TypeScript complains
       (data) =>
         objectGuard({
           tag: literalGuard('leaf'),
