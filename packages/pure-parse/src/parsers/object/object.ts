@@ -1,15 +1,15 @@
-import { isObject } from '../guards'
+import { isObject } from '../../guards'
 import {
   failure,
   OptionalParser,
-  ParseSuccess,
   Parser,
-  success,
+  ParseSuccess,
   propagateFailure,
-} from './types'
-import { OmitProperty, omitProperty, propertyAbsent } from '../internals'
-import { Infer } from '../common'
-import { lazy } from '../common'
+  success,
+} from '../types'
+import { omitProperty, propertyAbsent } from '../../internals'
+import { Infer, lazy } from '../../common'
+import { OptionalKeys, WithOptionalFields } from './utility-types'
 
 const notAnObjectMsg = 'Not an object'
 
@@ -18,34 +18,6 @@ const missingPropertyError = (key: string) =>
     tag: 'object',
     key,
   })
-
-export type Values<T> = keyof T extends never ? never : T[keyof T]
-
-export type OptionalKeys<T> = Values<{
-  [K in keyof T]: unknown extends T[K]
-    ? never
-    : OmitProperty extends T[K]
-      ? K
-      : never
-}>
-
-export type RequiredKeys<T> = Values<{
-  [K in keyof T]: unknown extends T[K]
-    ? K
-    : OmitProperty extends T[K]
-      ? never
-      : K
-}>
-
-export type Simplify<T> = T extends infer _ ? { [K in keyof T]: T[K] } : never
-
-export type WithOptionalFields<T> = Simplify<
-  {
-    [K in RequiredKeys<T>]: Exclude<T[K], OmitProperty>
-  } & {
-    [K in OptionalKeys<T>]?: Exclude<T[K], OmitProperty>
-  }
->
 
 /**
  * Objects have a fixed set of properties of different types.
@@ -82,7 +54,12 @@ export type WithOptionalFields<T> = Simplify<
 export const object = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
-}): Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
+}): /* The reason for the conditional is twofold:
+ * 1. When inferring `T` from a schema with optional properties, `T` gets inferred with required properties, where the property values instead are union with `omitProperty`.
+ * 2. When `T` is explicitly declared, we do not want to use the expression because we want the return type to be printed in the IDE as `Parser<T>`.
+ *    For example, `object<User>(...)` should return `Parser<User>`, not `Parser<{ id: number; name?: string; }>`.
+ */
+Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
   const entries = Object.entries(schema)
   return (data) => {
     if (!isObject(data)) {
