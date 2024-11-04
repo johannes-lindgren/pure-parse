@@ -58,6 +58,13 @@ export type OptionalParser<T> = (
   data: unknown,
 ) => ParseResult<T | undefined | typeof optionalSymbol>
 
+/**
+ * A parser that does not represent an optional property.
+ */
+export type RequiredParser<T> = (
+  data: unknown,
+) => ParseResult<Exclude<T, typeof optionalSymbol>>
+
 /*
  * Utility functions
  */

@@ -15,24 +15,29 @@ const notAnObjectMsg = 'Not an object'
 const propertyMissingMsg = 'Property is missing'
 
 export type OptionalParserKeys<T> = {
-  [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? K : never
+  [K in keyof T]: OptionalParser<never> extends T[K] ? K : never
 }[keyof T]
 
 export type RequiredParserKeys<T> = {
-  [K in keyof T]: Parser<typeof optionalSymbol> extends T[K] ? never : K
+  [K in keyof T]: OptionalParser<never> extends T[K] ? never : K
 }[keyof T]
 
-export type ObjectFromSchema<Schema extends Record<string, Parser<unknown>>> = {
-  [K in RequiredParserKeys<Schema>]: Exclude<
-    Infer<Schema[K]>,
-    typeof optionalSymbol
+export type ObjectFromSchema<Schema extends Record<string, Parser<unknown>>> =
+  Simplify<
+    {
+      [K in RequiredParserKeys<Schema>]: Exclude<
+        Infer<Schema[K]>,
+        typeof optionalSymbol
+      >
+    } & {
+      [K in OptionalParserKeys<Schema>]?: Exclude<
+        Infer<Schema[K]>,
+        typeof optionalSymbol
+      >
+    }
   >
-} & {
-  [K in OptionalParserKeys<Schema>]?: Exclude<
-    Infer<Schema[K]>,
-    typeof optionalSymbol
-  >
-}
+
+type Simplify<T> = T extends infer U ? { [K in keyof T]: T[K] } : never
 
 /**
  * Objects have a fixed set of properties of different types.

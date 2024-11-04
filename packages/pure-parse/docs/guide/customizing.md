@@ -41,22 +41,28 @@ To create a custom, higher-order parser function, create a generic function that
 ```ts
 import { Parser, union, object, literal, arrays } from 'pure-parse'
 
-type Leaf<T> = { tag: 'leaf'; data: T }
+type Leaf<T> = {
+  tag: 'leaf'
+  data: T
+}
 type Tree<T> = {
   tag: 'tree'
   data: (Tree<T> | Leaf<T>)[]
 }
 
+// `RequiredParser` means that the user gets an error if they pass an optional parser; for example, `leaf(optional(parseString))`
 const leaf =
-  <T>(parser: Parser<T>): Parser<Leaf<T>> =>
+  <T>(parser: RequiredParser<T>): Parser<Leaf<T>> =>
   (data) =>
+    // @ts-expect-error TypeScript gives a false error for the `data` property:
+    //  we have already guaranteed that `parser` does not represent an optional property, yet TypeScript complains
     object({
       tag: literal('leaf'),
       data: parser,
     })(data)
 
 const tree =
-  <T>(parser: Parser<T>): Parser<Tree<T>> =>
+  <T>(parser: RequiredParser<T>): Parser<Tree<T>> =>
   (data) =>
     object({
       tag: literal('tree'),
@@ -113,7 +119,7 @@ type Tree<T> = {
 }
 
 const leafGuard =
-  <T>(parser: Parser<T>): Parser<Leaf<T>> =>
+  <T>(parser: Parser<T>): Guard<Leaf<T>> =>
   (data) =>
     object({
       tag: literal('leaf'),
@@ -121,7 +127,7 @@ const leafGuard =
     })(data)
 
 const treeGuard =
-  <T>(parser: Parser<T>): Parser<Tree<T>> =>
+  <T>(parser: Parser<T>): Guard<Tree<T>> =>
   (data) =>
     object({
       tag: literal('tree'),

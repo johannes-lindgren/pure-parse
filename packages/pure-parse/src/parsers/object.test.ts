@@ -301,7 +301,7 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             email: optional(optional(parseString)),
           })
         })
-        describe('type inferrence', () => {
+        describe('type inference', () => {
           test('required properties inference', () => {
             type User = {
               id: number
@@ -325,9 +325,6 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             type User = {
               email?: string
             }
-            type RequiredUser = {
-              email: string | undefined
-            }
             const parseUser = object({
               email: optional(parseString),
             })
@@ -342,6 +339,39 @@ suites.forEach(({ name: suiteName, fn: object }) => {
             const a3: InferredUser = {}
 
             const a4: InferredUser = {
+              // @ts-expect-error `optionalSymbol` is not included in the inferred type
+              email: optionalSymbol,
+            }
+          })
+          test('mix of required and optional properties', () => {
+            type User = {
+              id: number
+              email?: string
+            }
+            const parseUser = object({
+              id: parseNumber,
+              email: optional(parseString),
+            })
+            type InferredUser = Infer<typeof parseUser>
+            const t1: Equals<InferredUser, User> = true
+            // @ts-expect-error -- the id property is required
+            const a0: InferredUser = {
+              email: '',
+            }
+            const a1: InferredUser = {
+              id: 123,
+              email: '',
+            }
+            const a2: InferredUser = {
+              id: 123,
+              email: undefined,
+            }
+            const a3: InferredUser = {
+              id: 123,
+            }
+
+            const a4: InferredUser = {
+              id: 123,
               // @ts-expect-error `optionalSymbol` is not included in the inferred type
               email: optionalSymbol,
             }
@@ -601,6 +631,18 @@ suites.forEach(({ name: suiteName, fn: object }) => {
       })
     })
   })
+  it('handles generic parsers', () => {
+    type Node<T> = { data: T }
+    const node = <T>(parser: Parser<T>, d: T): Parser<Node<T>> =>
+      // @ts-expect-error -- TODO should not give an error
+      object({
+        data: parser,
+      })
+    const parseNode = node(parseString, '')
+    const n: Infer<typeof parseNode> = {
+      data: 'a',
+    }
+  })
 })
 describe('utility types', () => {
   describe('RequiredParserKeys', () => {
@@ -610,6 +652,16 @@ describe('utility types', () => {
         b: optional(parseString),
       } as const
       const t0: Equals<RequiredParserKeys<typeof schema>, 'a'> = true
+    })
+    it('handles required unknown', () => {
+      const schema1 = {
+        a: parseUnknown,
+      }
+      const t1: Equals<RequiredParserKeys<typeof schema1>, 'a'> = true
+      const schema2 = {
+        a: optional(parseUnknown),
+      }
+      const t2: Equals<RequiredParserKeys<typeof schema2>, never> = true
     })
   })
   describe('OptionalParserKeys', () => {
@@ -623,18 +675,12 @@ describe('utility types', () => {
     it('handles required unknown', () => {
       const schema1 = {
         a: parseUnknown,
-      } as const
+      }
       const t1: Equals<OptionalParserKeys<typeof schema1>, never> = true
       const schema2 = {
         a: optional(parseUnknown),
-      } as const
+      }
       const t2: Equals<OptionalParserKeys<typeof schema2>, 'a'> = true
-    })
-    it('handles generic parsers', () => {
-      const p = <T>(parser: Parser<T>) =>
-        object({
-          data: parser,
-        })
     })
   })
 })
