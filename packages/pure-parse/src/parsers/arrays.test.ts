@@ -1,11 +1,9 @@
 import { describe, expect, it, test } from 'vitest'
 import { array } from './arrays'
 import { failure, success } from './types'
-
 import { literal } from './literal'
-import { oneOf } from './oneOf'
 import { parseString } from './primitives'
-import { succeedWith } from './defaults'
+import { withDefault } from './withDefault'
 
 describe('arrays', () => {
   it('validates when all elements pass validation', () => {
@@ -20,7 +18,7 @@ describe('arrays', () => {
     expect(parseArr(['a', 'b'])).toHaveProperty('tag', 'failure')
   })
   test('with fallbackValue', () => {
-    const parseArr = array(oneOf(literal('#FF0000'), succeedWith('#00FF00')))
+    const parseArr = array(withDefault(literal('#FF0000'), '#00FF00'))
     expect(parseArr(['#FF0000', '#FF0000'])).toEqual(
       expect.objectContaining({
         value: ['#FF0000', '#FF0000'],

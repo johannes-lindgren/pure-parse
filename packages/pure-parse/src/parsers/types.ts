@@ -1,5 +1,3 @@
-import { optionalSymbol } from '../internals'
-
 /**
  * The data adheres to the schema. The `value` is equal to the parsed data
  */
@@ -74,3 +72,11 @@ export const isSuccess = <T>(
  */
 export const isFailure = <T>(result: ParseResult<T>): result is ParseFailure =>
   result.tag === 'failure'
+/**
+ * A parser that always succeeds
+ */
+export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
+/**
+ * A parser that always fails
+ */
+export type UnsuccessfulParser = (data: unknown) => ParseFailure

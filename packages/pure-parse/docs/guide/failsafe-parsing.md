@@ -4,28 +4,37 @@ A benefit of parsing data over of validating data (with guards) is that errors c
 
 ### Defaults with Static Values
 
-The [succeedWith](/api/parsers/defaults#succeedWith) function returns a parser that always succeeds; for example, `succeedWith(0)` returns a parser that always returns `Success<0>`.
-
-To fall back to a static value, chain together a parser of your liking with [oneOf](/api/parsers/oneOf) and [/api/parsers/defaults#succeedWith]; for example, parsing a number and falling back to `0` when parsing fails:
+The [withDefault](/api/parsers/withDefault) function wraps a parser and provides a default value if it fails; for example, `withDefault(parseNumber, 0)` is a parser that attempts to validate numbers, and falls back to `0` if it fails.
 
 ```ts
-import { parseNumber, oneOf, succeedWith } from 'pure-parse'
+import { parseNumber, withDefault } from 'pure-parse'
 
-const parseNum = oneOf(parseNumber, succeedWith(0))
+const parseNum = withDefault(parseNumber, 0)
+parseNum(1) // -> ParseSuccess<number>
+parseNum(null) // -> ParseSuccess<0>
 ```
+
+Parsers can also be chained with [oneOf](/api/parsers/oneOf) and [/api/parsers/types#succeed]:
+
+```ts
+import { parseNumber, oneOf, success, parseBigInt } from 'pure-parse'
+
+const parseNum = oneOf(
+  parseNumber,
+  parseBigInt,
+  // A parser that always succeeds
+  () => success(0),
+)
+```
+
+In fact, `withDefault(parser, defaultValue)` is just a shorthand for `oneOf(parser, () => success(defaultValue))`.
 
 ### Parsing Unions into Non-unions
 
-Sometimes, data consists of strange union types that should be parsed into a more narrow type; for example, parsing a mix of numbers and stringified numbers:
+Sometimes, data consists of strange union types that should be parsed into a more narrow type; for example, a mix of numbers and stringified numbers might need to be parsed into a list of numbers:
 
 ```ts
-const data = [1, '2']
-```
-
-into:
-
-```ts
-;[1, 2]
+const data = [1, '2'] // Desired result: [1, 2]
 ```
 
 Write a custom parser `parseNumberFromString` that parses stringified numbers into `number`, and use `oneOf` to chain it together with `parseNumber`:
@@ -36,20 +45,22 @@ import { array, oneOf, parseNumber } from 'pure-parse'
 const parseData = array(oneOf(parseNumber, parseNumberFromString))
 ```
 
-To ensure that the result is always a `number`, simply append `succeedWith` at the end:
+If the data could include `null` or other non-numeric values, the parser can be extended with a fallback mechanism:
 
 ```ts
-import { parseNumber, array, oneOf, succeedWith } from 'pure-parse'
+import { parseNumber, array, oneOf, success } from 'pure-parse'
 
 const parseData = array(
   oneOf(
     parseNumber,
     parseNumberFromString,
     // Default to 0; for example, when the value is `null`, or `"two"`
-    succeedWith(0),
+    () => success(0),
   ),
 )
 ```
+
+`() => success(0)` is a parser that ignores all arguments and always returns `Success<0>`.
 
 ### Graceful Error Handling
 
@@ -65,7 +76,7 @@ import {
   object,
   array,
   oneOf,
-  succeedWith,
+  success,
 } from 'pure-parse'
 
 type RichText =
@@ -92,10 +103,8 @@ const parseNumberContent = object({
 })
 
 const parseRichText = array(
-  oneOf(
-    parseStringContent,
-    parseNumberContent,
-    succeedWith({
+  oneOf(parseStringContent, parseNumberContent, () =>
+    success({
       tag: 'empty',
     }),
   ),

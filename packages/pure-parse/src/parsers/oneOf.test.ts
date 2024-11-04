@@ -141,13 +141,4 @@ describe('oneOf', () => {
     })
     const t: Equals<typeof parseRichText, Parser<RichText>> = true
   })
-  // describe('with succeedWith (static defaults)', () => {
-  // TODO can we reactivate this? It was easier to infer the type when we had withDefault
-  // test('that the result type is infallible', () => {
-  //   const res = oneOf(parseString, succeedWith(''))(123)
-  //   const a1: typeof res = success('')
-  //   // @ts-expect-error -- fallbackValue result is infallible
-  //   const a3: typeof res = failure('')
-  // })
-  // })
 })

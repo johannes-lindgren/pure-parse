@@ -56,7 +56,6 @@ Secondly, there is a category of higher order functions that constructs new pars
 
 - [literal](/api/parsers/literal#literal)
 - [oneOf](/api/parsers/oneOf) (for unions and graceful error handling)
-- [succeedWith](/api/parsers/defaults#succeedWith) (for default values)
 - [tuple](/api/parsers/tuples#tuple)
 - [object](/api/parsers/object#object)
 - [record](/api/parsers/records#record)
