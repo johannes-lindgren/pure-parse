@@ -4,9 +4,12 @@ import typedocSidebar from '../docs/api/typedoc-sidebar.json'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'PureParse',
+  head: [['link', { rel: 'icon', href: '/logo.webp' }]],
+
   description: 'Derive parsers from types',
   srcDir: 'docs',
   themeConfig: {
+    logo: '/logo.webp',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },

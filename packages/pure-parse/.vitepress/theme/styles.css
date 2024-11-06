@@ -1,0 +1,21 @@
+
+
+:root {
+    --pp-1: #3d9efe;
+    --pp-3: #2b7df5;
+    --pp-5: #266be9;
+
+    --vp-c-brand-1: var(--pp-5);
+    --vp-c-brand-2: var(--pp-5);
+    --vp-c-brand-3: var(--pp-1);
+
+    --vp-home-hero-name-color: var(--pp-1);
+}
+
+.dark {
+    --vp-c-brand-1: var(--pp-1);
+    --vp-c-brand-2: var(--pp-3);
+    --vp-c-brand-3: var(--pp-5);
+
+    --vp-home-hero-name-color: var(--pp-1);
+}

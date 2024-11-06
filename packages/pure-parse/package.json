@@ -1,8 +1,8 @@
 {
   "name": "pure-parse",
-  "version": "0.0.0-beta.5",
+  "version": "0.0.0-beta.6",
   "private": false,
-  "description": "Lightweight validation library that decouples type aliases from validation logic",
+  "description": "Strongly typed validation library that decouples type aliases from validation logic",
   "author": {
     "name": "Johannes Lindgren"
   },
@@ -25,7 +25,8 @@
   "license": "MIT",
   "sideEffects": false,
   "files": [
-    "dist"
+    "dist",
+    "logo.webp"
   ],
   "type": "module",
   "module": "./dist/index.js",
