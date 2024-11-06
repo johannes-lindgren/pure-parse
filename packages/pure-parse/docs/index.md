@@ -4,7 +4,7 @@ layout: home
 hero:
   name: PureParse
   text: Typesafe, lightweight parsers
-  tagline: Lightweight validation library that decouples type aliases from validation logic
+  tagline: Strongly typed validation library that decouples type aliases from validation logic
   actions:
     - theme: brand
       text: Quick Start
@@ -18,22 +18,26 @@ hero:
 features:
   - title: Lightweight
     icon:
-      src: /feather.svg
-    details: 0 dependencies, tree-shakeable, and less than 3 kB gzipped.
+      light: /feather-light.svg
+      dark: /feather-dark.svg
+    details: 0 dependencies, 5 kB gzipped, and fully tree-shakeable.
     link: /guide/overview#lightweight
   - title: Easy to use
     icon:
-      src: /block.svg
+      light: /block-light.svg
+      dark: /block-dark.svg
     details: Compose and customize with ease.
     link: /guide/overview#extensible-and-easy-to-use
   - title: Fast
     icon:
-      src: /guage.svg
+      light: /guage-light.svg
+      dark: /guage-dark.svg
     details: Among the fastest validators. Memoize for even better performance.
     link: /guide/overview#fast
   - title: Fail-safe
     icon:
-      src: /shield.svg
+      light: /shield-light.svg
+      dark: /shield-dark.svg
     details: Recover from errors gracefully when parsing large documents.
     link: /guide/overview#fail-safe
 ---

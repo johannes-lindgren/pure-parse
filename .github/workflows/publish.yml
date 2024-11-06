@@ -21,7 +21,10 @@ jobs:
       - name: Build
         run: npm run build --workspace=pure-parse
       - name: Copy README into the workspace
-        run: cp README.md packages/pure-parse/
+        run: |
+          cp README.md packages/pure-parse/
+          cp logo.webp packages/pure-parse/
+          cp LICENSE packages/pure-parse/
       - name: Publish to NPM
         run: npm publish --access public --workspace=pure-parse
         env:
