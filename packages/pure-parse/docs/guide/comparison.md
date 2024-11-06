@@ -58,7 +58,7 @@ _Safe parsing_ means that a copy of the parsed data is returned, which contains 
 
 | Library                                               | Minified + Zipped |
 | ----------------------------------------------------- | ----------------- |
-| [PureParse](https://www.npmjs.com/package/pure-parse) | 3 kB              |
+| [PureParse](https://www.npmjs.com/package/pure-parse) | 5 kB              |
 | [Zod](https://www.npmjs.com/package/zod)              | 21 kB             |
 | [Joi](https://www.npmjs.com/package/joi)              | 236 kB            |
 | [Ajv](https://www.npmjs.com/package/ajv)              | 32 kB             |

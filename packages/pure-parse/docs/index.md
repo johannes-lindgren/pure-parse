@@ -20,7 +20,7 @@ features:
     icon:
       light: /feather-light.svg
       dark: /feather-dark.svg
-    details: 0 dependencies, tree-shakeable, and less than 3 kB gzipped.
+    details: 0 dependencies, 5 kB gzipped, and fully tree-shakeable.
     link: /guide/overview#lightweight
   - title: Easy to use
     icon:
