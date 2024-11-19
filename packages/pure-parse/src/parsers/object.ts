@@ -166,3 +166,57 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
 
   return (data) => fun(data, propertyAbsent, omitProperty, parsers)
 }
+
+export const objectStrict = <T extends Record<string, unknown>>(schema: {
+  // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
+  [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
+}): /* The reason for the conditional is twofold:
+ * 1. When inferring `T` from a schema with optional properties, `T` gets inferred with required properties, where the property values instead are union with `omitProperty`.
+ * 2. When `T` is explicitly declared, we do not want to use the expression because we want the return type to be printed in the IDE as `Parser<T>`.
+ *    For example, `object<User>(...)` should return `Parser<User>`, not `Parser<{ id: number; name?: string; }>`.
+ */
+Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
+  const parseLoose = object(schema)
+  const schemaKeys = new Set(Object.keys(schema))
+
+  return (data) => {
+    if (!isObject(data)) {
+      return failure(notAnObjectMsg)
+    }
+    const dataKeys = Object.keys(data)
+    for (const key of dataKeys) {
+      if (!schemaKeys.has(key)) {
+        return failure(`Object has an extra property ${JSON.stringify(key)}`)
+      }
+    }
+    return parseLoose(data)
+  }
+}
+
+export const objectStrictCompiled = <
+  T extends Record<string, unknown>,
+>(schema: {
+  // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
+  [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
+}): /* The reason for the conditional is twofold:
+ * 1. When inferring `T` from a schema with optional properties, `T` gets inferred with required properties, where the property values instead are union with `omitProperty`.
+ * 2. When `T` is explicitly declared, we do not want to use the expression because we want the return type to be printed in the IDE as `Parser<T>`.
+ *    For example, `object<User>(...)` should return `Parser<User>`, not `Parser<{ id: number; name?: string; }>`.
+ */
+Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
+  const parseLoose = objectCompiled(schema)
+  const schemaKeys = new Set(Object.keys(schema))
+
+  return (data) => {
+    if (!isObject(data)) {
+      return failure(notAnObjectMsg)
+    }
+    const dataKeys = Object.keys(data)
+    for (const key of dataKeys) {
+      if (!schemaKeys.has(key)) {
+        return failure(`Object has an extra property ${JSON.stringify(key)}`)
+      }
+    }
+    return parseLoose(data)
+  }
+}
