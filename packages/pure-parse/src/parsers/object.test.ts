@@ -1,5 +1,10 @@
 import { describe, expect, it, test } from 'vitest'
-import { objectCompiled, object, objectStrict } from './object'
+import {
+  objectCompiled,
+  object,
+  objectStrict,
+  objectStrictCompiled,
+} from './object'
 import { isSuccess, Parser } from './types'
 import { Equals, omitProperty } from '../internals'
 import { oneOf } from './oneOf'
@@ -33,11 +38,11 @@ const looseSuites = [
   },
   // Compiled
   {
-    name: 'memoized object without JIT compilation',
+    name: 'object without JIT compilation memoized',
     fn: objectMemo,
   },
   {
-    name: 'memoized object with JIT compilation',
+    name: 'object with JIT compilation memoized',
     fn: objectCompiledMemo,
   },
 ]
@@ -45,20 +50,20 @@ const looseSuites = [
 const strictSuites = [
   // Non-compiled
   {
-    name: 'object without JIT compilation',
+    name: 'objectStrict without JIT compilation',
     fn: objectStrict,
   },
   {
-    name: 'object with JIT compilation',
-    fn: objectCompiled,
+    name: 'objectStrict with JIT compilation',
+    fn: objectStrictCompiled,
   },
   // Compiled
   {
-    name: 'memoized object without JIT compilation',
+    name: 'objectStrict without JIT compilation memoized',
     fn: objectStrictMemo,
   },
   {
-    name: 'memoized object with JIT compilation',
+    name: 'objectStrict with JIT compilation memoized',
     fn: objectStrictCompiledMemo,
   },
 ]
@@ -816,7 +821,7 @@ describe('object', () => {
   })
 
   describe('objectStrict', () => {
-    strictSuites.forEach(({ name: suiteName, fn: object }) => {
+    strictSuites.forEach(({ name: suiteName, fn: objectStrict }) => {
       describe(suiteName, () => {
         it('invalidates non-object data', () => {
           ;[
