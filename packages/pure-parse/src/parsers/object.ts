@@ -23,6 +23,7 @@ const missingPropertyError = (key: string) =>
  * Objects have a fixed set of properties of different types.
  * If the `data` received has properties that are not declared in the parser,
  * the extra properties are omitted from the result.
+ * @see {@link objectStrict} for a strict version.
  * @example
  * Object with both required and optional properties:
  * ```ts
@@ -109,6 +110,9 @@ Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
  * However, the JIT compilation is slow and gets executed at the time when the validation function is constructed.
  * When invoking this function at the module level, it is recommended to wrap it in {@link lazy} to defer the JIT compilation to when the validation function is called for the first time.
  * This function will be blocked in environments where the `Function` constructor is blocked; for example, when the [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) policy is set without the `'unsafe-eval`' directive.
+ * @see {@link object} for a non-compiled version of this function.
+ * @see {@link lazy} for deferring the JIT compilation.
+ * @see {@link objectStrictCompiled} for a strict version.
  * @example
  * Defer the JIT compilation to when the validation function is called for the first time.
  * ```ts
@@ -167,6 +171,60 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
   return (data) => fun(data, propertyAbsent, omitProperty, parsers)
 }
 
+/**
+ * Like `object`, but fails when the input `data` object has undeclared properties.
+ * Although `object` removes undeclared properties from the result,
+ * there are scenarios where you want to reject the input if it has extra properties.
+ * @see {@link object} for a non-strict version.
+ * @example
+ * When designing APIs, you want to reject calls to the API that includes undeclared properties,
+ * as this will allow you to add new properties in the future without breaking changes.
+ *
+ * For example, consider a REST API endpoint `PUT /user/:id`, which is validating the body with the non-strict object parser:
+ * ```ts
+ * const handlePutUser = (body: unknown) => {
+ *  const parseBody = object({
+ *    id: parseNumber,
+ *    name: parseString,
+ *  })
+ * }
+ * ```
+ * A client decides to call it with an extra property `email`:
+ * ```ts
+ * fetch('/user/1', {
+ *  method: 'PUT',
+ *  body: JSON.stringify({
+ *    id: 123,
+ *    name: 'Alice',
+ *    email: null
+ * }),
+ * ```
+ * Since `handlePutUser` does not reject the API call, the client's success will succeed.
+ *
+ * Now, the backend is updated to include the email property:
+ * ```ts
+ * const handlePutUser = (body: unknown) => {
+ *  const parseBody = object({
+ *    id: parseNumber,
+ *    name: parseString,
+ *    email: optional(parseString),
+ *  })
+ * }
+ * ```
+ * That is, `email` is optional, but not nullable.
+ * If the client now sends the same request, it will suddenly fail.
+ *
+ * To avoid such breaking change, use `objectStrict`:
+ * ```ts
+ * const handlePutUser = (body: unknown) => {
+ *  const parseBody = objectStrict({
+ *    id: parseNumber,
+ *    name: parseString,
+ *  })
+ * }
+ * ```
+ * @param schema
+ */
 export const objectStrict = <T extends Record<string, unknown>>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
   [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
@@ -193,6 +251,12 @@ Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
   }
 }
 
+/**
+ * Like `objectCompiled`, but fails when the input `data` object has undeclared properties in the same manner as `objectStrict`.
+ * @see {@link objectStrict} for a non-compiled version.
+ * @see {@link objectCompiled} for a non-strict version.
+ * @param schema
+ */
 export const objectStrictCompiled = <
   T extends Record<string, unknown>,
 >(schema: {
