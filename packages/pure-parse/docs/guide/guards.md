@@ -48,8 +48,7 @@ Secondly, there is a category of higher order functions that constructs new guar
 - [oneOfGuard](/api/guards/oneOf#oneOfGuard)
 - [tupleGuard](/api/guards/tuples#tupleGuard)
 - [objectGuard](/api/guards/object#objectGuard)
-- [recordGuard](/api/guards/records#recordGuard)
-- [partialRecordGuard](/api/guards/records#partialRecordGuard)
+- [dictionaryGuard](/api/guards/dictionary#dictionaryGuard)
 - [arrayGuard](/api/guards/arrays#arrayGuard)
 - [nonEmptyArrayGuard](/api/guards/arrays#nonEmptyArrayGuard)
 - [optionalGuard](/api/guards/optional#optionalGuard)–for optional properties. This function is special; only Guard functions constructed with `optional` can describe optional properties.

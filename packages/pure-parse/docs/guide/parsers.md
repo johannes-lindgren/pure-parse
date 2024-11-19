@@ -58,8 +58,7 @@ Secondly, there is a category of higher order functions that constructs new pars
 - [oneOf](/api/parsers/oneOf) (for unions and graceful error handling)
 - [tuple](/api/parsers/tuples#tuple)
 - [object](/api/parsers/object#object)
-- [record](/api/parsers/records#record)
-- [partialRecord](/api/parsers/records#partialRecord)
+- [dictionary](/api/parsers/dictionary#dictionary)
 - [arrays](/api/parsers/arrays#arrays)
 - [optional](/api/parsers/optional#optional)
 
