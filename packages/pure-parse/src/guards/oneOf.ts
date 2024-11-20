@@ -7,10 +7,10 @@ import { Guard } from './types'
  * ```ts
  * const isResult = oneOfGuard([
  *  objectGuard({
- *    tag: literalGuard('success')
+ *    tag: equalsGuard('success')
  *  }),
  *  objectGuard({
- *    tag: literalGuard('error')
+ *    tag: equalsGuard('error')
  *   }),
  * ])
  * ```
@@ -19,7 +19,7 @@ import { Guard } from './types'
  * ```ts
  * const isId = oneOfGuard<[string, number]>(isString, isNumber)
  * ```
- * Due to a limitation of TypeScript, it is not possible to write `unionGuard<string | number>()` or `literalGuard<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
+ * Due to a limitation of TypeScript, it is not possible to write `unionGuard<string | number>()` or `equalsGuard<'red' | 'green' | 'blue'>()`. Therefore, it is generally recommended to omit the type arguments for union types and let TypeScript infer them.
  * @param guards any of these guard functions must match the data.
  * @return a guard function that validates unions
  */

@@ -5,30 +5,30 @@ import { Guard } from './types'
  * Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values.
  * @example
  * ```ts
- * const parseRed = literalGuard('red')
- * const parseOne = literalGuard(1)
+ * const parseRed = equalsGuard('red')
+ * const parseOne = equalsGuard(1)
  * ```
  * @example
  * Commonly used in discriminated unions:
  * ```ts
  * const isResult = oneOfGuard([
  *  objectGuard({
- *    tag: literalGuard('success')
+ *    tag: equalsGuard('success')
  *  }),
  *  objectGuard({
- *    tag: literalGuard('error')
+ *    tag: equalsGuard('error')
  *   }),
  * ])
  * ```
  * @example
  * If you pass in multiple values, the guard will validate a union type:
  * ```ts
- * const isLogLevel = literalGuard('debug', 'info', 'warning', 'error')
+ * const isLogLevel = equalsGuard('debug', 'info', 'warning', 'error')
  * ```
  * @example
  * When explicitly annotating unions, provide a tuple of the union members as type argument:
  * ```ts
- * const isColor = literalGuard<['red', 'green', 'blue']>('red', 'green', 'blue')
+ * const isColor = equalsGuard<['red', 'green', 'blue']>('red', 'green', 'blue')
  * ```
  * @param constants compared against `data` with the `===` operator.
  */
