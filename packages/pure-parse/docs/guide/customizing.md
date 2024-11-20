@@ -102,7 +102,7 @@ To do the same with a validator, simply import the guard functions as alias them
 ```ts
 import {
   Guard,
-  literalGuard as literal,
+  equalsGuard as literal,
   objectGuard as object,
   unionGuard as union,
   arrayGuard as arrays,
@@ -124,7 +124,7 @@ const leafGuard =
   //  `RequiredGuard` guarantees that `parser` does not represent an optional property, yet TypeScript complains
   (data) =>
     objectGuard({
-      tag: literalGuard('leaf'),
+      tag: equalsGuard('leaf'),
       data: guard,
     })(data)
 
@@ -132,7 +132,7 @@ const treeGuard =
   <T>(guard: Guard<T>): Guard<Tree<T>> =>
   (data) =>
     objectGuard({
-      tag: literalGuard('tree'),
+      tag: equalsGuard('tree'),
       data: arrayGuard(unionGuard(leafGuard(guard), treeGuard(guard))),
     })(data)
 ```

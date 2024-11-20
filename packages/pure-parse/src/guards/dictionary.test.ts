@@ -2,7 +2,7 @@ import { describe, expect, it, test } from 'vitest'
 import { dictionaryGuard } from './dictionary'
 import { isBoolean, isNumber, isString } from './primitives'
 import { Guard } from './types'
-import { literalGuard } from './literal'
+import { equalsGuard } from './equals'
 import { objectGuard } from './object'
 import { oneOfGuard } from './oneOf'
 import { arrayGuard } from './arrays'
@@ -42,11 +42,11 @@ describe('dictionaries', () => {
         dictionaryGuard<string, number[]>(isString, arrayGuard(isString))
       })
       test('literal union as key', () => {
-        dictionaryGuard<'a', string>(literalGuard('a'), isString)
+        dictionaryGuard<'a', string>(equalsGuard('a'), isString)
         // @ts-expect-error
         dictionaryGuard<'a', string>(isString, isString)
         // @ts-expect-error
-        dictionaryGuard<'a', string>(literalGuard('b'), isString)
+        dictionaryGuard<'a', string>(equalsGuard('b'), isString)
       })
     })
   })
@@ -100,7 +100,7 @@ describe('dictionaries', () => {
       expect(dictionaryGuard(isString, isString)({})).toEqual(true)
     })
     it('does not allow extra keys', () => {
-      const isKey = oneOfGuard(literalGuard('a'), literalGuard('b'))
+      const isKey = oneOfGuard(equalsGuard('a'), equalsGuard('b'))
       expect(
         dictionaryGuard(isKey, isString)({ a: 'hello', b: 'hello2' }),
       ).toEqual(true)
@@ -112,7 +112,7 @@ describe('dictionaries', () => {
       ).toEqual(false)
     })
     it('allows each key to be omitted', () => {
-      const isKey = oneOfGuard(literalGuard('a'), literalGuard('b'))
+      const isKey = oneOfGuard(equalsGuard('a'), equalsGuard('b'))
       expect(
         dictionaryGuard(isKey, isString)({ a: 'hello', b: 'hello2' }),
       ).toEqual(true)

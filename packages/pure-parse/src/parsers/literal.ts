@@ -1,7 +1,7 @@
 // TODO rename to primitive?
 import { Primitive } from '../common'
 import { failure, ParseFailure, Parser, ParseSuccess, success } from './types'
-import { literalGuard as literal1 } from '../guards'
+import { equalsGuard as literal1 } from '../guards'
 
 /**
  * Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values.

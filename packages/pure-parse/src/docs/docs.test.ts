@@ -15,7 +15,7 @@ import {
   arrayGuard,
   Guard,
   isString,
-  literalGuard,
+  equalsGuard,
   objectGuard,
   oneOfGuard,
 } from '../guards'
@@ -268,7 +268,7 @@ describe('Documentation examples', () => {
       //  `RequiredGuard` guarantees that `parser` does not represent an optional property, yet TypeScript complains
       (data) =>
         objectGuard({
-          tag: literalGuard('leaf'),
+          tag: equalsGuard('leaf'),
           data: guard,
         })(data)
 
@@ -276,7 +276,7 @@ describe('Documentation examples', () => {
       <T>(guard: Guard<T>): Guard<Tree<T>> =>
       (data) =>
         objectGuard({
-          tag: literalGuard('tree'),
+          tag: equalsGuard('tree'),
           data: arrayGuard(oneOfGuard(leafGuard(guard), treeGuard(guard))),
         })(data)
 

@@ -44,7 +44,7 @@ First, there are type guards. Each primitive value and reference type has a corr
 
 Secondly, there is a category of higher order functions that constructs new guards based on parameters:
 
-- [literalGuard](/api/guards/literal#literalGuard)
+- [equalsGuard](/api/guards/equals#equalsGuard)
 - [oneOfGuard](/api/guards/oneOf#oneOfGuard)
 - [tupleGuard](/api/guards/tuples#tupleGuard)
 - [objectGuard](/api/guards/object#objectGuard)
@@ -99,20 +99,20 @@ isSymbol(Symbol()) // -> true
 
 ## Literals
 
-Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values. Use the `literalGuard()` function to create a guard function for a literal type:
+Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values. Use the `equalsGuard()` function to create a guard function for a literal type:
 
 ```ts
-const isRed = literalGuard('red')
-const isOne = literalGuard(1)
+const isRed = equalsGuard('red')
+const isOne = equalsGuard(1)
 ```
 
-`literalGuard()` also lets you define unions of literals:
+`equalsGuard()` also lets you define unions of literals:
 
 ```ts
-const isDirection = literalGuard('north', 'south', 'east', 'west')
+const isDirection = equalsGuard('north', 'south', 'east', 'west')
 isDirection('north') // -> true
 
-const isDigit = literalGuard(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+const isDigit = equalsGuard(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 isDigit(5) // -> true
 ```
 
@@ -210,7 +210,7 @@ const isUser = objectGuard<User>({
 Arrays are ordered sets of elements of the same type. Use the `arrayGuard()` function to create a validation function for an arrays type:
 
 ```ts
-const isBase = literalGuard('A', 'T', 'C', 'G')
+const isBase = equalsGuard('A', 'T', 'C', 'G')
 const isDna = arrayGuard(isBase)
 isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
 ```
@@ -229,14 +229,14 @@ Validate discriminated unions with unions of objects with a common tag property:
 ```ts
 const isState = unionGuard(
   objectGuard({
-    tag: literalGuard('loading'),
+    tag: equalsGuard('loading'),
   }),
   objectGuard({
-    tag: literalGuard('error'),
+    tag: equalsGuard('error'),
     error: isString,
   }),
   objectGuard({
-    tag: literalGuard('loaded'),
+    tag: equalsGuard('loaded'),
     message: isString,
   }),
 )

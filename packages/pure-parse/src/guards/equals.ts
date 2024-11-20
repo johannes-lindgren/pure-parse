@@ -32,7 +32,7 @@ import { Guard } from './types'
  * ```
  * @param constants compared against `data` with the `===` operator.
  */
-export const literalGuard =
+export const equalsGuard =
   <const T extends readonly [...Primitive[]]>(
     ...constants: T
   ): Guard<T[number]> =>
