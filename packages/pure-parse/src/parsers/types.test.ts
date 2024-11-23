@@ -3,7 +3,7 @@ import { array } from './arrays'
 import { object } from './object'
 import { oneOf } from './oneOf'
 import { parseNumber, parseString } from './primitives'
-import { literal } from './literal'
+import { equals } from './equals'
 import { optional } from './optional'
 import { failure, ParseFailurePathSegment, propagateFailure } from './types'
 import { withDefault } from './withDefault'
@@ -35,15 +35,15 @@ describe('parsing', () => {
        * Parsers
        */
       const parseStringContent = object<StringContent>({
-        tag: literal('string'),
+        tag: equals('string'),
         value: parseString,
       })
       const parseNumberContent = object<NumberContent>({
-        tag: literal('number'),
+        tag: equals('number'),
         value: parseNumber,
       })
       const parseUnknownContent = object<UnknownContent>({
-        tag: literal('unknown'),
+        tag: equals('unknown'),
       })
       const parseContent = oneOf<
         [StringContent, NumberContent, UnknownContent]

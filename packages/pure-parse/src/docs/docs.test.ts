@@ -2,7 +2,7 @@ import { describe, expect, it, test } from 'vitest'
 import {
   array,
   failure,
-  literal,
+  equals,
   object,
   Parser,
   parseString,
@@ -120,7 +120,7 @@ describe('Documentation examples', () => {
         // @ts-expect-error TypeScript gives a false error for the `data` property:
         //  `RequiredParser` guarantees that `parser` does not represent an optional property, yet TypeScript complains
         object({
-          tag: literal('leaf'),
+          tag: equals('leaf'),
           data: parser,
         })(data)
 
@@ -128,7 +128,7 @@ describe('Documentation examples', () => {
       <T>(parser: RequiredParser<T>): Parser<Tree<T>> =>
       (data) =>
         object({
-          tag: literal('tree'),
+          tag: equals('tree'),
           data: array(oneOf(leaf(parser), tree(parser))),
         })(data)
 

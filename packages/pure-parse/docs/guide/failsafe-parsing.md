@@ -72,7 +72,7 @@ For example, parsing a lengthy rich text document:
 import {
   parseNumber,
   parseString,
-  literal,
+  equals,
   object,
   array,
   oneOf,
@@ -93,12 +93,12 @@ type RichText =
     }
 
 const parseStringContent = object({
-  tag: literal('string'),
+  tag: equals('string'),
   value: parseString,
 })
 
 const parseNumberContent = object({
-  tag: literal('number'),
+  tag: equals('number'),
   value: parseNumber,
 })
 

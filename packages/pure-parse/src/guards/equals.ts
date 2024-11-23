@@ -2,11 +2,19 @@ import { Primitive } from '../common'
 import { Guard } from './types'
 
 /**
- * Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values.
+ * Compares the input against a list of primitive values with the strict equality operator (`===`).
+ * The inferred type of the guard is that of a literal type; for example, `equalsGuard('red')` returns a `Guard<'red'>`.
+ * When called with multiple arguments, the guard will return `true` if the input equals to any of the provided values,
+ * and thus return a union type.
  * @example
  * ```ts
- * const parseRed = equalsGuard('red')
- * const parseOne = equalsGuard(1)
+ * const isRed = equalsGuard('red')
+ * isRed('red') // -> true
+ * isRed('blue') // -> false
+ *
+ * const isOne = equalsGuard(1)
+ * isOne(1) // -> true
+ * isOne(2) // -> false
  * ```
  * @example
  * Commonly used in discriminated unions:

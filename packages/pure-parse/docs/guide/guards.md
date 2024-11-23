@@ -97,23 +97,30 @@ isBigInt(42n) // -> true
 isSymbol(Symbol()) // -> true
 ```
 
-## Literals
+## Equality Checks for Primitive Literals
 
-Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values. Use the `equalsGuard()` function to create a guard function for a literal type:
+Primitive literals such as `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values (depending on the context they appear in). Use the `equalsGuard()` function to create a guard function that compares the data with the strict equality operator (`===`):
 
 ```ts
 const isRed = equalsGuard('red')
+isRed('red') // -> true
+isRed('blue') // -> false
+
 const isOne = equalsGuard(1)
+isOne(1) // -> true
+isOne(2) // -> false
 ```
 
-`equalsGuard()` also lets you define unions of literals:
+When called with multiple arguments, `equalsGuard()` validates a union:
 
 ```ts
 const isDirection = equalsGuard('north', 'south', 'east', 'west')
 isDirection('north') // -> true
+isDirection('east') // -> true
 
 const isDigit = equalsGuard(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 isDigit(5) // -> true
+isDigit(100) // -> false
 ```
 
 ## Unions

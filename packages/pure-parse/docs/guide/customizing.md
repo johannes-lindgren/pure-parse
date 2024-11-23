@@ -39,7 +39,7 @@ const hasWhiteSpace = (str: string): boolean => {
 To create a custom, higher-order parser function, create a generic function that accepts a parser as argument and returns a new parser. Here is a working example with generic trees:
 
 ```ts
-import { Parser, union, object, literal, arrays } from 'pure-parse'
+import { Parser, union, object, equals, arrays } from 'pure-parse'
 
 type Leaf<T> = {
   tag: 'leaf'
@@ -57,7 +57,7 @@ const leaf =
     // @ts-expect-error TypeScript gives a false error for the `data` property:
     //  `RequiredParser` guarantees that `parser` does not represent an optional property, yet TypeScript complains
     object({
-      tag: literal('leaf'),
+      tag: equals('leaf'),
       data: parser,
     })(data)
 
@@ -65,7 +65,7 @@ const tree =
   <T>(parser: RequiredParser<T>): Parser<Tree<T>> =>
   (data) =>
     object({
-      tag: literal('tree'),
+      tag: equals('tree'),
       data: arrays(oneOf(leaf(parser), tree(parser))),
     })(data)
 ```
@@ -102,7 +102,7 @@ To do the same with a validator, simply import the guard functions as alias them
 ```ts
 import {
   Guard,
-  equalsGuard as literal,
+  equalsGuard as equals,
   objectGuard as object,
   unionGuard as union,
   arrayGuard as arrays,

@@ -2,7 +2,7 @@ import { describe, expect, it, test } from 'vitest'
 import { equalsGuard } from './equals'
 import { Guard } from './types'
 
-describe('literal types', () => {
+describe('equals', () => {
   describe('type checking', () => {
     describe('type inference', () => {
       it('works with literals', () => {
@@ -69,16 +69,22 @@ describe('literal types', () => {
       equalsGuard<['red', 'green', 'blue']>('red', 'green', 'blue', 'music')
     })
   })
-  describe('literal', () => {
+  describe('primitive arguments', () => {
     it('matches null', () => {
       expect(equalsGuard(null)(null)).toEqual(true)
+      expect(equalsGuard(null)('null')).toEqual(false)
+      expect(equalsGuard(null)(undefined)).toEqual(false)
     })
     it('matches undefined', () => {
       expect(equalsGuard(undefined)(undefined)).toEqual(true)
+      expect(equalsGuard(undefined)(null)).toEqual(false)
     })
     it('matches strings', () => {
       expect(equalsGuard('')('')).toEqual(true)
+      expect(equalsGuard('')('a')).toEqual(false)
       expect(equalsGuard('a')('a')).toEqual(true)
+      expect(equalsGuard('a')('b')).toEqual(false)
+      expect(equalsGuard('abc')('abc')).toEqual(true)
       expect(equalsGuard('abc')('123')).toEqual(false)
     })
     it('matches numbers', () => {
@@ -87,12 +93,25 @@ describe('literal types', () => {
       expect(equalsGuard(1)(1)).toEqual(true)
 
       expect(equalsGuard(123)('123')).toEqual(false)
+      expect(equalsGuard(123)(0)).toEqual(false)
     })
     it('matches booleans', () => {
       expect(equalsGuard(true)(true)).toEqual(true)
       expect(equalsGuard(false)(false)).toEqual(true)
       expect(equalsGuard(true)(false)).toEqual(false)
       expect(equalsGuard(false)(true)).toEqual(false)
+    })
+    it('matches symbols', () => {
+      const symbol1 = Symbol()
+      const symbol2 = Symbol()
+      expect(equalsGuard(symbol1)(symbol1)).toEqual(true)
+      expect(equalsGuard(symbol1)(symbol2)).toEqual(false)
+      expect(equalsGuard(symbol1)(Symbol())).toEqual(false)
+    })
+    it('matches bigints', () => {
+      expect(equalsGuard(1n)(1n)).toEqual(true)
+      expect(equalsGuard(1n)(2n)).toEqual(false)
+      expect(equalsGuard(1n)(1)).toEqual(false)
     })
   })
 })
