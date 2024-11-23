@@ -28,7 +28,6 @@ describe('instanceOfGuard', () => {
     class A {}
     class B {}
     const b = new B()
-    console.log(instanceOf(A)(b))
     expect(instanceOf(A)(b)).toEqual(
       expect.objectContaining({
         tag: 'failure',
