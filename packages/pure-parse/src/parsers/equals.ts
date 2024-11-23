@@ -1,6 +1,7 @@
 import { Primitive } from '../common'
 import { failure, ParseFailure, Parser, ParseSuccess, success } from './types'
-import { equalsGuard, isArray } from '../guards'
+import { equalsGuard } from '../guards'
+import { stringify } from '../internals'
 
 /**
  * Compares the input against a list of primitive values with the strict equality operator (`===`).
@@ -57,19 +58,5 @@ export const equals = <const T extends [...Primitive[]]>(
   return (data: unknown): ParseSuccess<T[number]> | ParseFailure =>
     v(data)
       ? success(data as T[number])
-      : failure(`Does not equal to ${serialize(constants)}`)
-}
-
-const serialize = (values: Primitive | Primitive[]): string => {
-  if (isArray(values)) {
-    return values.map(serialize).join(', ')
-  }
-  switch (typeof values) {
-    case 'bigint':
-      return `${String(values)}n`
-    case 'symbol':
-      return values.toString()
-    default:
-      return JSON.stringify(values)
-  }
+      : failure(`Does not equal to any value in ${stringify(constants)}`)
 }

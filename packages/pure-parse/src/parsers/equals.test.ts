@@ -1,6 +1,8 @@
 import { describe, expect, it, test } from 'vitest'
 import { equals } from './equals'
 import { withDefault } from './withDefault'
+import { Parser } from './types'
+import { Equals } from '../internals'
 
 const expectFailure = () => expect.objectContaining({ tag: 'failure' })
 
@@ -202,13 +204,39 @@ describe('equals', () => {
     })
   })
 
-  it('todo', () => {
-    const parseLiteral = equals('a')
-    expect(parseLiteral('a')).toEqual({
-      tag: 'success',
-      value: 'a',
+  describe('multiple arguments', () => {
+    it('validates any of the values', () => {
+      const parser = equals('a', 'b')
+      expect(parser('a')).toEqual(
+        expect.objectContaining({
+          tag: 'success',
+          value: 'a',
+        }),
+      )
+      expect(parser('b')).toEqual(
+        expect.objectContaining({
+          tag: 'success',
+          value: 'b',
+        }),
+      )
     })
   })
+
+  describe('type inference', () => {
+    it('infers with one argument', () => {
+      const parser0 = equals('a')
+      const t0: Equals<typeof parser0, Parser<'a'>> = true
+    })
+    it('infers with multiple arguments', () => {
+      const parser0 = equals('a', 'b')
+      const t0: Equals<typeof parser0, Parser<'a' | 'b'>> = true
+    })
+    it('infers with multiple arguments of different types', () => {
+      const parser0 = equals('a', 1, false)
+      const t0: Equals<typeof parser0, Parser<'a' | 1 | false>> = true
+    })
+  })
+
   test('with fallbackValue', () => {
     const parseLiteral = withDefault(equals('#FF0000'), '#00FF00')
     expect(parseLiteral('#XXYYZZ')).toEqual({
