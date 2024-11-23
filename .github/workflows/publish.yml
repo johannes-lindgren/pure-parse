@@ -17,7 +17,7 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
       - name: Install
-        run: npm install --workspace=pure-parse
+        run: npm install --frozen-lockfile
       - name: Build
         run: npm run build --workspace=pure-parse
       - name: Copy README into the workspace

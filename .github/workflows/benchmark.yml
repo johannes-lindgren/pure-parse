@@ -14,7 +14,7 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
       - name: Install
-        run: npm install
+        run: npm install --frozen-lockfile
       - name: Build
         run: npm run build --workspace=pure-parse
       - name: Run Benchmarks

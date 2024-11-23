@@ -14,7 +14,7 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
       - name: Install
-        run: npm install
+        run: npm install --frozen-lockfile
       - name: Check Code Formatting
         run: npm run check:formatting --workspace=pure-parse
       - name: Check Types
