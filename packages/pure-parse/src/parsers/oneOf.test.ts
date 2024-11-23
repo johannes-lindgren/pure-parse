@@ -5,7 +5,7 @@ import { Equals } from '../internals'
 import { failure, Parser, success } from './types'
 import { isString } from '../guards'
 import { object } from './object'
-import { literal } from './literal'
+import { equals } from './equals'
 
 const parseNumberFromString: Parser<number> = (data) => {
   if (!isString(data)) {
@@ -32,7 +32,7 @@ const parsRichTextFromString: Parser<RichText> = (data) => {
   })
 }
 const parseRichTextNode = object({
-  tag: literal('text'),
+  tag: equals('text'),
   value: parseString,
 })
 
@@ -53,10 +53,10 @@ describe('oneOf', () => {
   it('parses discriminated unions', () => {
     const parseStringOrNumber = oneOf(
       object({
-        tag: literal('left'),
+        tag: equals('left'),
       }),
       object({
-        tag: literal('right'),
+        tag: equals('right'),
       }),
     )
     expect(

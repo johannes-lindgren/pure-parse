@@ -54,7 +54,7 @@ First, there are parsers; each [primitive value](/api/parsers/primitives) has a 
 
 Secondly, there is a category of higher order functions that constructs new parsers based on parameters:
 
-- [literal](/api/parsers/literal#literal)
+- [equals](/api/parsers/equals#equals)
 - [oneOf](/api/parsers/oneOf) (for unions and graceful error handling)
 - [tuple](/api/parsers/tuples#tuple)
 - [object](/api/parsers/object#object)
@@ -101,22 +101,29 @@ parseBigInt(42n) // -> ParseSuccess
 parseSymbol(Symbol()) // -> ParseSuccess
 ```
 
-## Literals
+## Equality Checks for Primitive Literals
 
-Literals types represent single values of primitive types; for example, `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values. Use the `literal()` function to create a parser function for a literal type:
+Primitive literals such as `true`, `false`, `42`, `"hello"`, and `null` are all types _and_ values (depending on the context they appear in). Use the `equalsGuard()` function to create a guard function that compares the data with the strict equality operator (`===`):
 
 ```ts
-const parseRed = literal('red')
-const parseOne = literal(1)
+const parseRed = equals('red')
+parseRed('red') // -> ParseSuccess<'red'>
+parseRed('blue') // -> ParseError
+
+const parseOne = equals(1)
+parseOne(1) // -> ParseSuccess<1>
+parseOne(2) // -> ParseError
 ```
 
-`literal()` also lets you define unions of literals:
+When called with multiple arguments, `equals()` validates a union:
 
 ```ts
-const parseDirection = literal('north', 'south', 'east', 'west')
-parseDirection('north') // -> ParseSuccess
+const parseDirection = equals('north', 'south', 'east', 'west')
+parseDirection('north') // -> ParseSuccess<'north' | 'south' | 'east' | 'west'>
+parseDirection('up') // -> ParseError
 
-const parseDigit = literal(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+const parseDigit = equals(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+parseDigit(5) // -> ParseSuccess<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>
 parseDigit(50) // -> ParseError
 ```
 
@@ -216,7 +223,7 @@ const parseUser = object<User>({
 Arrays are ordered set of elements of the same type. Use the `arrays()` function to create a validation function for an arrays type:
 
 ```ts
-const parseBase = literal('A', 'T', 'C', 'G')
+const parseBase = equals('A', 'T', 'C', 'G')
 const parseDna = arrays(parseBase)
 parseDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> ParseSuccess
 ```
@@ -235,14 +242,14 @@ Parse discriminated unions with unions of objects with a common tag property:
 ```ts
 const parseState = oneOf(
   object({
-    tag: literal('loading'),
+    tag: equals('loading'),
   }),
   object({
-    tag: literal('error'),
+    tag: equals('error'),
     error: parseString,
   }),
   object({
-    tag: literal('loaded'),
+    tag: equals('loaded'),
     message: parseString,
   }),
 )

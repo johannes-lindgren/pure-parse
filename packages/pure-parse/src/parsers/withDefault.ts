@@ -18,7 +18,7 @@ import { oneOf } from './oneOf'
  * const parseContent = array(
  *   withDefault(
  *     object({
- *       tag: literal('text'),
+ *       tag: equals('text'),
  *       value: parseString,
  *     }),
  *     {

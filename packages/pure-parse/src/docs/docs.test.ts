@@ -2,7 +2,7 @@ import { describe, expect, it, test } from 'vitest'
 import {
   array,
   failure,
-  literal,
+  equals,
   object,
   Parser,
   parseString,
@@ -15,7 +15,7 @@ import {
   arrayGuard,
   Guard,
   isString,
-  literalGuard,
+  equalsGuard,
   objectGuard,
   oneOfGuard,
 } from '../guards'
@@ -120,7 +120,7 @@ describe('Documentation examples', () => {
         // @ts-expect-error TypeScript gives a false error for the `data` property:
         //  `RequiredParser` guarantees that `parser` does not represent an optional property, yet TypeScript complains
         object({
-          tag: literal('leaf'),
+          tag: equals('leaf'),
           data: parser,
         })(data)
 
@@ -128,7 +128,7 @@ describe('Documentation examples', () => {
       <T>(parser: RequiredParser<T>): Parser<Tree<T>> =>
       (data) =>
         object({
-          tag: literal('tree'),
+          tag: equals('tree'),
           data: array(oneOf(leaf(parser), tree(parser))),
         })(data)
 
@@ -268,7 +268,7 @@ describe('Documentation examples', () => {
       //  `RequiredGuard` guarantees that `parser` does not represent an optional property, yet TypeScript complains
       (data) =>
         objectGuard({
-          tag: literalGuard('leaf'),
+          tag: equalsGuard('leaf'),
           data: guard,
         })(data)
 
@@ -276,7 +276,7 @@ describe('Documentation examples', () => {
       <T>(guard: Guard<T>): Guard<Tree<T>> =>
       (data) =>
         objectGuard({
-          tag: literalGuard('tree'),
+          tag: equalsGuard('tree'),
           data: arrayGuard(oneOfGuard(leafGuard(guard), treeGuard(guard))),
         })(data)
 

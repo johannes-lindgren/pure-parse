@@ -6,7 +6,7 @@ import {
   parseString,
   parseSymbol,
 } from './primitives'
-import { literal } from './literal'
+import { equals } from './equals'
 import { Equals } from '../internals'
 import { Infer } from '../common'
 import { failure, Parser, success } from './types'
@@ -37,7 +37,7 @@ describe('record', () => {
         > = true
       })
       it('infers the keys as string literal', () => {
-        const parse = dictionary(literal('a', 'b'), parseString)
+        const parse = dictionary(equals('a', 'b'), parseString)
         const t0: Equals<
           Infer<typeof parse>,
           Partial<Record<'a' | 'b', string>>
@@ -50,7 +50,7 @@ describe('record', () => {
         dictionary<string, string>(parseString, parseString)
       })
       it('allows for union keys', () => {
-        dictionary<'a' | 'b', string>(literal('a', 'b'), parseString)
+        dictionary<'a' | 'b', string>(equals('a', 'b'), parseString)
       })
       it('binds the second type argument to the second parser', () => {
         dictionary<string, string>(parseString, parseString)
@@ -103,7 +103,7 @@ describe('record', () => {
         const t0: { a: boolean; b: boolean } = { a: true, b: true }
         expect(
           dictionary(
-            literal('a', 'b'),
+            equals('a', 'b'),
             parseBoolean,
           )({
             a: true,
@@ -122,7 +122,7 @@ describe('record', () => {
       it('fails on extra keys', () => {
         expect(
           dictionary(
-            literal('a', 'b'),
+            equals('a', 'b'),
             parseBoolean,
           )({
             a: true,
@@ -135,7 +135,7 @@ describe('record', () => {
       test('that keys are optional', () => {
         expect(
           dictionary(
-            literal('a', 'b'),
+            equals('a', 'b'),
             parseBoolean,
           )({
             a: true,
@@ -208,7 +208,7 @@ describe('record', () => {
         test('values', () => {
           expect(
             dictionary(
-              literal('a'),
+              equals('a'),
               parseBoolean,
             )({
               b: true,

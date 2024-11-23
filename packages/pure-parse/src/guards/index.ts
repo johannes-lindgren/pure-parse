@@ -1,6 +1,6 @@
 export * from './primitives'
 export * from './types'
-export * from './literal'
+export * from './equals'
 export * from './oneOf'
 export * from './tuples'
 export * from './object'

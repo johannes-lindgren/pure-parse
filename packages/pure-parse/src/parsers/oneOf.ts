@@ -17,11 +17,11 @@ import { failure, Parser, success } from './types'
  * ```ts
  * const parseResult = oneOf(
  *   object({
- *     tag: literal('success')
+ *     tag: equals('success')
  *     value: parseString
  *   }),
  *   object({
- *     tag: literal('error')
+ *     tag: equals('error')
  *   }),
  * )
  * ```
@@ -53,13 +53,13 @@ import { failure, Parser, success } from './types'
  *    tag: 'failure'
  *  }
  *  type Result = Success | Failure
- *  const parseLogLevel = literal<[Success, Failure]>(
+ *  const parseLogLevel = equals<[Success, Failure]>(
  *   object({
- *     tag: literal('success')
+ *     tag: equals('success')
  *     value: parseString
  *   }),
  *   object({
- *     tag: literal('error')
+ *     tag: equals('error')
  *   }),
  * )
  * ```

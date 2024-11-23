@@ -1,24 +1,24 @@
 import { describe, expect, it, test } from 'vitest'
 import { array } from './arrays'
 import { failure, success } from './types'
-import { literal } from './literal'
+import { equals } from './equals'
 import { parseString } from './primitives'
 import { withDefault } from './withDefault'
 
 describe('arrays', () => {
   it('validates when all elements pass validation', () => {
-    const parseArr = array(literal('a'))
+    const parseArr = array(equals('a'))
     expect(parseArr(['a', 'a'])).toEqual({
       tag: 'success',
       value: ['a', 'a'],
     })
   })
   it('invalidates when any elements pass validation', () => {
-    const parseArr = array(literal('a'))
+    const parseArr = array(equals('a'))
     expect(parseArr(['a', 'b'])).toHaveProperty('tag', 'failure')
   })
   test('with fallbackValue', () => {
-    const parseArr = array(withDefault(literal('#FF0000'), '#00FF00'))
+    const parseArr = array(withDefault(equals('#FF0000'), '#00FF00'))
     expect(parseArr(['#FF0000', '#FF0000'])).toEqual(
       expect.objectContaining({
         value: ['#FF0000', '#FF0000'],

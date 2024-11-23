@@ -15,7 +15,7 @@ import {
   parseUndefined,
 } from './primitives'
 import { Infer } from '../common'
-import { literal } from './literal'
+import { equals } from './equals'
 import { nullable, optional, undefineable } from './optional'
 import {
   objectMemo,
@@ -75,7 +75,7 @@ describe('object', () => {
         describe('unknown properties', () => {
           it('excludes unknown properties', () => {
             const parseObj = object({
-              expected: literal(true),
+              expected: equals(true),
             })
             const data = { expected: true, unexpected: true }
             expect(parseObj(data)).toEqual(

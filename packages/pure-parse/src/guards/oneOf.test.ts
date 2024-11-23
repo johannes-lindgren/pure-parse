@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { oneOfGuard } from './oneOf'
-import { literalGuard } from './literal'
+import { equalsGuard } from './equals'
 import { Guard } from './types'
 import { isNull, isNumber, isString, isUndefined } from './primitives'
 
@@ -8,24 +8,24 @@ describe('unions', () => {
   describe('type checking', () => {
     it('returns a guard', () => {
       oneOfGuard(
-        literalGuard('red'),
-        literalGuard('green'),
-        literalGuard('blue'),
+        equalsGuard('red'),
+        equalsGuard('green'),
+        equalsGuard('blue'),
       ) satisfies Guard<'red' | 'green' | 'blue'>
       oneOfGuard(isString, isUndefined) satisfies Guard<string | undefined>
       oneOfGuard(isString, isNumber) satisfies Guard<string | number>
       oneOfGuard(isString) satisfies Guard<string>
 
       oneOfGuard(
-        literalGuard('red'),
-        literalGuard('green'),
-        literalGuard('blue'),
+        equalsGuard('red'),
+        equalsGuard('green'),
+        equalsGuard('blue'),
         // @ts-expect-error
       ) satisfies Guard<'a' | 'b' | 'c'>
       oneOfGuard(
-        literalGuard('red'),
-        literalGuard('green'),
-        literalGuard('blue'),
+        equalsGuard('red'),
+        equalsGuard('green'),
+        equalsGuard('blue'),
         // @ts-expect-error
       ) satisfies Guard<'red'>
       // @ts-expect-error
@@ -34,15 +34,15 @@ describe('unions', () => {
     describe('explicit generic type annotation', () => {
       it('works with literals', () => {
         oneOfGuard<['red', 'green', 'blue']>(
-          literalGuard('red'),
-          literalGuard('green'),
-          literalGuard('blue'),
+          equalsGuard('red'),
+          equalsGuard('green'),
+          equalsGuard('blue'),
         )
         oneOfGuard<['red', 'green', 'blue']>(
           // @ts-expect-error
-          literalGuard('a'),
-          literalGuard('b'),
-          literalGuard('c'),
+          equalsGuard('a'),
+          equalsGuard('b'),
+          equalsGuard('c'),
         )
       })
       it('requires a guard of each type', () => {
