@@ -1,6 +1,6 @@
 {
   "name": "pure-parse",
-  "version": "0.0.0-beta.6",
+  "version": "0.0.0-beta.7",
   "private": false,
   "description": "Strongly typed validation library that decouples type aliases from validation logic",
   "author": {
