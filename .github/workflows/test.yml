@@ -18,6 +18,8 @@ jobs:
       - name: Check Code Formatting
         run: npm run check:formatting --workspace=pure-parse
       - name: Check Types
+        run: npm run check:circular-dependencies --workspace=pure-parse
+      - name: Check Types
         run: npm run check:types --workspace=pure-parse
       #        No linters for this repo
       #      - name: Lint

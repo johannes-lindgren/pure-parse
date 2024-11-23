@@ -45,6 +45,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "check:types": "tsc",
+    "check:circular-dependencies": "dpdm  -T --exit-code circular:1 ./src/index.ts",
     "check:formatting": "prettier . --check",
     "format": "prettier . --write",
     "predocs:build": "typedoc",
@@ -71,6 +72,7 @@
     "vitest": "0.34.6",
     "sass-embedded": "^1.79.4",
     "@egjs/vue3-flicking": "^4.11.4",
-    "@egjs/flicking-plugins": "^4.7.1"
+    "@egjs/flicking-plugins": "^4.7.1",
+    "dpdm": "^3.14.0"
   }
 }
