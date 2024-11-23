@@ -1,19 +1,13 @@
-## What?
-
-<!-- Mention the changes that are included in the PR -->
-
-## Why?
-
 <!--
-  Explain the **motivation** for making this change.
-  What existing problem does the pull request solve?
-  Are there any linked issues?
+  Summary
 -->
 
-## How to test? (optional)
+<!--
+  Background and motivation for the changes
+-->
+
+## Changes Summary
 
 <!--
-  Demonstrate the code is solid.
-  Example: The exact commands you ran and their output,
-  screenshots / videos if the pull request changes UI.
+  Mention _all_ changes that are included in the PR
 -->
