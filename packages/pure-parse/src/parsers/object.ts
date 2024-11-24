@@ -1,7 +1,9 @@
 import { isObject } from '../guards'
 import {
+  ErrorOfParser,
   failure,
   OptionalParser,
+  ParseFailureDetails,
   Parser,
   ParseSuccess,
   propagateFailure,
@@ -18,6 +20,12 @@ const missingPropertyError = (key: string) =>
     tag: 'object',
     key,
   })
+
+export type PropertyParseFailure<Key, E> = {
+  tag: 'propertyFailure'
+  key: Key
+  error: E
+}
 
 /**
  * Objects have a fixed set of properties of different types.
@@ -52,15 +60,25 @@ const missingPropertyError = (key: string) =>
  * @param schema maps keys to validation functions.
  * @return a parser function that validates objects according to `schema`.
  */
-export const object = <T extends Record<string, unknown>>(schema: {
+export const object = <
+  T extends Record<string, unknown>,
+  E extends { [K in keyof T]: unknown },
+>(schema: {
   // When you pick K from T, do you get an object with an optional property, which {} can be assigned to?
-  [K in keyof T]-?: {} extends Pick<T, K> ? OptionalParser<T[K]> : Parser<T[K]>
+  [K in keyof T]-?: {} extends Pick<T, K>
+    ? OptionalParser<T[K], E[K]>
+    : Parser<T[K], E[K]>
 }): /* The reason for the conditional is twofold:
  * 1. When inferring `T` from a schema with optional properties, `T` gets inferred with required properties, where the property values instead are union with `omitProperty`.
  * 2. When `T` is explicitly declared, we do not want to use the expression because we want the return type to be printed in the IDE as `Parser<T>`.
  *    For example, `object<User>(...)` should return `Parser<User>`, not `Parser<{ id: number; name?: string; }>`.
  */
-Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
+Parser<
+  OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>,
+  {
+    [K in keyof T]: PropertyParseFailure<K, E[K]>
+  }[keyof T]
+> => {
   const entries = Object.entries(schema)
   return (data) => {
     if (!isObject(data)) {

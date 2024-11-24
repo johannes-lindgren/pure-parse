@@ -60,6 +60,10 @@ export const parseNumber = (
 ): ParseSuccess<number> | ParseFailure =>
   isNumber(data) ? success(data) : failure('Not a number')
 
+export type NotAStringFailure = {
+  tag: 'notAString'
+}
+
 /**
  * Parse `string`
  * @example
@@ -70,7 +74,7 @@ export const parseNumber = (
  */
 export const parseString = (
   data: unknown,
-): ParseSuccess<string> | ParseFailure =>
+): ParseSuccess<string> | ParseFailure<NotAStringFailure> =>
   isString(data) ? success(data) : failure('Not a string')
 
 /**

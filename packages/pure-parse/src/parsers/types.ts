@@ -1,5 +1,7 @@
 import { OmitProperty } from '../internals'
 
+export type ErrorOfParser<E> = E extends Parser<unknown, infer U> ? U : never
+
 /**
  * The data adheres to the schema. The `value` is equal to the parsed data
  */
@@ -8,11 +10,18 @@ export type ParseSuccess<T> = {
   value: T
 }
 
+export type ParseFailureDetails = {
+  tag: string
+}
+
+export type DefaultParseFailure = ParseFailureDetails
+
 /**
  * The parsing failed.
  */
-export type ParseFailure = {
+export type ParseFailure<E = DefaultParseFailure> = {
   tag: 'failure'
+  value?: E
   error: string
   path: ParseFailurePathSegment[]
 }
@@ -27,7 +36,9 @@ export type ParseFailurePathSegment =
       index: number
     }
 
-export type ParseResult<T> = ParseSuccess<T> | ParseFailure
+export type ParseResult<T, E = DefaultParseFailure> =
+  | ParseSuccess<T>
+  | ParseFailure<E>
 
 export const success = <T>(value: T): ParseSuccess<T> => ({
   tag: 'success',
@@ -49,21 +60,21 @@ export const propagateFailure = (
   path: [pathSegment, ...failureRes.path],
 })
 
-export type Parser<T> = (data: unknown) => ParseResult<T>
+export type Parser<T, E> = (data: unknown) => ParseResult<T, E>
 
 /**
  * Special parser to check optional values
  */
-export type OptionalParser<T> = (
+export type OptionalParser<T, E = DefaultParseFailure> = (
   data: unknown,
-) => ParseResult<T | undefined | OmitProperty>
+) => ParseResult<T | undefined | OmitProperty, E>
 
 /**
  * A parser that does not represent an optional property.
  */
-export type RequiredParser<T> = (
+export type RequiredParser<T, E = DefaultParseFailure> = (
   data: unknown,
-) => ParseResult<Exclude<T, OmitProperty>>
+) => ParseResult<Exclude<T, OmitProperty>, E>
 
 /*
  * Utility functions

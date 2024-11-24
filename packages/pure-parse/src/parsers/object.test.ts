@@ -4,11 +4,13 @@ import {
   object,
   objectStrict,
   objectStrictCompiled,
+  PropertyParseFailure,
 } from './object'
-import { isSuccess, Parser } from './types'
+import { ErrorOfParser, isSuccess, Parser } from './types'
 import { Equals, omitProperty } from '../internals'
 import { oneOf } from './oneOf'
 import {
+  NotAStringFailure,
   parseBoolean,
   parseNumber,
   parseString,
@@ -902,3 +904,15 @@ describe('object', () => {
     })
   })
 })
+
+const parser = object({
+  a: parseString,
+  b: parseString,
+})
+
+const t0: Equals<ErrorOfParser<typeof parseString>, NotAStringFailure> = true
+const t1: Equals<
+  ErrorOfParser<typeof parser>,
+  PropertyParseFailure<'a', NotAStringFailure>
+> = true
+const t2: Equals<ErrorOfParser<typeof parser>, any> = false
