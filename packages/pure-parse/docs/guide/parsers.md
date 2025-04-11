@@ -115,14 +115,30 @@ parseOne(1) // -> ParseSuccess<1>
 parseOne(2) // -> ParseError
 ```
 
-When called with multiple arguments, `equals()` validates a union:
+To validate a union of literals, use `oneOf`:
 
 ```ts
-const parseDirection = equals('north', 'south', 'east', 'west')
+const parseDirection = oneOf(
+  equals('north'),
+  equals('south'),
+  equals('east'),
+  equals('west'),
+)
 parseDirection('north') // -> ParseSuccess<'north' | 'south' | 'east' | 'west'>
 parseDirection('up') // -> ParseError
 
-const parseDigit = equals(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+const parseDigit = oneOf(
+  equals(0),
+  equals(1),
+  equals(2),
+  equals(3),
+  equals(4),
+  equals(5),
+  equals(6),
+  equals(7),
+  equals(8),
+  equals(9),
+)
 parseDigit(5) // -> ParseSuccess<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9>
 parseDigit(50) // -> ParseError
 ```
@@ -223,7 +239,7 @@ const parseUser = object<User>({
 Arrays are ordered set of elements of the same type. Use the `arrays()` function to create a validation function for an arrays type:
 
 ```ts
-const parseBase = equals('A', 'T', 'C', 'G')
+const parseBase = oneOf(equals('A'), equals('T'), equals('C'), equals('G'))
 const parseDna = arrays(parseBase)
 parseDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> ParseSuccess
 ```
