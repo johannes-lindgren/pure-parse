@@ -1,6 +1,7 @@
 import { describe, expect, it, test } from 'vitest'
 import { equalsGuard } from './equals'
 import { Guard } from './types'
+import { isString } from './primitives'
 
 describe('equals', () => {
   describe('type checking', () => {
@@ -23,50 +24,22 @@ describe('equals', () => {
       })
     })
     describe('explicit generic type annotation', () => {
-      it('works with literals', () => {
-        equalsGuard<['red']>('red')
+      it('works with primitives', () => {
+        equalsGuard<'red'>('red')
         // @ts-expect-error
-        equalsGuard<['green']>('red')
+        equalsGuard<'green'>('red')
 
-        equalsGuard<[1]>(1)
+        equalsGuard<1>(1)
         // @ts-expect-error
-        equalsGuard<[1]>(2)
+        equalsGuard<1>(2)
 
         // @ts-expect-error
-        equalsGuard<['1']>(1)
+        equalsGuard<'1'>(1)
       })
-    })
-  })
-  describe('unions of literals', () => {
-    it('validates unions of literals correctly', () => {
-      const isColor = equalsGuard('red', 'green', 'blue')
-      expect(isColor('red')).toEqual(true)
-      expect(isColor('green')).toEqual(true)
-      expect(isColor('blue')).toEqual(true)
-      expect(isColor('music')).toEqual(false)
-
-      const isInUnion = equalsGuard('red', 1, true)
-      expect(isInUnion('red')).toEqual(true)
-      expect(isInUnion('green')).toEqual(false)
-      expect(isInUnion(1)).toEqual(true)
-      expect(isInUnion(2)).toEqual(false)
-      expect(isInUnion(true)).toEqual(true)
-      expect(isInUnion(false)).toEqual(false)
-    })
-    it('infers the types of unions of literals', () => {
-      equalsGuard('red', 1, true) satisfies Guard<'red' | 1 | true>
-      equalsGuard('red', 'green', 'blue') satisfies Guard<
-        'red' | 'green' | 'blue'
-      >
-      // @ts-expect-error
-      equalsGuard('red', 'green', 'blue') satisfies Guard<'red'>
-    })
-    test('explicit type annotation', () => {
-      equalsGuard<['red', 'green', 'blue']>('red', 'green', 'blue')
-      // @ts-expect-error
-      equalsGuard<['red', 'green', 'blue']>('red')
-      // @ts-expect-error
-      equalsGuard<['red', 'green', 'blue']>('red', 'green', 'blue', 'music')
+      it('does not work with reference types', () => {
+        // @ts-expect-error
+        equalsGuard<{ a: 'b' }>({ a: equalsGuard('b') })
+      })
     })
   })
   describe('primitive arguments', () => {

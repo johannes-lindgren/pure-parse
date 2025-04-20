@@ -111,14 +111,30 @@ isOne(1) // -> true
 isOne(2) // -> false
 ```
 
-When called with multiple arguments, `equalsGuard()` validates a union:
+To validate a union of literals, use `oneOfGuard`:
 
 ```ts
-const isDirection = equalsGuard('north', 'south', 'east', 'west')
+const isDirection = oneOfGuard(
+  equals('north'),
+  equals('south'),
+  equals('east'),
+  equals('west'),
+)
 isDirection('north') // -> true
 isDirection('east') // -> true
 
-const isDigit = equalsGuard(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+const isDigit = oneOfGuard(
+  equalsGuard(0),
+  equalsGuard(1),
+  equalsGuard(2),
+  equalsGuard(3),
+  equalsGuard(4),
+  equalsGuard(5),
+  equalsGuard(6),
+  equalsGuard(7),
+  equalsGuard(8),
+  equalsGuard(9),
+)
 isDigit(5) // -> true
 isDigit(100) // -> false
 ```
@@ -217,7 +233,12 @@ const isUser = objectGuard<User>({
 Arrays are ordered sets of elements of the same type. Use the `arrayGuard()` function to create a validation function for an arrays type:
 
 ```ts
-const isBase = equalsGuard('A', 'T', 'C', 'G')
+const isBase = oneOf(
+  equalsGuard('A'),
+  equalsGuard('T'),
+  equalsGuard('C'),
+  equalsGuard('G'),
+)
 const isDna = arrayGuard(isBase)
 isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
 ```

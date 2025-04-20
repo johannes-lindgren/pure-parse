@@ -3,6 +3,7 @@ import { equals } from './equals'
 import { withDefault } from './withDefault'
 import { Parser } from './types'
 import { Equals } from '../internals'
+import { parseString } from './primitives'
 
 const expectFailure = () => expect.objectContaining({ tag: 'failure' })
 
@@ -204,36 +205,29 @@ describe('equals', () => {
     })
   })
 
-  describe('multiple arguments', () => {
-    it('validates any of the values', () => {
-      const parser = equals('a', 'b')
-      expect(parser('a')).toEqual(
-        expect.objectContaining({
-          tag: 'success',
-          value: 'a',
-        }),
-      )
-      expect(parser('b')).toEqual(
-        expect.objectContaining({
-          tag: 'success',
-          value: 'b',
-        }),
-      )
-    })
-  })
-
   describe('type inference', () => {
-    it('infers with one argument', () => {
+    it('infers the type', () => {
       const parser0 = equals('a')
       const t0: Equals<typeof parser0, Parser<'a'>> = true
     })
-    it('infers with multiple arguments', () => {
-      const parser0 = equals('a', 'b')
-      const t0: Equals<typeof parser0, Parser<'a' | 'b'>> = true
+  })
+
+  describe('explicit type annotation', () => {
+    it('works with primitives', () => {
+      equals<'a'>('a')
+      // @ts-expect-error
+      equals<'a'>('b')
+
+      equals<1>(1)
+      // @ts-expect-error
+      equals<1>(2)
+
+      // @ts-expect-error
+      equals<'1'>(1)
     })
-    it('infers with multiple arguments of different types', () => {
-      const parser0 = equals('a', 1, false)
-      const t0: Equals<typeof parser0, Parser<'a' | 1 | false>> = true
+    it('does not work with reference types', () => {
+      // @ts-expect-error
+      equals<{ a: 'b' }>({ a: equals('b') })
     })
   })
 

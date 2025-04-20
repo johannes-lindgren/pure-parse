@@ -11,6 +11,7 @@ import { Equals } from '../internals'
 import { Infer } from '../common'
 import { failure, Parser, success } from './types'
 import { isString } from '../guards'
+import { oneOf } from './oneOf'
 
 const parseCapitalized: Parser<string> = (data) => {
   if (!isString(data)) {
@@ -37,7 +38,7 @@ describe('record', () => {
         > = true
       })
       it('infers the keys as string literal', () => {
-        const parse = dictionary(equals('a', 'b'), parseString)
+        const parse = dictionary(oneOf(equals('a'), equals('b')), parseString)
         const t0: Equals<
           Infer<typeof parse>,
           Partial<Record<'a' | 'b', string>>
@@ -50,7 +51,10 @@ describe('record', () => {
         dictionary<string, string>(parseString, parseString)
       })
       it('allows for union keys', () => {
-        dictionary<'a' | 'b', string>(equals('a', 'b'), parseString)
+        dictionary<'a' | 'b', string>(
+          oneOf(equals('a'), equals('b')),
+          parseString,
+        )
       })
       it('binds the second type argument to the second parser', () => {
         dictionary<string, string>(parseString, parseString)
@@ -103,7 +107,7 @@ describe('record', () => {
         const t0: { a: boolean; b: boolean } = { a: true, b: true }
         expect(
           dictionary(
-            equals('a', 'b'),
+            oneOf(equals('a'), equals('b')),
             parseBoolean,
           )({
             a: true,
@@ -122,7 +126,7 @@ describe('record', () => {
       it('fails on extra keys', () => {
         expect(
           dictionary(
-            equals('a', 'b'),
+            oneOf(equals('a'), equals('b')),
             parseBoolean,
           )({
             a: true,
@@ -135,7 +139,7 @@ describe('record', () => {
       test('that keys are optional', () => {
         expect(
           dictionary(
-            equals('a', 'b'),
+            oneOf(equals('a'), equals('b')),
             parseBoolean,
           )({
             a: true,
