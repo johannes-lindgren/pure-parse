@@ -206,8 +206,10 @@ describe('equals', () => {
   })
 
   describe('type inference', () => {
-    const parser0 = equals('a')
-    const t0: Equals<typeof parser0, Parser<'a'>> = true
+    it('infers the type', () => {
+      const parser0 = equals('a')
+      const t0: Equals<typeof parser0, Parser<'a'>> = true
+    })
   })
 
   describe('explicit type annotation', () => {
