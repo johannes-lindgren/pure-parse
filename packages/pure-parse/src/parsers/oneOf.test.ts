@@ -6,17 +6,7 @@ import { failure, Parser, success } from './types'
 import { isString } from '../guards'
 import { object } from './object'
 import { equals } from './equals'
-
-const parseNumberFromString: Parser<number> = (data) => {
-  if (!isString(data)) {
-    return failure('Not a string')
-  }
-  const num = parseFloat(data)
-  if (isNaN(num)) {
-    return failure('Not a number, but NaN')
-  }
-  return success(num)
-}
+import { parseNumberFromString } from './parseNumberFromString'
 
 type RichText = {
   tag: 'text'
@@ -24,7 +14,7 @@ type RichText = {
 }
 const parsRichTextFromString: Parser<RichText> = (data) => {
   if (!isString(data)) {
-    return failure('Not a string')
+    return failure('Expected a string')
   }
   return success({
     tag: 'text',
