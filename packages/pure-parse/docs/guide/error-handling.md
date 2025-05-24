@@ -82,13 +82,15 @@ Sometimes, data consists of strange union types that should be parsed into a mor
 const data = [1, '2'] // Desired result: [1, 2]
 ```
 
-Write a custom parser `parseNumberFromString` that parses stringified numbers into `number`, and use `oneOf` to chain it together with `parseNumber`:
+Use `parseNumberFromString` with `oneOf` to chain it together with `parseNumber`:
 
 ```ts
 import { array, oneOf, parseNumber } from 'pure-parse'
 
 const parseData = array(oneOf(parseNumber, parseNumberFromString))
 ```
+
+If `parseNumber` fails, `oneOf` will proceed to `parseNumberFromString`.
 
 If the data could include `null` or other non-numeric values, the parser can be extended with a fallback mechanism:
 
@@ -107,7 +109,9 @@ const parseData = array(
 
 `() => success(0)` is a parser that ignores all arguments and always returns `Success<0>`.
 
-### Graceful Error Handling
+> [!TIP] > `oneOf(parser, () => defaultValue)` is effectively the same as `withDefault(parser, defaultValue)
+
+### Graceful Error Handling in Large Documents
 
 Consider an application with a large document with many nested properties: if there is a small error anywhere in the data, it might be preferable to ignore the error and continue processing—rather than discarding the entire document.
 
