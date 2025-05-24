@@ -1,5 +1,5 @@
 import { describe, it, expect, test } from 'vitest'
-import { formatFailure, formatPath } from './format'
+import { formatFailure, formatPath } from './formatting'
 import { object } from './object'
 import { array } from './arrays'
 import { parseString } from './primitives'
