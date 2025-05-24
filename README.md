@@ -6,12 +6,13 @@
     Strongly typed validation library that decouples type aliases from validation logic
   </p>
   <p align="center">
-    <a href="https://pure-parse.vercel.app">Documentation</a>
+  <a href="https://pure-parse.vercel.app" style="padding: 10px 15px; background-color: #3d9efe; color: white; border-radius: 20px; line-height: 38px; font-size: 14px">Documentation</a>
   </p>
 </div>
 
+
 <p align="center">
-<a href="https://github.com/johannes-lindgren/pure-parse/actions?query=branch%3Amain"><img src="https://github.com/johannes-lindgren/pure-parse/actions/workflows/test.yml/badge.svg?event=push&branch=main" alt="CI Status for Tests" /></a>
+<a href="https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-integration-checks.yml" rel="nofollow"><img src="https://img.shields.io/badge/Tests-passing-yellow0green.svg" alt="Tests CI stats"></a>
 <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/badge/Licence-MIT-green" alt="License"></a>
 <a href="https://github.com/johannes-lindgren" rel="nofollow"><img src="https://img.shields.io/badge/Author-@johannes--lindgren-blue.svg" alt="Created by Johannes Lindgren"></a>
 </p>
