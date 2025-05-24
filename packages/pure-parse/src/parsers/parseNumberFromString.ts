@@ -21,7 +21,7 @@ const hasWhiteSpace = (str: string): boolean => {
 }
 
 /**
- * Parses a number from a string without any surprises.
+ * Parses a number from a stringified number. The result is always a `number`, and never `NaN` or `±Infinity`.
  * Strings that describe numbers (without any other characters involved) yield results.
  * Numbers that can be represented in binary, octal, decimal, hexadecimal, and scientific format are supported.
  * @param data
