@@ -72,7 +72,7 @@ When working with immutable data structures, [memoization](performance#memoizati
 
 Another problem with large documents is that just a tiny change can cause the validation to fail. Sometimes, it is acceptable to throw away the part of the document that failed the validation, so that the rest of the document can be used. For example, when working with a backend that did not validate all historically persisted data, you may want to incrementally add validation and type safety to the frontend application.
 
-[Read more](failsafe-parsing.md)
+[Read more](error-handling.md)
 
 ## Extensible and Easy-to-use
 
