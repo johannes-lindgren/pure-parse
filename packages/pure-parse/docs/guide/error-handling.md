@@ -1,6 +1,6 @@
 # Error Handling
 
-Errors are described by the type `Failure`. If the failure originated from within a data structure, the `path` property describes the path to the error, while the `message` property describes the error that occurred. For example:
+If the parsing failed, the result type will be [ParseFailure](/api/parsers/types#ParseFailure). The `path` property describes the location in the data where the error occured, while the `message` property describes the error that occurred. For example:
 
 ```ts
 import { isFailure } from 'pure-parse/src'
@@ -45,7 +45,7 @@ Gives:
 
 ## Failsafe Parsing
 
-A benefit of parsing data over of validating data (with guards) is that errors can be handled _gracefully_ with defaults and other fallback mechanisms.
+Errors can be handled _gracefully_ with defaults and other fallback mechanisms. This is a major benefit with parsing over simple validation.
 
 ### Defaults with Static Values
 

@@ -1,4 +1,4 @@
-import { ParseFailure, Path } from './types'
+import { ParseFailure, PathSegment } from './types'
 
 /**
  * Formats a failure to a human-readable string.
@@ -27,7 +27,7 @@ export const formatFailure = (failure: ParseFailure): string =>
  * ```
  * @param path
  */
-export const formatPath = (path: Path[]): string =>
+export const formatPath = (path: PathSegment[]): string =>
   '$' +
   path
     .map((segment) => {

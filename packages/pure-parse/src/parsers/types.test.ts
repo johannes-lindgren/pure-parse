@@ -5,7 +5,7 @@ import { oneOf } from './oneOf'
 import { parseNumber, parseString } from './primitives'
 import { equals } from './equals'
 import { optional } from './optional'
-import { failure, Path, propagateFailure } from './types'
+import { failure, PathSegment, propagateFailure } from './types'
 import { withDefault } from './withDefault'
 
 describe('parsing', () => {
@@ -81,9 +81,9 @@ describe('parsing', () => {
     })
   })
   describe('propagateFailure', () => {
-    const segmentA: Path = { tag: 'object', key: 'a' }
-    const segmentB: Path = { tag: 'object', key: 'b' }
-    const segmentC: Path = { tag: 'object', key: 'c' }
+    const segmentA: PathSegment = { tag: 'object', key: 'a' }
+    const segmentB: PathSegment = { tag: 'object', key: 'b' }
+    const segmentC: PathSegment = { tag: 'object', key: 'c' }
     it('keeps the original error message', () => {
       const errorMsg = '094uiroi34f'
       expect(
