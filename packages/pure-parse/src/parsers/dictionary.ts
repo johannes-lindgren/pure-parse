@@ -32,21 +32,21 @@ export const dictionary =
   ): Parser<Partial<Record<K, V>>> =>
   (data) => {
     if (!isObject(data)) {
-      return failure('Expected an object')
+      return failure('Expected type object')
     }
     const resultData: Partial<Record<K, V>> = {}
     for (const key in data) {
       const value = (data as Record<string | symbol, unknown>)[key]
       const parsedKey = parseKey(key)
       if (parsedKey.tag === 'failure') {
-        return propagateFailure(failure('Invalid key'), {
+        return propagateFailure(failure('Invalid property key'), {
           tag: 'object',
           key,
         })
       }
       const parsedValue = parseValue(value)
       if (parsedValue.tag === 'failure') {
-        return propagateFailure(failure('Invalid value'), {
+        return propagateFailure(failure('Invalid property value'), {
           tag: 'object',
           key,
         })

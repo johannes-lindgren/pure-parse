@@ -34,7 +34,7 @@ export const tuple =
   ): Parser<T> =>
   (data) => {
     if (!Array.isArray(data)) {
-      return failure('not an array')
+      return failure('Expected array')
     }
     if (data.length < parsers.length) {
       return failure(
