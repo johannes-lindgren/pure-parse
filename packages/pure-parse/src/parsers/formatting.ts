@@ -1,4 +1,4 @@
-import { ParseFailure, PathSegment } from './types'
+import { ParseFailure, PathSegment } from './ParseResult'
 
 /**
  * Formats a failure to a human-readable string.

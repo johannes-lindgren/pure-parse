@@ -7,7 +7,7 @@ import {
   isSymbol,
   isUndefined,
 } from '../guards'
-import { failure, ParseFailure, ParseSuccess, success } from './types'
+import { failure, ParseFailure, ParseSuccess, success } from './ParseResult'
 
 /**
  * Parse `undefined`

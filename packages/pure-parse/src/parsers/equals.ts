@@ -1,6 +1,6 @@
 import { Primitive } from '../common'
-import { failure, ParseFailure, Parser, ParseSuccess, success } from './types'
-import { equalsGuard } from '../guards'
+import { Parser } from './Parser'
+import { failure, ParseFailure, ParseSuccess, success } from './ParseResult'
 import { stringify } from '../internals'
 
 /**

@@ -1,10 +1,5 @@
-import {
-  failure,
-  Parser,
-  ParseSuccess,
-  propagateFailure,
-  success,
-} from './types'
+import { Parser } from './Parser'
+import { failure, ParseSuccess, propagateFailure, success } from './ParseResult'
 
 /**
  * Construct parsers for tuples.

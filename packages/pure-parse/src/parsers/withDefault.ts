@@ -1,5 +1,6 @@
-import { InfallibleParser, Parser, success } from './types'
+import { InfallibleParser, Parser } from './Parser'
 import { oneOf } from './oneOf'
+import { success } from './ParseResult'
 
 /**
  * Provide a default value to fall back to when parsing fails.

@@ -1,4 +1,5 @@
-import { failure, OptionalParser, Parser, success } from './types'
+import { OptionalParser, Parser } from './Parser'
+import { failure, success } from './ParseResult'
 import { parseNull, parseUndefined } from './primitives'
 import { omitProperty, OmitProperty, propertyAbsent } from '../internals'
 import { oneOf } from './oneOf'

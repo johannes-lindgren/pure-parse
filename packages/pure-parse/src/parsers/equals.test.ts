@@ -1,9 +1,8 @@
 import { describe, expect, it, test } from 'vitest'
 import { equals } from './equals'
 import { withDefault } from './withDefault'
-import { Parser } from './types'
+import { Parser } from './Parser'
 import { Equals } from '../internals'
-import { parseString } from './primitives'
 
 const expectFailure = () => expect.objectContaining({ tag: 'failure' })
 

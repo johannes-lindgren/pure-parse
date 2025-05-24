@@ -1,7 +1,7 @@
 import { describe, it, expect, test } from 'vitest'
 import { instanceOf } from './instanceOf'
 import { Equals } from '../internals'
-import { Parser } from './types'
+import { Parser } from './Parser'
 
 describe('instanceOfGuard', () => {
   it('validates functions', () => {

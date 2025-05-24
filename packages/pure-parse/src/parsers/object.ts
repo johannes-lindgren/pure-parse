@@ -1,12 +1,6 @@
 import { isObject } from '../guards'
-import {
-  failure,
-  OptionalParser,
-  Parser,
-  ParseSuccess,
-  propagateFailure,
-  success,
-} from './types'
+import { OptionalParser, Parser } from './Parser'
+import { failure, ParseSuccess, propagateFailure, success } from './ParseResult'
 import { omitProperty, propertyAbsent } from '../internals'
 import { Infer, lazy } from '../common'
 import { OptionalKeys, WithOptionalFields } from '../internals/utility-types'

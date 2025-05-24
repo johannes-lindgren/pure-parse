@@ -10,7 +10,6 @@
   </p>
 </div>
 
-
 <p align="center">
 <a href="https://github.com/johannes-lindgren/pure-parse/actions/workflows/code-integration-checks.yml" rel="nofollow"><img src="https://img.shields.io/badge/Tests-passing-yellow0green.svg" alt="Tests CI stats"></a>
 <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/badge/Licence-MIT-green" alt="License"></a>

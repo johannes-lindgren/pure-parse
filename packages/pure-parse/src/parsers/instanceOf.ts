@@ -1,4 +1,5 @@
-import { failure, Parser, success } from './types'
+import { Parser } from './Parser'
+import { failure, success } from './ParseResult'
 
 /**
  * Returns a parser that checks whether the data is an instance of the given constructor.
