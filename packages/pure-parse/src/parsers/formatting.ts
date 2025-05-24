@@ -2,6 +2,14 @@ import { ParseFailure, Path } from './types'
 
 /**
  * Formats a failure to a human-readable string.
+ * @example
+ * ```ts
+ * const res = parseUser({ name: 123 })
+ * if(isFailure(res){
+ *   console.log(formatFailure(res))
+ *   // "Expected string at $.name"
+ * }
+ * ```
  * @param failure
  */
 export const formatFailure = (failure: ParseFailure): string =>
@@ -11,6 +19,12 @@ export const formatFailure = (failure: ParseFailure): string =>
 
 /**
  * Formats a failure `Path` to a JsonPath.
+ * @example
+ * ```ts
+ * const path = [{ tag: 'object', key: 'name' }]
+ * console.log(formatPath(path))
+ * // "$.name"
+ * ```
  * @param path
  */
 export const formatPath = (path: Path[]): string =>

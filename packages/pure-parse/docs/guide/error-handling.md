@@ -1,6 +1,51 @@
-# Failsafe Parsing
+# Error Handling
 
-A benefit of parsing data over of validating data (with guards) is that errors can be handled gracefully with defaults and other fallback mechanisms.
+Errors are described by the type `Failure`. If the failure originated from within a data structure, the `path` property describes the path to the error, while the `message` property describes the error that occurred. For example:
+
+```ts
+import { isFailure } from 'pure-parse/src'
+
+const res = parseUser({ name: 123 })
+if (isFailure(res)) {
+  console.error(res)
+}
+```
+
+Gives:
+
+```json
+{
+  "tag": "failure",
+  "error": "Expected type string",
+  "path": [
+    {
+      "tag": "object",
+      "key": "name"
+    }
+  ]
+}
+```
+
+## Formatting
+
+To format a `Failure` in a human-readable format, use [formatFailure](/api/parsers/formatting#formatFailure):
+
+```ts
+import { formatFailure } from 'pure-parse'
+
+const result = parseUser({ name: 123 })
+if (isFailure(result)) {
+  console.error(formatFailure(result))
+}
+```
+
+Gives:
+
+> Expected type string at $.name
+
+## Failsafe Parsing
+
+A benefit of parsing data over of validating data (with guards) is that errors can be handled _gracefully_ with defaults and other fallback mechanisms.
 
 ### Defaults with Static Values
 
