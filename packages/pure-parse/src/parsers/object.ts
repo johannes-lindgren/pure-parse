@@ -14,10 +14,13 @@ import { OptionalKeys, WithOptionalFields } from '../internals/utility-types'
 const notAnObjectMsg = 'Not an object'
 
 const missingPropertyError = (key: string) =>
-  propagateFailure(failure('Property is missing'), {
-    tag: 'object',
-    key,
-  })
+  propagateFailure(
+    failure(`Expected property ${JSON.stringify(key)} to be present`),
+    {
+      tag: 'object',
+      key,
+    },
+  )
 
 /**
  * Objects have a fixed set of properties of different types.

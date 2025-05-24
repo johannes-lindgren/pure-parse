@@ -17,7 +17,7 @@ export const array =
   <T>(parseItem: Parser<T>): Parser<T[]> =>
   (data) => {
     if (!Array.isArray(data)) {
-      return failure('Not an array')
+      return failure('Expected array')
     }
 
     const dataOutput = []

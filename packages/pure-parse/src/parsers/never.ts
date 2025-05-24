@@ -6,4 +6,4 @@ import { failure, UnsuccessfulParser } from './types'
  * @param data data to be validated
  */
 export const parseNever: UnsuccessfulParser = (data) =>
-  failure('never cannot be instantiated')
+  failure('Expected error because never cannot be instantiated')

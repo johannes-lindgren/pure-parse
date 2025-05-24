@@ -1,6 +1,51 @@
-# Failsafe Parsing
+# Error Handling
 
-A benefit of parsing data over of validating data (with guards) is that errors can be handled gracefully with defaults and other fallback mechanisms.
+If the parsing failed, the result type will be [ParseFailure](/api/parsers/types#ParseFailure). The `path` property describes the location in the data where the error occured, while the `message` property describes the error that occurred. For example:
+
+```ts
+import { isFailure } from 'pure-parse/src'
+
+const res = parseUser({ name: 123 })
+if (isFailure(res)) {
+  console.error(res)
+}
+```
+
+Gives:
+
+```json
+{
+  "tag": "failure",
+  "error": "Expected type string",
+  "path": [
+    {
+      "tag": "object",
+      "key": "name"
+    }
+  ]
+}
+```
+
+## Formatting
+
+To format a `Failure` in a human-readable format, use [formatFailure](/api/parsers/formatting#formatFailure):
+
+```ts
+import { formatFailure } from 'pure-parse'
+
+const result = parseUser({ name: 123 })
+if (isFailure(result)) {
+  console.error(formatFailure(result))
+}
+```
+
+Gives:
+
+> Expected type string at $.name
+
+## Failsafe Parsing
+
+Errors can be handled _gracefully_ with defaults and other fallback mechanisms. This is a major benefit with parsing over simple validation.
 
 ### Defaults with Static Values
 
@@ -37,13 +82,15 @@ Sometimes, data consists of strange union types that should be parsed into a mor
 const data = [1, '2'] // Desired result: [1, 2]
 ```
 
-Write a custom parser `parseNumberFromString` that parses stringified numbers into `number`, and use `oneOf` to chain it together with `parseNumber`:
+Use `parseNumberFromString` with `oneOf` to chain it together with `parseNumber`:
 
 ```ts
 import { array, oneOf, parseNumber } from 'pure-parse'
 
 const parseData = array(oneOf(parseNumber, parseNumberFromString))
 ```
+
+If `parseNumber` fails, `oneOf` will proceed to `parseNumberFromString`.
 
 If the data could include `null` or other non-numeric values, the parser can be extended with a fallback mechanism:
 
@@ -62,7 +109,9 @@ const parseData = array(
 
 `() => success(0)` is a parser that ignores all arguments and always returns `Success<0>`.
 
-### Graceful Error Handling
+> [!TIP] > `oneOf(parser, () => defaultValue)` is effectively the same as `withDefault(parser, defaultValue)
+
+### Graceful Error Handling in Large Documents
 
 Consider an application with a large document with many nested properties: if there is a small error anywhere in the data, it might be preferable to ignore the error and continue processing—rather than discarding the entire document.
 

@@ -19,7 +19,7 @@ import { failure, ParseFailure, ParseSuccess, success } from './types'
 export const parseUndefined = (
   data: unknown,
 ): ParseSuccess<undefined> | ParseFailure =>
-  isUndefined(data) ? success(data) : failure('Not undefined')
+  isUndefined(data) ? success(data) : failure('Expected undefined')
 
 /**
  * Parse `null`
@@ -30,7 +30,7 @@ export const parseUndefined = (
  * @param data data to be validated
  */
 export const parseNull = (data: unknown): ParseSuccess<null> | ParseFailure =>
-  isNull(data) ? success(data) : failure('Not null')
+  isNull(data) ? success(data) : failure('Expected null')
 
 /**
  * Parse `boolean`
@@ -45,7 +45,7 @@ export const parseNull = (data: unknown): ParseSuccess<null> | ParseFailure =>
 export const parseBoolean = (
   data: unknown,
 ): ParseSuccess<boolean> | ParseFailure =>
-  isBoolean(data) ? success(data) : failure('Not a boolean')
+  isBoolean(data) ? success(data) : failure('Expected type boolean')
 
 /**
  * Parse `number`
@@ -58,7 +58,7 @@ export const parseBoolean = (
 export const parseNumber = (
   data: unknown,
 ): ParseSuccess<number> | ParseFailure =>
-  isNumber(data) ? success(data) : failure('Not a number')
+  isNumber(data) ? success(data) : failure('Expected type number')
 
 /**
  * Parse `string`
@@ -71,7 +71,7 @@ export const parseNumber = (
 export const parseString = (
   data: unknown,
 ): ParseSuccess<string> | ParseFailure =>
-  isString(data) ? success(data) : failure('Not a string')
+  isString(data) ? success(data) : failure('Expected type string')
 
 /**
  * Parse `bigint`
@@ -84,7 +84,7 @@ export const parseString = (
 export const parseBigInt = (
   data: unknown,
 ): ParseSuccess<bigint> | ParseFailure =>
-  isBigInt(data) ? success(data) : failure('Not a bigint')
+  isBigInt(data) ? success(data) : failure('Expected type bigint')
 
 /**
  * Parse `symbol`
@@ -97,4 +97,4 @@ export const parseBigInt = (
 export const parseSymbol = (
   data: unknown,
 ): ParseSuccess<symbol> | ParseFailure =>
-  isSymbol(data) ? success(data) : failure('Not a symbol')
+  isSymbol(data) ? success(data) : failure('Expected type symbol')

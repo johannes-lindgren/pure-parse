@@ -80,5 +80,5 @@ export const oneOf =
         return success(result.value)
       }
     }
-    return failure('No parser in the union matched')
+    return failure('The value is not in the union')
   }

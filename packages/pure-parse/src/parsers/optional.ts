@@ -40,7 +40,7 @@ const parseOptionalProperty: Parser<OmitProperty> = (data) => {
   return data === propertyAbsent
     ? // This indicates that the property should be omitted
       success(omitProperty)
-    : failure('not optional')
+    : failure('Expected property to be present')
 }
 
 /**
