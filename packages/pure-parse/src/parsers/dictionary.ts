@@ -3,10 +3,14 @@ import { failure, propagateFailure, success } from './ParseResult'
 import { isObject } from '../guards'
 
 /**
- * Dictionaries are objects where all properties are optional and have the same type.
- * In TypeScript, this can be represented by `Partial<Record<string, ?>>`.
+ * Dictionaries are objects that map strings to other values.
+ *
+ * Due to how TypeScript works, this function has two behaviors at the type level, depending on `Key` (At runtime, it always behaves the same):
+ * - When the key is `string`, it validates `Record<string, V>`. When `noUncheckedIndexedAccess` is enabled, TypeScript understands that a value retrieved with a string the value can be `undefined`. However, the value is _not semantically identical_ to `Partial<Record<string, V>>`.
+ * - When the key is a subset of `string`, it validates `Partial<Record<K, V>>`. If the properties were not marked as optional, TypeScript would assume that all keys map to values.
+ *
  * @example
- * Validate a word dictionary:
+ * Validate a dictionary:
  * ```ts
  * const parseDictionary = dictionary(isString, isString)
  * parseDictionary({ hello: 'world' }) // -> Success
@@ -24,20 +28,21 @@ import { isObject } from '../guards'
  * ```
  * @param parseKey parses every key
  * @param parseValue parses every value
- * @returns a parser for a dictionary, of type `Partial<Record<K, V>>`
+ * @returns a parser for a record
  */
 export const dictionary =
   <K extends string, V>(
     parseKey: Parser<K>,
     parseValue: Parser<V>,
-  ): Parser<Partial<Record<K, V>>> =>
+  ): Parser<string extends K ? Record<K, V> : Partial<Record<K, V>>> =>
   (data) => {
     if (!isObject(data)) {
       return failure('Expected type object')
     }
-    const resultData: Partial<Record<K, V>> = {}
+    const resultData: Record<string, V> = {}
     for (const key in data) {
-      const value = (data as Record<string | symbol, unknown>)[key]
+      // This type assertion just makes TypeScript allow us to index with a key
+      const value = (data as Record<keyof any, unknown>)[key]
       const parsedKey = parseKey(key)
       if (parsedKey.tag === 'failure') {
         return propagateFailure(failure('Invalid property key'), {
@@ -54,5 +59,7 @@ export const dictionary =
       }
       resultData[parsedKey.value] = parsedValue.value
     }
-    return success(resultData)
+    return success(
+      resultData as string extends K ? Record<K, V> : Partial<Record<K, V>>,
+    )
   }
