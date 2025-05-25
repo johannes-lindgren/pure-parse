@@ -92,6 +92,8 @@ export const map =
     return isSuccess(result) ? success(mapSuccess(result.value)) : result
   }
 
+export const mapParser = map
+
 /**
  * Transform successful results into either success or failure.
  * This is useful for chaining parsers.
