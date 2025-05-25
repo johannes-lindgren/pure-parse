@@ -232,7 +232,7 @@ describe('memoization', () => {
     })
     it('memoizes validator constructors with multiple arguments', () => {
       const defaultValue = {
-        fist: 'Anon',
+        first: 'Anon',
         last: 'Ymousson',
       }
       const parseNameFallible = vi.fn(

@@ -63,6 +63,25 @@ describe('withDefault', () => {
         const parse = withDefault(parseString, 'default')
         const t1: Equals<typeof parse, InfallibleParser<string>> = true
       })
+      it('infers objects', () => {
+        const t1 = withDefault(
+          object({
+            a: parseString,
+          }),
+          {
+            a: 'default',
+          },
+        )
+        const t2 = withDefault(
+          object({
+            a: parseString,
+          }),
+          {
+            // @ts-expect-error -- Different property name
+            b: 'default',
+          },
+        )
+      })
     })
     test('type checking when defaulting an empty list', () => {
       const parseList = withDefault<number[]>(array(parseNumber), [])
