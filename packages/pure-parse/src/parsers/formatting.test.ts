@@ -21,9 +21,9 @@ describe('formatting', () => {
         expect(formatResult(success(new Set()))).toEqual(
           'ParseSuccess: [object Set]',
         )
-        const date = new Date('2025-05-25T01:16:54+02:00')
+        const date = new Date(447567)
         expect(formatResult(success(date))).toEqual(
-          'ParseSuccess: Sun May 25 2025 01:16:54 GMT+0200 (Central European Summer Time)',
+          `ParseSuccess: ${new Date(447567)}`,
         )
         const error = new Error('Test error')
         expect(formatResult(success(error))).toEqual(
