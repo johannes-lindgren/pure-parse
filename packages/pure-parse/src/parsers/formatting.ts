@@ -1,18 +1,48 @@
-import { ParseFailure, PathSegment } from './ParseResult'
+import { ParseFailure, ParseResult, PathSegment } from './ParseResult'
+import { isUndefined } from '../guards'
 
 /**
  * Formats a failure to a human-readable string.
+ * This is useful for debugging and logging parse results.
+ * It formats both successful and unsuccessful parse results.
+ * - Successful results are formatted as `ParseSuccess: <value>`, where `<value>` comes from `Object.prototype.toString()`. To customize the output, you can pass a `toString` function that converts the value to a string.
+ * - Failures include the error message and the path where the failure occurred.
  * @example
+ * Format an unsuccessful parse result:
  * ```ts
+ * const parseUser = object({ name: parseString })
  * const res = parseUser({ name: 123 })
- * if(isFailure(res){
- *   console.log(formatFailure(res))
- *   // "Expected string at $.name"
- * }
+ * console.log(formatResult(res)) // -> "ParseFailure: Expected type string at $.name"
  * ```
- * @param failure
+ * @example
+ * Format a successful parse result:
+ * ```ts
+ * const parseUser = object({ name: parseString })
+ * const res = parseUser({ name: 'Alice' })
+ * console.log(formatResult(res, JSON.stringify)) // -> "ParseSuccess: {"name":"Alice"}"
+ * ```
+ * @param result The result of a parse operation.
+ * @param formatValue Optional function to convert the value to a string. If not provided, it uses string interpolation.
  */
-export const formatFailure = (failure: ParseFailure): string =>
+export const formatResult = <T>(
+  result: ParseResult<T>,
+  formatValue?: (value: T) => string,
+): string => {
+  if (result.tag === 'success') {
+    if (!isUndefined(formatValue)) {
+      return `ParseSuccess: ${formatValue(result.value)}`
+    }
+    try {
+      return `ParseSuccess: ${result.value}`
+    } catch {
+      return `ParseSuccess: <unserializable>`
+    }
+  } else {
+    return `ParseFailure: ${formatFailure(result)}`
+  }
+}
+
+const formatFailure = (failure: ParseFailure): string =>
   failure.path.length === 0
     ? failure.error
     : `${failure.error} at ${formatPath(failure.path)}`

@@ -75,6 +75,13 @@ export const isFailure = <T>(result: ParseResult<T>): result is ParseFailure =>
 
 /**
  * Transform the values of successful results.
+ * @example
+ * Transform strings to uppercase
+ * ```ts
+ * const parseToUpperCase = map(parseString, (str) => str.toUpperCase())
+ * parseToUpperCase('hello') // -> ParseSuccess<'HELLO'>
+ * parseToUpperCase(123) // -> ParseFailure
+ * ```
  * @param parser
  * @param mapSuccess
  */
