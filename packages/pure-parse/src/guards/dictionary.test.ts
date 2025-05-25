@@ -1,5 +1,4 @@
 import { describe, expect, it, test } from 'vitest'
-import { dictionaryGuard } from './dictionary'
 import { isBoolean, isNumber, isString } from './primitives'
 import { Guard } from './types'
 import { equalsGuard } from './equals'
@@ -8,9 +7,26 @@ import { oneOfGuard } from './oneOf'
 import { arrayGuard } from './arrays'
 import { Equals } from '../internals'
 import { Infer } from '../common'
+import { dictionaryGuard } from './dictionary'
 
 describe('dictionaries', () => {
   describe('type checking', () => {
+    it('returns a non-optional record when the key is `string`', () => {
+      const guard = dictionaryGuard(isString, isString) satisfies Guard<
+        Record<string, string>
+      >
+      const t1: Equals<Infer<typeof guard>, Record<string, string>> = true
+    })
+    it('returns a partial record when the key is a union of string literals', () => {
+      const guard = dictionaryGuard(
+        oneOfGuard(equalsGuard('a'), equalsGuard('b')),
+        isString,
+      )
+      const t1: Equals<
+        Infer<typeof guard>,
+        Partial<Record<'a' | 'b', string>>
+      > = true
+    })
     it('returns a guard', () => {
       dictionaryGuard(isString, isString) satisfies Guard<
         Partial<Record<string, string>>
@@ -24,11 +40,18 @@ describe('dictionaries', () => {
       >
     })
     describe('type inference', () => {
-      it('infers', () => {
+      it('infers non-partial record when key is string', () => {
         const guard = dictionaryGuard(isString, isNumber)
+        const t0: Equals<Infer<typeof guard>, Record<string, number>> = true
+      })
+      it('infers partial record when key is union of string literals', () => {
+        const guard = dictionaryGuard(
+          oneOfGuard(equalsGuard('a'), equalsGuard('b')),
+          isString,
+        )
         const t0: Equals<
           Infer<typeof guard>,
-          Partial<Record<string, number>>
+          Partial<Record<'a' | 'b', string>>
         > = true
       })
     })

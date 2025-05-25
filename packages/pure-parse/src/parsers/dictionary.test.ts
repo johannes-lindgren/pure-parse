@@ -13,6 +13,7 @@ import { Parser } from './Parser'
 import { failure, success } from './ParseResult'
 import { isString } from '../guards'
 import { oneOf } from './oneOf'
+import { object } from './object'
 
 const parseCapitalized: Parser<string> = (data) => {
   if (!isString(data)) {
@@ -31,24 +32,42 @@ describe('record', () => {
   })
   describe('types', () => {
     describe('type inference', () => {
-      it('infers the keys as string', () => {
+      it('infers a non-partial record when the keys is a string', () => {
         const parse = dictionary(parseString, parseString)
-        const t0: Equals<
-          Infer<typeof parse>,
-          Partial<Record<string, string>>
-        > = true
+        const t0: Equals<Infer<typeof parse>, Record<string, string>> = true
+        const t1: Equals<Infer<typeof parse>, { [key: string]: string }> = true
+
+        type A = {
+          a: Record<string, string>
+        }
+        const parseA = object<A>({
+          a: dictionary(parseString, parseString),
+        })
       })
-      it('infers the keys as string literal', () => {
+      it('infers a partial record when the keys is a union of string literals', () => {
         const parse = dictionary(oneOf(equals('a'), equals('b')), parseString)
         const t0: Equals<
           Infer<typeof parse>,
           Partial<Record<'a' | 'b', string>>
         > = true
+        const t1: Equals<Infer<typeof parse>, { a?: string; b?: string }> = true
       })
-      it('infers the value', () => {})
+      it('infers the value', () => {
+        const parse1 = dictionary(parseString, parseNumber)
+        const t0: Equals<Infer<typeof parse1>, Record<string, number>> = true
+
+        const parse2 = dictionary(oneOf(equals('a'), equals('b')), parseString)
+        const t1: Equals<
+          Infer<typeof parse2>,
+          Partial<Record<'a' | 'b', string>>
+        > = true
+      })
     })
     describe('explicit type declaration', () => {
       it('requires two type arguments', () => {
+        dictionary<string, string>(parseString, parseString)
+      })
+      it('allows for string keys', () => {
         dictionary<string, string>(parseString, parseString)
       })
       it('allows for union keys', () => {
