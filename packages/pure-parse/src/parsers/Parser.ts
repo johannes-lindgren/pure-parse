@@ -1,5 +1,12 @@
 import { OmitProperty } from '../internals'
-import { ParseFailure, ParseResult, ParseSuccess } from './ParseResult'
+import {
+  isFailure,
+  isSuccess,
+  ParseFailure,
+  ParseResult,
+  ParseSuccess,
+  success,
+} from './ParseResult'
 
 export type Parser<T> = (data: unknown) => ParseResult<T>
 
@@ -25,3 +32,77 @@ export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
  * A parser that always fails
  */
 export type UnsuccessfulParser = (data: unknown) => ParseFailure
+
+/**
+ * *****************************
+ * Parser Combinators
+ * *****************************
+ */
+
+/**
+ * Transform the values of successful results.
+ * @example
+ * Transform strings to uppercase
+ * ```ts
+ * const parseToUpperCase = map(parseString, (str) => str.toUpperCase())
+ * parseToUpperCase('hello') // -> ParseSuccess<'HELLO'>
+ * parseToUpperCase(123) // -> ParseFailure
+ * ```
+ * @param parser
+ * @param mapSuccess
+ */
+export const map =
+  <A, B>(parser: Parser<A>, mapSuccess: (value: A) => B): Parser<B> =>
+  (value) => {
+    const result = parser(value)
+    return isSuccess(result) ? success(mapSuccess(result.value)) : result
+  }
+
+/**
+ * Transform successful results into either success or failure.
+ * This is useful for chaining parsers.
+ * @example
+ * After parsing an array of numbers, ensure it is non-empty:
+ * ```
+ * const parseNonEmptyArray = chain(array(parseNumber), (value) =>
+ *           value.length > 0
+ *             ? success(value)
+ *             : failure('Expected non-empty array'),
+ *         )
+ * ```
+ * @param parser
+ * @param parseSuccess
+ */
+export const chain =
+  <A, B>(
+    parser: Parser<A>,
+    parseSuccess: (value: A) => ParseResult<B>,
+  ): Parser<B> =>
+  (value) => {
+    const result = parser(value)
+    return isSuccess(result) ? parseSuccess(result.value) : result
+  }
+
+/**
+ * Transform failed results into either success or failure.
+ * This is useful for error handling.
+ * @example
+ * Fall back to a default value if parsing fails:
+ * ```
+ * const parseCount = recover(
+ *   parseNumber,
+ *   () => 0
+ * )
+ * ```
+ * @param parser
+ * @param parseFailure
+ */
+export const recover =
+  <A>(
+    parser: Parser<A>,
+    parseFailure: (error: ParseFailure) => ParseResult<A>,
+  ): Parser<A> =>
+  (value) => {
+    const result = parser(value)
+    return isFailure(result) ? parseFailure(result) : result
+  }
