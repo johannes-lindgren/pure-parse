@@ -1,9 +1,11 @@
 import { describe, expect, it, test } from 'vitest'
 import { withDefault } from './withDefault'
-import { parseString } from './primitives'
+import { parseNumber, parseString } from './primitives'
 import { object } from './object'
 import { Equals } from '../internals'
 import { InfallibleParser } from './Parser'
+import { array } from './arrays'
+import { equals } from './equals'
 
 describe('withDefault', () => {
   test('as a root parser', () => {
@@ -61,6 +63,31 @@ describe('withDefault', () => {
         const parse = withDefault(parseString, 'default')
         const t1: Equals<typeof parse, InfallibleParser<string>> = true
       })
+      it('infers objects', () => {
+        const t1 = withDefault(
+          object({
+            a: parseString,
+          }),
+          {
+            a: 'default',
+          },
+        )
+        const t2 = withDefault(
+          object({
+            a: parseString,
+          }),
+          {
+            // @ts-expect-error -- Different property name
+            b: 'default',
+          },
+        )
+      })
+    })
+    test('type checking when defaulting an empty list', () => {
+      const parseList = withDefault<number[]>(array(parseNumber), [])
+    })
+    test('explicit type annotation', () => {
+      const p = withDefault<'a'>(equals('a'), 'a')
     })
   })
 })

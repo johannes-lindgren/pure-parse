@@ -52,8 +52,8 @@ import { success } from './ParseResult'
  * @param parser
  * @param fallbackValue
  */
-export const withDefault = <T, F>(
+export const withDefault = <T>(
   parser: Parser<T>,
-  fallbackValue: F,
-): InfallibleParser<T | F> =>
-  oneOf(parser, () => success(fallbackValue)) as InfallibleParser<T | F>
+  fallbackValue: T,
+): InfallibleParser<T> =>
+  oneOf(parser, () => success(fallbackValue)) as InfallibleParser<T>
