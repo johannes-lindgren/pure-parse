@@ -1,4 +1,5 @@
-import { failure, Parser, propagateFailure, success } from './types'
+import { Parser } from './Parser'
+import { failure, propagateFailure, success } from './ParseResult'
 import { isObject } from '../guards'
 
 /**

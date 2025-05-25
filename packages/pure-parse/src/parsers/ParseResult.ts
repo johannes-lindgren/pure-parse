@@ -1,7 +1,13 @@
-import { OmitProperty } from '../internals'
+import { Parser } from './Parser'
+
+/*
+ * Type Definitions
+ */
 
 /**
+ * *****************************
  * The data adheres to the schema. The `value` is equal to the parsed data
+ * *****************************
  */
 export type ParseSuccess<T> = {
   tag: 'success'
@@ -43,33 +49,10 @@ export const failure = (error: string): ParseFailure => ({
   path: [],
 })
 
-export const propagateFailure = (
-  failureRes: ParseFailure,
-  pathSegment: PathSegment,
-): ParseFailure => ({
-  tag: 'failure',
-  error: failureRes.error,
-  path: [pathSegment, ...failureRes.path],
-})
-
-export type Parser<T> = (data: unknown) => ParseResult<T>
-
 /**
- * Special parser to check optional values
- */
-export type OptionalParser<T> = (
-  data: unknown,
-) => ParseResult<T | undefined | OmitProperty>
-
-/**
- * A parser that does not represent an optional property.
- */
-export type RequiredParser<T> = (
-  data: unknown,
-) => ParseResult<Exclude<T, OmitProperty>>
-
-/*
- * Utility functions
+ * *****************************
+ * Utilities
+ * *****************************
  */
 
 /**
@@ -86,11 +69,18 @@ export const isSuccess = <T>(
  */
 export const isFailure = <T>(result: ParseResult<T>): result is ParseFailure =>
   result.tag === 'failure'
+
 /**
- * A parser that always succeeds
+ * Propagate a failure result in a nested structure.
+ * When parsing objects and arrays with nested values, the failure at the root level should convey where in the hierarchy the failure occurred.
+ * @param failureRes
+ * @param pathSegment
  */
-export type InfallibleParser<T> = (data: unknown) => ParseSuccess<T>
-/**
- * A parser that always fails
- */
-export type UnsuccessfulParser = (data: unknown) => ParseFailure
+export const propagateFailure = (
+  failureRes: ParseFailure,
+  pathSegment: PathSegment,
+): ParseFailure => ({
+  tag: 'failure',
+  error: failureRes.error,
+  path: [pathSegment, ...failureRes.path],
+})

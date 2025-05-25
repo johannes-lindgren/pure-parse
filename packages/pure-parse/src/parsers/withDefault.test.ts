@@ -3,7 +3,7 @@ import { withDefault } from './withDefault'
 import { parseString } from './primitives'
 import { object } from './object'
 import { Equals } from '../internals'
-import { InfallibleParser } from './types'
+import { InfallibleParser } from './Parser'
 
 describe('withDefault', () => {
   test('as a root parser', () => {

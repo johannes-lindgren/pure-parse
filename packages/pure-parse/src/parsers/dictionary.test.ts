@@ -9,7 +9,8 @@ import {
 import { equals } from './equals'
 import { Equals } from '../internals'
 import { Infer } from '../common'
-import { failure, Parser, success } from './types'
+import { Parser } from './Parser'
+import { failure, success } from './ParseResult'
 import { isString } from '../guards'
 import { oneOf } from './oneOf'
 

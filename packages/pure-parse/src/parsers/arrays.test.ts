@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { array } from './arrays'
-import { failure, success } from './types'
+import { failure, success } from './ParseResult'
 import { equals } from './equals'
 import { parseString } from './primitives'
 import { withDefault } from './withDefault'

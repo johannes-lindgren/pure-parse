@@ -1,4 +1,5 @@
-import { failure, Parser, success } from './types'
+import { Parser } from './Parser'
+import { failure, success } from './ParseResult'
 
 /**
  * Executes `parsers` in order and returns the first successful parsing attempt, or a failure if all fail.

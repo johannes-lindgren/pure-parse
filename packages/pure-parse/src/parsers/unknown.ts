@@ -1,4 +1,5 @@
-import { InfallibleParser, success } from './types'
+import { InfallibleParser } from './Parser'
+import { success } from './ParseResult'
 
 /**
  * A parser that always succeeds.

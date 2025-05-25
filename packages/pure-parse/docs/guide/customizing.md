@@ -1,38 +1,42 @@
-# Customizing
+# Custom Parsers and Guards
 
 The API of PureParse is designed to be as simple as possible, so that it is easy to extend the functionality.
 
+> [!NOTE]
+> Before writing a custom parser, consider whetehr you can apply a simple transformation on top of a built-in parser. See the [Transformations guide](./transformations.md) for more information.
+
 ## Custom Parsers
 
-To create a custom parser, implement a function of the `Parser<?>` type. For example, to create a parser that parses a number from a string, write:
+To create a custom parser, implement a function of the `Parser<?>` type. For example, to create a parser that parses a stringified number from a number:
 
 ```ts
-import { Parser, ParseResult, success, failure, isString } from 'pure-parse'
+import {
+  Parser,
+  ParseResult,
+  success,
+  failure,
+  isString,
+  parseNumber,
+} from 'pure-parse'
+import { isSuccess } from 'pure-parse/src'
 
-const parseNumberFromString: Parser<number> = (data: unknown) => {
-  if (!isString(data)) {
-    return failure('Expected a string')
+const parseStringifiedNumber: Parser<number> = (data: unknown) => {
+  const result = parseNumber(data)
+  if (!isSuccess(data)) {
+    return result
   }
-  const parsed = Number(data)
-  return data !== '' &&
-    !hasWhiteSpace(data) &&
-    !isNaN(parsed) &&
-    isFinite(parsed)
-    ? success(parsed)
-    : failure(
-        `The string could not be parsed into a number: got ${JSON.stringify(
-          data,
-        )}`,
-      )
-}
-
-const hasWhiteSpace = (str: string): boolean => {
-  return /\s+/.test(str)
+  return success(result.value.toString())
 }
 ```
 
 > [!TIP]
 > The `success` and `failure` functions are simple constructors for the `ParseResult` type and make the code more readable.
+
+Very often though, it's better to use `map` or `chain`:
+
+```ts
+const parseStringified = map(parseNumber, (it) => it.toString())
+```
 
 ## Higher-order Parsers
 

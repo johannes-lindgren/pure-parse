@@ -1,12 +1,5 @@
-import {
-  failure,
-  isSuccess,
-  ParseSuccess,
-  Parser,
-  ParseResult,
-  success,
-  propagateFailure,
-} from './types'
+import { Parser } from './Parser'
+import { failure, ParseSuccess, propagateFailure, success } from './ParseResult'
 
 /**
  * Validate arrays

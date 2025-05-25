@@ -2,7 +2,7 @@ import { describe, expect, it, test, vi } from 'vitest'
 import { tuple } from './tuples'
 import { parseNumber, parseString } from './primitives'
 import { Equals } from '../internals'
-import { Parser } from './types'
+import { Parser } from './Parser'
 
 const parseVec2 = tuple([parseNumber, parseNumber])
 

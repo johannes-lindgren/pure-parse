@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parseNever } from './never'
-import { isSuccess, ParseFailure, ParseSuccess } from './types'
+import { isSuccess, ParseFailure, ParseSuccess } from './ParseResult'
 import { Equals } from '../internals'
 import { Infer } from '../common'
 

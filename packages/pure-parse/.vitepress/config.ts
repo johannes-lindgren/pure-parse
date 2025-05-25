@@ -24,8 +24,13 @@ export default defineConfig({
           { text: 'Quick Start', link: '/guide/getting-started' },
           { text: 'Parsers', link: '/guide/parsers' },
           { text: 'Guards', link: '/guide/guards' },
-          { text: 'Error Handling', link: '/guide/error-handling' },
-          { text: 'Customizing', link: '/guide/customizing' },
+          {
+            text: 'Failure Handling',
+            link: '/guide/error-handling',
+          },
+          { text: 'Transformations', link: '/guide/transformations' },
+          { text: 'Custom Parsers', link: '/guide/customizing' },
+          { text: 'Formatting', link: '/guide/formatting' },
           { text: 'Performance', link: '/guide/performance' },
           { text: 'Security', link: '/guide/security' },
           {

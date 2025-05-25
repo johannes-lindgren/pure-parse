@@ -5,7 +5,8 @@ import {
   objectStrict,
   objectStrictCompiled,
 } from './object'
-import { isSuccess, Parser } from './types'
+import { Parser } from './Parser'
+import { isSuccess } from './ParseResult'
 import { Equals, omitProperty } from '../internals'
 import { oneOf } from './oneOf'
 import {

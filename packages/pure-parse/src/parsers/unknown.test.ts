@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { parseUnknown } from './unknown'
-import { isSuccess, ParseFailure, ParseSuccess, success } from './types'
 import { Equals } from '../internals'
 import { Infer } from '../common'
+import { isSuccess, ParseFailure, ParseSuccess, success } from './ParseResult'
 
 describe('parseUnknown', () => {
   it('it always succeeds', () => {
