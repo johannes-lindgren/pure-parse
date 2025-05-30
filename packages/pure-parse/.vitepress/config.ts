@@ -1,12 +1,62 @@
 import { defineConfig } from 'vitepress'
 import typedocSidebar from '../docs/api/typedoc-sidebar.json'
 
+const baseUrl = 'https://pure-parse.vercel.app'
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'PureParse',
-  head: [['link', { rel: 'icon', href: '/logo.webp' }]],
+  description:
+    'Strongly typed validation library that decouples types from validation logic.',
+  head: [
+    ['link', { rel: 'icon', href: `${baseUrl}/logo.webp` }],
+    [
+      'meta',
+      {
+        name: 'description',
+        content:
+          'Strongly typed validation library that decouples types from validation logic.',
+      },
+    ],
+    ['meta', { name: 'author', content: 'Johannes Lindgren' }],
+    // Open Graph tags
+    [
+      'meta',
+      {
+        property: 'og:title',
+        content: 'PureParse',
+      },
+    ],
+    [
+      'meta',
+      {
+        property: 'og:description',
+        content:
+          'Strongly typed validation library that decouples types from validation logic.',
+      },
+    ],
+    ['meta', { property: 'og:image', content: `${baseUrl}/logo.webp` }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    // Twitter Card tags
+    [
+      'meta',
+      {
+        name: 'twitter:title',
+        content: 'PureParse',
+      },
+    ],
+    [
+      'meta',
+      {
+        name: 'twitter:description',
+        content:
+          'Strongly typed validation library that decouples types from validation logic.',
+      },
+    ],
+    ['meta', { name: 'twitter:image', content: `${baseUrl}/logo.webp` }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+  ],
 
-  description: 'Derive parsers from types',
   srcDir: 'docs',
   themeConfig: {
     logo: '/logo.webp',
