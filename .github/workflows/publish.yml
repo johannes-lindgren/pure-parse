@@ -26,6 +26,6 @@ jobs:
           cp logo.webp packages/pure-parse/
           cp LICENSE packages/pure-parse/
       - name: Publish to NPM
-        run: npm publish --access public --workspace=pure-parse
+        run: npm publish --access public --provenance --workspace=pure-parse
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
