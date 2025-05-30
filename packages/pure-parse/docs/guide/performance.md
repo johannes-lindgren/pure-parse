@@ -23,10 +23,10 @@ const parseUsers = memo(
 Nested parsers can also be memoized:
 
 ```ts
-import { memo, object, arrays, parseString, parseNumber } from 'pure-parse'
+import { memo, object, array, parseString, parseNumber } from 'pure-parse'
 
 const parseUsers = memo(
-  arrays(
+  array(
     memo(
       object({
         name: parseString,
@@ -46,12 +46,12 @@ For convenience, each higher order function (`oneOf`, `object`, `arrays`, etc.) 
 import {
   memo,
   objectMemo as object,
-  arrayMemo as arrays,
+  arrayMemo as array,
   parseString,
   parseNumber,
 } from 'pure-parse'
 
-const parseUsers = arrays(
+const parseUsers = array(
   object({
     name: parseString,
     age: parseNumber,

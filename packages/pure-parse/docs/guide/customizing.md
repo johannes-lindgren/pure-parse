@@ -43,7 +43,7 @@ const parseStringified = map(parseNumber, (it) => it.toString())
 To create a custom, higher-order parser function, create a generic function that accepts a parser as argument and returns a new parser. Here is a working example with generic trees:
 
 ```ts
-import { Parser, union, object, equals, arrays } from 'pure-parse'
+import { Parser, union, object, equals, array } from 'pure-parse'
 
 type Leaf<T> = {
   tag: 'leaf'
@@ -70,7 +70,7 @@ const tree =
   (data) =>
     object({
       tag: equals('tree'),
-      data: arrays(oneOf(leaf(parser), tree(parser))),
+      data: array(oneOf(leaf(parser), tree(parser))),
     })(data)
 ```
 

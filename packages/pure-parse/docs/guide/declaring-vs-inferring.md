@@ -83,7 +83,7 @@ For example, attempt to define a tree parser:
 ```ts:line-numbers
 const parseTree = object({
   name: parseString,
-  children: arrays(parseTree), // [!code error]
+  children: array(parseTree), // [!code error]
 })
 ```
 
@@ -97,7 +97,7 @@ The way to work around this error is to wrap the reference in a function:
 const parseTree = (data) =>  // [!code error]
   object({
     name: parseString,
-    children: arrays(parseTree),
+    children: array(parseTree),
   })(data)
 ```
 
@@ -118,7 +118,7 @@ type Tree = {
 const parseTree: Parser<Tree> = (data) =>
   object({
     name: parseString,
-    children: arrays(parseTree),
+    children: array(parseTree),
   })(data)
 ```
 
