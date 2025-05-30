@@ -1,10 +1,12 @@
 ---
 layout: home
+title: PureParse
+description: Strongly typed validation library that decouples types from validation logic.
 
 hero:
   name: PureParse
   text: Typesafe, lightweight parsers
-  tagline: Strongly typed validation library that decouples type aliases from validation logic
+  tagline: Strongly typed validation library that decouples types from validation logic.
   actions:
     - theme: brand
       text: Quick Start
