@@ -63,7 +63,7 @@ import {
   optionalGuard as optional,
 } from 'pure-parse'
 
-const isUsers = arrays(
+const isUsers = array(
   object({
     id: isNumber,
     parentId: nullable(isNumber),
@@ -243,7 +243,7 @@ const isDna = arrayGuard(isBase)
 isDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> true
 ```
 
-When explicitly declaring arrays types, provide type of the item in the arrays type argument:
+When explicitly declaring array types, provide type of the item in the array type argument:
 
 ```ts
 // Guard<number[]>

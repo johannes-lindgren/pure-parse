@@ -59,7 +59,7 @@ Secondly, there is a category of higher order functions that constructs new pars
 - [tuple](/api/parsers/tuples#tuple)
 - [object](/api/parsers/object#object)
 - [dictionary](/api/parsers/dictionary#dictionary)
-- [arrays](/api/parsers/arrays#arrays)
+- [array](/api/parsers/arrays#array)
 - [optional](/api/parsers/optional#optional)
 
 By composing these higher order functions and primitives, you end up with a schema-like syntax that models your data:
@@ -67,7 +67,7 @@ By composing these higher order functions and primitives, you end up with a sche
 ```ts
 import { object, parseString, parseNumber, optional } from 'pure-parse'
 
-const isUsers = arrays(
+const isUsers = array(
   object({
     id: parseNumber,
     parentId: nullable(parseNumber),
@@ -236,19 +236,19 @@ const parseUser = object<User>({
 
 ## Arrays
 
-Arrays are ordered set of elements of the same type. Use the `arrays()` function to create a validation function for an arrays type:
+Arrays are ordered set of elements of the same type. Use the `array()` function to create a validation function for an arrays type:
 
 ```ts
 const parseBase = oneOf(equals('A'), equals('T'), equals('C'), equals('G'))
-const parseDna = arrays(parseBase)
+const parseDna = array(parseBase)
 parseDna(['A', 'T', 'A', 'T', 'C', 'G']) // -> ParseSuccess
 ```
 
-When explicitly declaring arrays types, provide type of the item in the arrays type argument:
+When explicitly declaring array types, provide type of the item in the array type argument:
 
 ```ts
 // Validator<number[]>
-const parseNumberArray = arrays<number>(parseNumber)
+const parseNumberArray = array<number>(parseNumber)
 ```
 
 ## Tagged/Discriminated Unions
