@@ -55,14 +55,18 @@ describe('ParseResult', () => {
           propagateFailure(failure(errorMsg), { tag: 'object', key: 'a' }),
         ).toEqual(
           expect.objectContaining({
-            error: errorMsg,
+            error: expect.objectContaining({
+              message: errorMsg,
+            }),
           }),
         )
       })
       it('includes the path segment in an error with no path segments', () => {
         expect(propagateFailure(failure('errorMsg'), segmentA)).toEqual(
           expect.objectContaining({
-            path: [segmentA],
+            error: expect.objectContaining({
+              path: [segmentA],
+            }),
           }),
         )
       })
@@ -74,7 +78,9 @@ describe('ParseResult', () => {
           ),
         ).toEqual(
           expect.objectContaining({
-            path: [segmentA, segmentB],
+            error: expect.objectContaining({
+              path: [segmentA, segmentB],
+            }),
           }),
         )
         expect(
@@ -87,7 +93,9 @@ describe('ParseResult', () => {
           ),
         ).toEqual(
           expect.objectContaining({
-            path: [segmentA, segmentB, segmentC],
+            error: expect.objectContaining({
+              path: [segmentA, segmentB, segmentC],
+            }),
           }),
         )
       })

@@ -194,8 +194,10 @@ describe('parsing', () => {
         expect(parseNum('a')).toEqual(expectFailure())
         expect(parseNum('a')).toEqual({
           tag: 'failure',
-          error: 'Error',
-          path: [],
+          error: expect.objectContaining({
+            message: 'Error',
+            path: [],
+          }),
         })
       })
       it('can change the error message', () => {
@@ -206,7 +208,7 @@ describe('parsing', () => {
         if (isSuccess(result)) {
           throw new Error('Expected failure')
         }
-        expect(result.error).toEqual('A UUID must be a string')
+        expect(result.error.message).toEqual('A UUID must be a string')
       })
       it('can recover to a different type with type annotation', () => {
         const parseNum = recover<number | undefined>(parseNumber, () =>
@@ -218,7 +220,7 @@ describe('parsing', () => {
       it('can read the error message', () => {
         const parseFailure = () => failure('Expected type number')
         const parseNum = recover(parseFailure, (result) =>
-          failure(`${result.error}!`),
+          failure(`${result.error.message}!`),
         )
         expect(parseNum('abc')).toEqual(failure('Expected type number!'))
       })

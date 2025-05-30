@@ -710,7 +710,9 @@ describe('object', () => {
             expect(parse('nonanobj')).toEqual(
               expect.objectContaining({
                 tag: 'failure',
-                path: [],
+                error: expect.objectContaining({
+                  path: [],
+                }),
               }),
             )
           })
@@ -721,12 +723,14 @@ describe('object', () => {
             expect(parse({})).toEqual(
               expect.objectContaining({
                 tag: 'failure',
-                path: [
-                  {
-                    tag: 'object',
-                    key: 'a',
-                  },
-                ],
+                error: expect.objectContaining({
+                  path: [
+                    {
+                      tag: 'object',
+                      key: 'a',
+                    },
+                  ],
+                }),
               }),
             )
           })
@@ -738,12 +742,14 @@ describe('object', () => {
               expect(parse({ a: 1 })).toEqual(
                 expect.objectContaining({
                   tag: 'failure',
-                  path: [
-                    {
-                      tag: 'object',
-                      key: 'a',
-                    },
-                  ],
+                  error: expect.objectContaining({
+                    path: [
+                      {
+                        tag: 'object',
+                        key: 'a',
+                      },
+                    ],
+                  }),
                 }),
               )
             })
@@ -756,16 +762,18 @@ describe('object', () => {
               expect(parse({ a: { b: 1 } })).toEqual(
                 expect.objectContaining({
                   tag: 'failure',
-                  path: [
-                    {
-                      tag: 'object',
-                      key: 'a',
-                    },
-                    {
-                      tag: 'object',
-                      key: 'b',
-                    },
-                  ],
+                  error: expect.objectContaining({
+                    path: [
+                      {
+                        tag: 'object',
+                        key: 'a',
+                      },
+                      {
+                        tag: 'object',
+                        key: 'b',
+                      },
+                    ],
+                  }),
                 }),
               )
             })

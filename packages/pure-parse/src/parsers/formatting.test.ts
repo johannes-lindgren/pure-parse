@@ -53,21 +53,23 @@ describe('formatting', () => {
         expect(
           formatResult({
             tag: 'failure',
-            error: 'Expected string',
-            path: [
-              {
-                tag: 'object',
-                key: 'users',
-              },
-              {
-                tag: 'array',
-                index: 2,
-              },
-              {
-                tag: 'object',
-                key: 'name',
-              },
-            ],
+            error: {
+              message: 'Expected string',
+              path: [
+                {
+                  tag: 'object',
+                  key: 'users',
+                },
+                {
+                  tag: 'array',
+                  index: 2,
+                },
+                {
+                  tag: 'object',
+                  key: 'name',
+                },
+              ],
+            },
           }),
         ).toEqual('ParseFailure: Expected string at $.users[2].name')
       })
@@ -75,8 +77,10 @@ describe('formatting', () => {
         expect(
           formatResult({
             tag: 'failure',
-            error: 'Expected type string',
-            path: [],
+            error: {
+              message: 'Expected type string',
+              path: [],
+            },
           }),
         ).toEqual('ParseFailure: Expected type string')
       })

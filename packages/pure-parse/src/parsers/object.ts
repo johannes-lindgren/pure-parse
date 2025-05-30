@@ -128,9 +128,9 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
   const schemaEntries = Object.entries(schema)
   const parsers = schemaEntries.map(([_, parser]) => parser)
   const statements = [
-    `if(typeof data !== 'object' || data === null) return {tag:'failure', error: ${JSON.stringify(
+    `if(typeof data !== 'object' || data === null) return {tag:'failure', error: { message: ${JSON.stringify(
       notAnObjectMsg,
-    )}, path: []}`,
+    )}, path: [] }}`,
     `const dataOutput = {}`,
     `let parseResult`,
     ...schemaEntries.map(([unescapedKey, parserFunction], i) => {
@@ -150,7 +150,7 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
           } 
         } else {
           parseResult = ${parser}(${value})
-          if(parseResult.tag === 'failure') return {tag:'failure', error: parseResult.error, path:[{tag:'object', key:${key}}, ...parseResult.path]}
+          if(parseResult.tag === 'failure') return {tag: 'failure', error: { message: parseResult.error.message, path:[{tag:'object', key:${key}}, ...parseResult.error.path] }}
           dataOutput[${key}] = parseResult.value
         }`
     }),
