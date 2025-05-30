@@ -119,7 +119,9 @@ describe('tuples', () => {
       expect(parse(1)).toEqual(
         expect.objectContaining({
           tag: 'failure',
-          path: [],
+          error: expect.objectContaining({
+            path: [],
+          }),
         }),
       )
     })
@@ -129,7 +131,9 @@ describe('tuples', () => {
         expect(parse([1])).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [{ tag: 'array', index: 0 }],
+            error: expect.objectContaining({
+              path: [{ tag: 'array', index: 0 }],
+            }),
           }),
         )
       })
@@ -146,10 +150,12 @@ describe('tuples', () => {
         ).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [
-              { tag: 'array', index: 0 },
-              { tag: 'array', index: 0 },
-            ],
+            error: expect.objectContaining({
+              path: [
+                { tag: 'array', index: 0 },
+                { tag: 'array', index: 0 },
+              ],
+            }),
           }),
         )
         expect(
@@ -160,10 +166,12 @@ describe('tuples', () => {
         ).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [
-              { tag: 'array', index: 0 },
-              { tag: 'array', index: 1 },
-            ],
+            error: expect.objectContaining({
+              path: [
+                { tag: 'array', index: 0 },
+                { tag: 'array', index: 1 },
+              ],
+            }),
           }),
         )
         expect(
@@ -174,10 +182,12 @@ describe('tuples', () => {
         ).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [
-              { tag: 'array', index: 1 },
-              { tag: 'array', index: 1 },
-            ],
+            error: expect.objectContaining({
+              path: [
+                { tag: 'array', index: 1 },
+                { tag: 'array', index: 1 },
+              ],
+            }),
           }),
         )
       })
@@ -186,19 +196,25 @@ describe('tuples', () => {
         expect(parse([1, 2, 3])).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [{ tag: 'array', index: 0 }],
+            error: expect.objectContaining({
+              path: [{ tag: 'array', index: 0 }],
+            }),
           }),
         )
         expect(parse(['1', 2, 3])).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [{ tag: 'array', index: 1 }],
+            error: expect.objectContaining({
+              path: [{ tag: 'array', index: 1 }],
+            }),
           }),
         )
         expect(parse(['1', '2', 3])).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [{ tag: 'array', index: 2 }],
+            error: expect.objectContaining({
+              path: [{ tag: 'array', index: 2 }],
+            }),
           }),
         )
       })

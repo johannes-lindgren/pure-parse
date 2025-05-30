@@ -224,7 +224,12 @@ describe('record', () => {
   describe('error handling', () => {
     test('that the error points to the object when it is not an object', () => {
       expect(dictionary(parseString, parseBoolean)(1)).toEqual(
-        expect.objectContaining({ tag: 'failure', path: [] }),
+        expect.objectContaining({
+          tag: 'failure',
+          error: expect.objectContaining({
+            path: [],
+          }),
+        }),
       )
     })
     describe('property errors', () => {
@@ -240,12 +245,14 @@ describe('record', () => {
           ).toEqual(
             expect.objectContaining({
               tag: 'failure',
-              path: [
-                {
-                  tag: 'object',
-                  key: 'a',
-                },
-              ],
+              error: expect.objectContaining({
+                path: [
+                  {
+                    tag: 'object',
+                    key: 'a',
+                  },
+                ],
+              }),
             }),
           )
         })
@@ -261,12 +268,14 @@ describe('record', () => {
         ).toEqual(
           expect.objectContaining({
             tag: 'failure',
-            path: [
-              {
-                tag: 'object',
-                key: 'a',
-              },
-            ],
+            error: expect.objectContaining({
+              path: [
+                {
+                  tag: 'object',
+                  key: 'a',
+                },
+              ],
+            }),
           }),
         )
       })
