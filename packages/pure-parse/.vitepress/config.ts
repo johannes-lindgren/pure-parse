@@ -35,6 +35,24 @@ export default defineConfig({
     ],
     ['meta', { property: 'og:image', content: '/logo.webp' }],
     ['meta', { property: 'og:type', content: 'website' }],
+    // Twitter Card tags
+    [
+      'meta',
+      {
+        name: 'twitter:title',
+        content: 'PureParse',
+      },
+    ],
+    [
+      'meta',
+      {
+        name: 'twitter:description',
+        content:
+          'Strongly typed validation library that decouples types from validation logic.',
+      },
+    ],
+    ['meta', { name: 'twitter:image', content: '/logo.webp' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
   ],
 
   srcDir: 'docs',
