@@ -72,6 +72,10 @@ export default defineConfig({
         items: [
           { text: 'Overview', link: '/guide/overview' },
           { text: 'Quick Start', link: '/guide/getting-started' },
+          {
+            text: 'Declaring vs Inferring',
+            link: '/guide/declaring-vs-inferring',
+          },
           { text: 'Parsers', link: '/guide/parsers' },
           { text: 'Guards', link: '/guide/guards' },
           {
@@ -104,10 +108,6 @@ export default defineConfig({
                 link: '/guide/comparison#yup',
               },
             ],
-          },
-          {
-            text: 'Declaring vs Inferring',
-            link: '/guide/declaring-vs-inferring',
           },
         ],
       },

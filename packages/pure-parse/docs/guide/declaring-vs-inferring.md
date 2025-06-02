@@ -2,7 +2,9 @@
 
 PureParse allows your to both declare the type of your validation functions explicitly, and to infer the types from the validation logic:
 
-```ts
+::: code-group
+
+```ts [Parser]
 import { object, parseString, parseNumber } from 'pure-parse'
 
 type User = {
@@ -17,9 +19,28 @@ const parseUser = object<User>({
 })
 ```
 
+```ts [Guard]
+import { objectGuard, isString, isNumber } from 'pure-parse'
+
+type User = {
+  name: string
+  age: number
+}
+
+// Declaring the type explicitly
+const isUser = objectGuard<User>({
+  name: isString,
+  age: isNumber,
+})
+```
+
+:::
+
 versus:
 
-```ts
+::: code-group
+
+```ts [Parser]
 import { object, parseString, parseNumber } from 'pure-parse'
 
 // Inferring the type from the validation logic
@@ -29,16 +50,112 @@ const parseUser = object({
 })
 ```
 
+```ts [Guard]
+import { objectGuard, isString, isNumber } from 'pure-parse'
+
+// Inferring the type from the validation logic
+const isUser = objectGuard({
+  name: isString,
+  age: isNumber,
+})
+```
+
+:::
+
 But which one should you use?
 
 ## Decoupling
 
-Inferring types can be convenient because you do not have to repeat the structure of the type in both the type alias and the parser. However, this convenience can come at a great cost: if you ever decide to switch to another validation library, _you will lose all your types_, since they're inferred from the schema. The problem with inferrence is that it couple the type aliases to the validation library. By instead deriving the parser from
+Consider this example library code for an HTTP client which is using Zod:
 
-Another benefit of declaring the types explicitly is that you can derive multiple parsers and guards from a single type alias.
+```ts
+import { z } from 'zod'
 
-> [!INFO]
-> This section is a work in progress...
+// Define the Zod schema
+const userSchema = z.object({
+  id: z.number(),
+  email: z.string(),
+})
+
+// Define the inferred TypeScript type
+export type User = z.infer<typeof userSchema>
+
+// Use a custom `Result` type for error handling
+import type { type Result, failure } from './result'
+
+export function fetchUsers(): Promise<Result<User[]>> {
+  return fetch('/api/users')
+    .then((response) => response.json())
+    .then((data) => userSchema.parse(data))
+    .catch(() => failure('Failed to fetch users'))
+}
+```
+
+The problem is that the type `User` contains a lot of references to `Zod`, which means that if you ever decide to switch to another validation library, **you will lose all your types**!
+
+With PureParse, you can define the type explicitly, decoupling it from the validation library:
+
+```ts
+import { object, parseNumber, parseString } from 'pure-parse'
+
+type User = {
+  id: number
+  email: string
+}
+
+const parseUser = object<User>({
+  id: parseNumber,
+  email: parseString,
+})
+
+// Use a custom `Result` type for error handling
+import { type Result, failure } from './result'
+
+export function fetchUsers(): Promise<Result<User[]>> {
+  return fetch('/api/users')
+    .then((response) => response.json())
+    .then(parseUser)
+    .catch(() => failure('Failed to fetch users'))
+}
+```
+
+Inferring types can thus be convenient because you do not have to repeat the structure of the type in both the type alias and the parser. However, this convenience can come at a great cost: if you ever decide to switch to another validation library, _you will lose all your types_. The problem with inferrence is that it couples the type aliases to the validation library.
+
+This is especially a problem in library code that may use a validation internally, but does not want to expose the validation library code via a its own API. For example, consider an HTTP client library that exposes a function `fetchUsers`:
+
+### Multiple Validation Functions for the Same Type
+
+Another benefit of declaring the types explicitly is that you can derive multiple parsers and guards from a single type alias:
+
+```ts
+import {
+  object,
+  parseString,
+  parseNumber,
+  objectGuard,
+  isString,
+  isNumber,
+} from 'pure-parse'
+
+type User = {
+  name: string
+  age: number
+}
+
+const parseUser = object<User>({
+  name: parseString,
+  age: parseNumber,
+})
+
+const isUser = objectGuard<User>({
+  name: isString,
+  age: isNumber,
+})
+
+// Etc. etc.
+```
+
+When inferring the type, there is no way to define multiple parsers/guards and guarantee that they describe the same type.
 
 ## Subtyping
 

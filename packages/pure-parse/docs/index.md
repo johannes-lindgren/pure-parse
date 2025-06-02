@@ -12,8 +12,8 @@ hero:
       text: Quick Start
       link: /guide/getting-started
     - theme: alt
-      text: Overview
-      link: /guide/overview
+      text: Why PureParse?
+      link: /guide/why-pure-parse
     - theme: alt
       text: API Reference
       link: /api
