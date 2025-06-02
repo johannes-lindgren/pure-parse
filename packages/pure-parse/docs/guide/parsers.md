@@ -19,6 +19,7 @@ To find out whether the parsing was successful, read the `tag` property of the r
 ```ts
 import { parseString, parseNumber, object } from 'pure-parse'
 import data from 'my-data.json'
+import { formatResult } from 'pure-parse/src'
 
 const parseUser = object({
   name: parseString,
@@ -32,7 +33,7 @@ switch (result.tag) {
     console.log(`The user's name is "${result.value.name}"`)
     break
   case 'failure':
-    console.log(`Failed to parse the user: ${result.error}`)
+    console.log(formatResult(result))
     break
 }
 ```

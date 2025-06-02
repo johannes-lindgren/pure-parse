@@ -100,9 +100,9 @@ export const chain =
 export const recover =
   <A>(
     parser: Parser<A>,
-    parseFailure: (error: ParseFailure) => ParseResult<A>,
+    parseFailure: (error: ParseFailure['error']) => ParseResult<A>,
   ): Parser<A> =>
   (value) => {
     const result = parser(value)
-    return isFailure(result) ? parseFailure(result) : result
+    return isFailure(result) ? parseFailure(result.error) : result
   }
