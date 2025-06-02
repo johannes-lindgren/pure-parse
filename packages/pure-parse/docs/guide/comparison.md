@@ -2,7 +2,7 @@
 
 What sets PureParse apart from other validation libraries is the freedom it gives to the user to choose between type inference and explicit type declarations.
 
-For a more detailed comparison, see the [overview](./overview).
+For a more detailed comparison, see the [Why PureParse](./why-pure-parse.md) aricle.
 
 ## Performance Benchmarks
 
