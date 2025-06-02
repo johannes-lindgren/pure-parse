@@ -219,8 +219,8 @@ describe('parsing', () => {
       })
       it('can read the error message', () => {
         const parseFailure = () => failure('Expected type number')
-        const parseNum = recover(parseFailure, (result) =>
-          failure(`${result.error.message}!`),
+        const parseNum = recover(parseFailure, (error) =>
+          failure(`${error.message}!`),
         )
         expect(parseNum('abc')).toEqual(failure('Expected type number!'))
       })
