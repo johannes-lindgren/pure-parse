@@ -43,9 +43,9 @@ export const formatResult = <T>(
 }
 
 const formatFailure = (failure: ParseFailure): string =>
-  failure.path.length === 0
-    ? failure.error
-    : `${failure.error} at ${formatPath(failure.path)}`
+  failure.error.path.length === 0
+    ? failure.error.message
+    : `${failure.error.message} at ${formatPath(failure.error.path)}`
 
 /**
  * Formats a failure `Path` to a JsonPath.
