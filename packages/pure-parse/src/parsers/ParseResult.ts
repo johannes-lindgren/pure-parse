@@ -5,9 +5,7 @@ import { Parser } from './Parser'
  */
 
 /**
- * *****************************
  * The data adheres to the schema. The `value` is equal to the parsed data
- * *****************************
  */
 export type ParseSuccess<T> = {
   tag: 'success'
@@ -19,10 +17,12 @@ export type ParseSuccess<T> = {
  */
 export type ParseFailure = {
   tag: 'failure'
-  error: {
-    message: string
-    path: PathSegment[]
-  }
+  error: Failure
+}
+
+export type Failure = {
+  message: string
+  path: PathSegment[]
 }
 
 /**

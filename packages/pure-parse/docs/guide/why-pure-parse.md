@@ -1,20 +1,6 @@
-# Overview
+# Why PureParse?
 
-PureParse is a lightweight validation library that aims to shift the coupling direction—making type aliases the primary driver for parser structure.
-
-These are the main features and goals of PureParse:
-
-[[toc]]
-
-> [!NOTE]
->
-> PureParse follows the [Parse, don't validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) principle.
-
-## Declaring Types
-
-Modern validation libraries use TypeScript generics to infer types from schemas, which guarantees type safety. But this approach has a huge downside: the schema becomes the source of truth for the types. This means that if you migrate to another validation library, _you lose all types_.
-
-PureParse takes a different approach: it uses type aliases as the source of truth, letting you type-check the parser structure:
+PureParse lets you achieve 100% type safety without leaking validation library types into your application code—you define your types once, and then you type check your validation logic against the type aliases:
 
 ```ts
 import { object, parseString, parseNumber } from 'pure-parse'
@@ -32,9 +18,17 @@ const parseUser = object<User>({
 
 If the validation function does not match the type, TypeScript will yield an error.
 
-The main benefit of this approach is that the type aliases are decoupled from the validation library, which makes it easier to migrate to another validation library.
+PureParse is a lightweight validation library that aims to shift the coupling direction—rather than deriving your type aliases from schemas, you define type aliases as the source of truth. This means that the **types** have **0 dependencies** on the validation library.
 
-Inferred types consist of complex type expressions, which are hard to read. Type aliases declared explicitly are much more readable.
+Many modern validation libraries use TypeScript generics to infer types from schemas; this approach guarantees type safety, but it comes with a _huge_ downside: the schema becomes the source of truth for the types. This means that if you migrate to another validation library, _you lose all types_.
+
+> [!NOTE]
+>
+> PureParse follows the [Parse, don't validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) principle.
+
+These are the _other_ main features and design goals of PureParse:
+
+[[toc]]
 
 ## Inferring Types
 
