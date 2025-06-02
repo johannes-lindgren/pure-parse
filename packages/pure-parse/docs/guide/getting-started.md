@@ -82,6 +82,8 @@ The result from parsing is a tagged union with the property `tag` as discriminat
 
 ```ts
 // Replace `data` with your own
+import { formatResult } from 'pure-parse/src'
+
 const result = parseUser(data)
 
 switch (result.tag) {
@@ -89,7 +91,7 @@ switch (result.tag) {
     console.log(`The user's name is "${result.value.name}"`)
     break
   case 'failure':
-    console.log(`Failed to parse the user: ${result.error}`)
+    console.log(formatResult(result))
     break
 }
 ```

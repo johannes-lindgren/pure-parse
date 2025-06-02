@@ -1,4 +1,4 @@
-import { describe, expect, it, test } from 'vitest'
+import { describe, expect, it, test, vi } from 'vitest'
 import { array } from './arrays'
 import { object } from './object'
 import { oneOf } from './oneOf'
@@ -6,7 +6,7 @@ import { parseNumber, parseString } from './primitives'
 import { equals } from './equals'
 import { optional } from './optional'
 import { withDefault } from './withDefault'
-import { failure, isSuccess, success } from './ParseResult'
+import { failure, isSuccess, ParseFailure, success } from './ParseResult'
 import { chain, map, recover } from './Parser'
 
 const expectFailure = () =>
@@ -223,6 +223,14 @@ describe('parsing', () => {
           failure(`${error.message}!`),
         )
         expect(parseNum('abc')).toEqual(failure('Expected type number!'))
+      })
+      test('that the callback function accepts the error', () => {
+        const error = failure('Expected type number')
+        const parseFailure = () => error
+        const callback = vi.fn((error: ParseFailure['error']) => failure(error))
+        const parseNum = recover(parseFailure, callback)
+        parseNum('abc')
+        expect(callback).toHaveBeenCalledWith(error.error)
       })
     })
   })
