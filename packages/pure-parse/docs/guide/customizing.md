@@ -18,11 +18,10 @@ import {
   isString,
   parseNumber,
 } from 'pure-parse'
-import { isSuccess } from 'pure-parse/src'
 
 const parseStringifiedNumber: Parser<number> = (data: unknown) => {
   const result = parseNumber(data)
-  if (!isSuccess(data)) {
+  if (data.error) {
     return result
   }
   return success(result.value.toString())

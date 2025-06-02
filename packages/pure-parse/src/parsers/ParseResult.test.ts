@@ -10,8 +10,27 @@ import {
   propagateFailure,
 } from './ParseResult'
 import { Equals } from '../internals'
+import { parseNumber } from './primitives'
 
 describe('ParseResult', () => {
+  describe('the `.error` property', () => {
+    it('can be used to discriminate between Success and Failure', () => {
+      const resultOk = parseNumber(123)
+      // Type checking here
+      if (resultOk.error) {
+        throw new Error('Expected success result')
+      }
+      const t1: Equals<typeof resultOk, ParseSuccess<number>> = true
+      expect(resultOk.tag).toEqual('success')
+
+      const resultError = parseNumber('abc')
+      if (!resultError.error) {
+        throw new Error('Expected failure result')
+      }
+      const t2: Equals<typeof resultError, ParseFailure> = true
+      expect(resultError.tag).toEqual('failure')
+    })
+  })
   describe('utilities', () => {
     describe('isSuccess', () => {
       test('success result', () => {
@@ -42,6 +61,30 @@ describe('ParseResult', () => {
         test('the return type is just ParseFailure', () => {
           const res = failure('Error')
           const a: Equals<typeof res, ParseFailure> = true
+        })
+      })
+    })
+    describe('success', () => {
+      it('creates a success result', () => {
+        const result = success(123)
+        expect(result).toEqual({
+          tag: 'success',
+          value: 123,
+        })
+      })
+      test('that .error not `undefined`', () => {
+        expect('error' in success(123)).toBe(false)
+      })
+    })
+    describe('failure', () => {
+      it('creates a failure result', () => {
+        const result = failure('Error message')
+        expect(result).toEqual({
+          tag: 'failure',
+          error: {
+            message: 'Error message',
+            path: [],
+          },
         })
       })
     })
@@ -98,15 +141,6 @@ describe('ParseResult', () => {
             }),
           }),
         )
-      })
-    })
-  })
-  describe('success', () => {
-    it('creates a success result', () => {
-      const result = success(123)
-      expect(result).toEqual({
-        tag: 'success',
-        value: 123,
       })
     })
   })

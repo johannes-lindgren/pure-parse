@@ -75,7 +75,7 @@ parseNumber('abc') // -> ParseSuccess<0>
 It also allows you to customize the error message:
 
 ```ts
-import { recoverm, failure, formatResult } from 'pure-parse/src'
+import { recoverm, failure, formatResult } from 'pure-parse'
 
 const parseUuid = recover(parseString, () => failure('A UUID must be a string'))
 

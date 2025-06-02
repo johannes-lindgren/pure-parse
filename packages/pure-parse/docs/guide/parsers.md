@@ -10,30 +10,35 @@ where `ParseResult` is a discriminated union:
 
 ```ts
 type ParseResult<T> =
-  | { tag: 'success'; value: T }
+  | { tag: 'success'; value: T; error?: never }
   | { tag: 'failure'; error: string }
 ```
 
-To find out whether the parsing was successful, read the `tag` property of the result; for example:
+To find out whether the parsing was successful, read the `error` or `tag` properties of the result; for example:
+
+...using the `error` property:
 
 ```ts
-import { parseString, parseNumber, object } from 'pure-parse'
-import data from 'my-data.json'
-import { formatResult } from 'pure-parse/src'
+const result = parseUser(data)
 
-const parseUser = object({
-  name: parseString,
-  age: parseNumber,
-})
+if (result.error) {
+  console.log(formatResult(result))
+  return
+}
+console.log(`The user's name is "${result.value.name}"`)
+```
 
+...or using the `tag` property:
+
+```ts
 const result = parseUser(data)
 
 switch (result.tag) {
-  case 'success':
-    console.log(`The user's name is "${result.value.name}"`)
-    break
   case 'failure':
     console.log(formatResult(result))
+    break
+  case 'success':
+    console.log(`The user's name is "${result.value.name}"`)
     break
 }
 ```
