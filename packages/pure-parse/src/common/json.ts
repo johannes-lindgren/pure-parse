@@ -1,5 +1,5 @@
 /**
- * A value that represent any JSON-serializable data
+ * A value that represent any JSON-serializable data.
  */
 export type JsonValue =
   | null
