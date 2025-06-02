@@ -68,10 +68,15 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Guides',
+        text: 'Introduction',
         items: [
-          { text: 'Overview', link: '/guide/overview' },
-          { text: 'Quick Start', link: '/guide/getting-started' },
+          { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'Why PureParse?', link: '/guide/why-pure-parse' },
+        ],
+      },
+      {
+        text: 'Guide',
+        items: [
           {
             text: 'Declaring vs Inferring',
             link: '/guide/declaring-vs-inferring',
