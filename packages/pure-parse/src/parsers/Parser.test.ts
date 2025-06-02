@@ -181,6 +181,14 @@ describe('parsing', () => {
           expect(parseNonEmptyArray([1, 2, 3])).toEqual(success([1, 2, 3]))
         })
       })
+      test('that the callback function receives the value', () => {
+        const error = success(123)
+        const parseSuccess = () => error
+        const callback = vi.fn((value: number) => success(1234556))
+        const parseNum = chain(parseSuccess, callback)
+        parseNum('abc')
+        expect(callback).toHaveBeenCalledWith(123)
+      })
     })
     describe('recover', () => {
       it('allows static defaults', () => {
@@ -224,10 +232,12 @@ describe('parsing', () => {
         )
         expect(parseNum('abc')).toEqual(failure('Expected type number!'))
       })
-      test('that the callback function accepts the error', () => {
+      test('that the callback function receives the error', () => {
         const error = failure('Expected type number')
         const parseFailure = () => error
-        const callback = vi.fn((error: ParseFailure['error']) => failure(error))
+        const callback = vi.fn((error: ParseFailure['error']) =>
+          failure('Some other error'),
+        )
         const parseNum = recover(parseFailure, callback)
         parseNum('abc')
         expect(callback).toHaveBeenCalledWith(error.error)
