@@ -9,7 +9,7 @@ export default defineConfig({
   description:
     'Strongly typed validation library that decouples types from validation logic.',
   head: [
-    ['link', { rel: 'icon', href: `${baseUrl}/logo.webp` }],
+    ['link', { rel: 'icon', href: `${baseUrl}/logo-small.webp` }],
     [
       'meta',
       {
@@ -35,7 +35,7 @@ export default defineConfig({
           'Strongly typed validation library that decouples types from validation logic.',
       },
     ],
-    ['meta', { property: 'og:image', content: `${baseUrl}/logo.webp` }],
+    ['meta', { property: 'og:image', content: `${baseUrl}/logo-small.webp` }],
     ['meta', { property: 'og:type', content: 'website' }],
     // Twitter Card tags
     [
@@ -53,13 +53,13 @@ export default defineConfig({
           'Strongly typed validation library that decouples types from validation logic.',
       },
     ],
-    ['meta', { name: 'twitter:image', content: `${baseUrl}/logo.webp` }],
+    ['meta', { name: 'twitter:image', content: `${baseUrl}/logo-small.webp` }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
   ],
 
   srcDir: 'docs',
   themeConfig: {
-    logo: '/logo.webp',
+    logo: '/logo-small.webp',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
@@ -121,6 +121,10 @@ export default defineConfig({
       {
         icon: 'github',
         link: 'https://github.com/johannes-lindgren/pure-parse',
+      },
+      {
+        icon: 'npm',
+        link: 'https://www.npmjs.com/package/pure-parse',
       },
     ],
 
