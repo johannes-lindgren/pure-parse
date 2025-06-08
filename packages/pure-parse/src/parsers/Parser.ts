@@ -1,5 +1,6 @@
 import { OmitProperty } from '../internals'
 import {
+  failure,
   isFailure,
   isSuccess,
   ParseFailure,
@@ -7,6 +8,8 @@ import {
   ParseSuccess,
   success,
 } from './ParseResult'
+import { Guard } from '../guards'
+import { formatResult } from './formatting'
 
 export type Parser<T> = (data: unknown) => ParseResult<T>
 
@@ -105,4 +108,33 @@ export const recover =
   (value) => {
     const result = parser(value)
     return isFailure(result) ? parseFailure(result.error) : result
+  }
+
+/**
+ * Construct a parser from a type guard.
+ * Tip: construct parsers from scratch for better error messages, and generally more flexibility.
+ * @example
+ * ```ts
+ * const isUser = objectGuard({
+ *   id: isNumber,
+ *   name: isString,
+ * })
+ * const parseUser = parserFromGuard(isUser)
+ * @param guard
+ */
+export const parserFromGuard =
+  <T>(guard: Guard<T>): Parser<T> =>
+  (data: unknown) =>
+    guard(data)
+      ? success(data)
+      : failure(`The data does not match the type guard`)
+
+export const assert =
+  <T>(parser: Parser<T>) =>
+  (data: unknown): T => {
+    const result = parser(data)
+    if (isFailure(result)) {
+      throw new Error(formatResult(result))
+    }
+    return result.value
   }

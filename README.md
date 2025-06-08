@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.webp" width="200px" align="center" alt="PureParse logo" />  
+  <img src="https://pure-parse.vercel.app/logo-small.webp" width="200px" align="center" alt="PureParse logo" />  
   <h1 align="center">PureParse</h1>
   <h3>Typesafe, lightweight parsers</h3>
   <p align="center">
