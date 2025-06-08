@@ -85,6 +85,7 @@ export default defineConfig({
           { text: 'Transformations', link: '/guide/transformations' },
           { text: 'Custom Parsers', link: '/guide/customizing' },
           { text: 'Formatting', link: '/guide/formatting' },
+          { text: 'JSON', link: '/guide/json' },
           { text: 'Performance', link: '/guide/performance' },
           { text: 'Security', link: '/guide/security' },
           {
