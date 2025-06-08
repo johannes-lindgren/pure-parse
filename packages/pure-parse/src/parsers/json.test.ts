@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { parseJson } from './json'
 import { object } from './object'
 import { parseNumber, parseString } from './primitives'
+import { chain } from './Parser'
 
 const expectFailure = () =>
   expect.objectContaining({
@@ -68,31 +69,32 @@ describe('parseJson', () => {
       ).toEqual(expectSuccess([null, { key: 'value' }, [1, 2, 3]]))
     })
   })
-})
-
-describe('json', () => {
-  it('invalidates non-JSON strings', () => {
-    expect(parseJson('invalid json string')).toEqual(expectFailure())
-  })
-  it('parsesStrings', () => {
-    const value = 'hello'
-    const json = JSON.stringify(value)
-    expect(parseJson(json)).toEqual(expectSuccess(value))
-  })
-  it('parses objects', () => {
-    const value = {
-      name: 'John',
-      age: 30,
-    }
-    const json = JSON.stringify(value)
+  describe('chaining', () => {
     const parseUser = object({
       name: parseString,
       age: parseNumber,
     })
-    expect(parseJson(json)).toEqual(expectSuccess(value))
-  })
-  it('invalidates non-JSON strings', () => {
-    const invalidJson = 'invalid json string'
-    expect(parseJson(invalidJson)).toEqual(expectFailure())
+    it('invalidates non-JSON strings', () => {
+      expect(chain(parseJson, parseUser)('invalid json string')).toEqual(
+        expectFailure(),
+      )
+    })
+    it('parsesStrings', () => {
+      const value = 'hello'
+      const json = JSON.stringify(value)
+      expect(chain(parseJson, parseString)(json)).toEqual(expectSuccess(value))
+    })
+    it('parses objects', () => {
+      const value = {
+        name: 'John',
+        age: 30,
+      }
+      const json = JSON.stringify(value)
+      expect(chain(parseJson, parseUser)(json)).toEqual(expectSuccess(value))
+    })
+    it('invalidates non-JSON strings', () => {
+      const invalidJson = 'invalid json string'
+      expect(chain(parseJson, parseUser)(invalidJson)).toEqual(expectFailure())
+    })
   })
 })
