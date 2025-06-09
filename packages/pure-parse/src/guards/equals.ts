@@ -1,5 +1,5 @@
 import { Primitive } from '../common'
-import { Guard } from './types'
+import { Guard } from './Guard'
 
 /**
  * Compares the input against a list of primitive values with the strict equality operator (`===`).

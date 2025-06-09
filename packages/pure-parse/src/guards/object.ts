@@ -1,4 +1,4 @@
-import { Guard, OptionalGuard } from './types'
+import { Guard, OptionalGuard } from './Guard'
 import { optionalSymbol } from '../internals'
 import { lazy } from '../common'
 import { Parser } from '../parsers'

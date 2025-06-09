@@ -1,4 +1,4 @@
-import { Guard } from './types'
+import { Guard } from './Guard'
 
 /**
  * Returns a guard that checks whether the data is an instance of the given constructor.

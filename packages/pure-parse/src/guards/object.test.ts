@@ -1,7 +1,7 @@
 import { objectGuard, objectGuardCompiled } from './object'
 import { describe, expect, it, test } from 'vitest'
 import { isNumber, isString, isUndefined } from './primitives'
-import { Guard } from './types'
+import { Guard } from './Guard'
 import { oneOfGuard } from './oneOf'
 import { optionalGuard, undefineableGuard } from './optional'
 import { objectGuardCompiledMemo, objectGuardMemo } from '../memoization'

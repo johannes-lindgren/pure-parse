@@ -1,4 +1,4 @@
-import { Guard } from './types'
+import { Guard } from './Guard'
 import { JsonValue } from '../common'
 
 /**

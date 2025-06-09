@@ -1,7 +1,7 @@
 import { describe, expect, it, test } from 'vitest'
 import { arrayGuard, nonEmptyArrayGuard } from './arrays'
 import { isBoolean, isNonEmptyArray, isNumber, isString } from './primitives'
-import { Guard } from './types'
+import { Guard } from './Guard'
 import { Infer } from '../common'
 import { Equals } from '../internals'
 import { oneOfGuard } from './oneOf'

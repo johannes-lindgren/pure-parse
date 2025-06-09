@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { equalsGuard } from './equals'
-import { Guard } from './types'
+import { Guard } from './Guard'
 import { isString } from './primitives'
 
 describe('equals', () => {

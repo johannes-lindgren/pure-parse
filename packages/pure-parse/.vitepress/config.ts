@@ -83,6 +83,7 @@ export default defineConfig({
           },
           { text: 'Parsers', link: '/guide/parsers' },
           { text: 'Guards', link: '/guide/guards' },
+          { text: 'Data Types', link: '/guide/data-types' },
           {
             text: 'Failure Handling',
             link: '/guide/error-handling',

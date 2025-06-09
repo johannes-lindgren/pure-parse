@@ -1,4 +1,4 @@
-import { Guard, OptionalGuard } from './types'
+import { Guard, OptionalGuard } from './Guard'
 import { oneOfGuard } from './oneOf'
 import { isNull, isUndefined } from './primitives'
 import { optionalSymbol } from '../internals'

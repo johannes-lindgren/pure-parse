@@ -1,4 +1,4 @@
-import { Guard } from './types'
+import { Guard } from './Guard'
 
 /**
  * Dictionaries are objects that map strings to other values. *
