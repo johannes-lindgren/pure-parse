@@ -77,13 +77,13 @@ export default defineConfig({
       {
         text: 'Guide',
         items: [
-          {
-            text: 'Declaring vs Inferring',
-            link: '/guide/declaring-vs-inferring',
-          },
           { text: 'Parsers', link: '/guide/parsers' },
           { text: 'Guards', link: '/guide/guards' },
           { text: 'Data Types', link: '/guide/data-types' },
+          {
+            text: 'Declaring vs. Inferring',
+            link: '/guide/declaring-vs-inferring',
+          },
           {
             text: 'Failure Handling',
             link: '/guide/error-handling',
