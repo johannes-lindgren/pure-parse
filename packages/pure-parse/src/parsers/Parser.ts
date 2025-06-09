@@ -128,13 +128,3 @@ export const parserFromGuard =
     guard(data)
       ? success(data)
       : failure(`The data does not match the type guard`)
-
-export const assert =
-  <T>(parser: Parser<T>) =>
-  (data: unknown): T => {
-    const result = parser(data)
-    if (isFailure(result)) {
-      throw new Error(formatResult(result))
-    }
-    return result.value
-  }

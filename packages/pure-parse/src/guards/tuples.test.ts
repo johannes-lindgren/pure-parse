@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { tupleGuard } from './tuples'
-import { Guard } from './types'
+import { Guard } from './Guard'
 import { isBoolean, isNumber, isString } from './primitives'
 
 describe('tuples', () => {

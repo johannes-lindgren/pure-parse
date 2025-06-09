@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { isBoolean, isNumber, isString } from './primitives'
-import { Guard } from './types'
+import { Guard } from './Guard'
 import { equalsGuard } from './equals'
 import { objectGuard } from './object'
 import { oneOfGuard } from './oneOf'

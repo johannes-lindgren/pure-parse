@@ -7,7 +7,9 @@ import { equals } from './equals'
 import { optional } from './optional'
 import { withDefault } from './withDefault'
 import { failure, isSuccess, ParseFailure, success } from './ParseResult'
-import { chain, map, recover } from './Parser'
+import { chain, map, Parser, parserFromGuard, recover } from './Parser'
+import { isNumber, isString, objectGuard } from '../guards'
+import { Equals } from '../internals'
 
 const expectFailure = () =>
   expect.objectContaining({
@@ -242,6 +244,28 @@ describe('parsing', () => {
         parseNum('abc')
         expect(callback).toHaveBeenCalledWith(error.error)
       })
+    })
+  })
+  describe('parserFromGuard', () => {
+    type User = {
+      id: number
+      name: string
+    }
+    const isUser = objectGuard({
+      id: isNumber,
+      name: isString,
+    })
+    const parseUser = parserFromGuard(isUser)
+    test('types', () => {
+      const t0: Equals<typeof parseUser, Parser<User>> = true
+    })
+    it('handles data that validates', () => {
+      const data = { id: 1, name: 'John Doe' }
+      expect(parseUser(data)).toEqual(success(data))
+    })
+    it('handles data that does not validate', () => {
+      const data = { id: '1', name: 'John Doe' }
+      expect(parseUser(data)).toEqual(expectFailure())
     })
   })
 })

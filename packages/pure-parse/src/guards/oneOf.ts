@@ -1,4 +1,4 @@
-import { Guard } from './types'
+import { Guard } from './Guard'
 
 /**
  * Executes `guards` in order and returns true if any guard matches. The result type is a union.

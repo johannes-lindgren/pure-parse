@@ -1,5 +1,5 @@
 export * from './primitives'
-export * from './types'
+export * from './Guard'
 export * from './equals'
 export * from './oneOf'
 export * from './tuples'

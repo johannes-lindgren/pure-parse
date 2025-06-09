@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { oneOfGuard } from './oneOf'
 import { equalsGuard } from './equals'
-import { Guard } from './types'
+import { Guard } from './Guard'
 import { isNull, isNumber, isString, isUndefined } from './primitives'
 
 describe('unions', () => {

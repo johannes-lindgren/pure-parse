@@ -1,4 +1,4 @@
-import { Guard } from './types'
+import { Guard } from './Guard'
 
 /**
  * @param guards an array of guards. Each guard validates the corresponding element in the data tuple.

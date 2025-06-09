@@ -26,7 +26,7 @@ $ bun add pure-parse
 
 :::
 
-Create a [parser](parsers) by composing higher-order functions with parser primitives.
+Create a [parser](parsers) by composing higher-order functions with parser primitives:
 
 ::: code-group
 
