@@ -27,5 +27,26 @@ import {
 // JSON
 import { JsonValue, parseJson, isJsonValue } from 'pure-parse'
 
+// Higher order parsers
+import {
+  array,
+  object,
+  oneOf,
+  optional,
+  withDefault,
+  equals,
+  map,
+  chain,
+  recover,
+} from 'pure-parse'
+
+// Higher order guards
+import {
+  equalsGuard,
+  objectGuard,
+  arrayGuard,
+  optionalGuard,
+} from 'pure-parse'
+
 // @ts-expect-error -- test that importing something that doesn't exist gives an error
 import { abcSomethingThatDoesNotExist } from 'pure-parse'
