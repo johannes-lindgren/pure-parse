@@ -26,3 +26,6 @@ import {
 
 // JSON
 import { JsonValue, parseJson, isJsonValue } from 'pure-parse'
+
+// @ts-expect-error -- test that importing something that doesn't exist gives an error
+import { abcSomethingThatDoesNotExist } from 'pure-parse'
