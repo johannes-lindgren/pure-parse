@@ -1,7 +1,7 @@
 /**
  * Creates a lazy-loaded function that initializes the function only when it is called for the first time.
  * With `lazy`, you can create recursive parsers without running into circular dependencies.
- * Also useful to lazily initialize just-in-time compuliled parsers and guards.
+ * Also useful to lazily initialize just-in-time compiled parsers and guards.
  * @example
  * Create recursive parsers with `lazy`.
  * Note that you must use explicit type annotations:
