@@ -90,6 +90,7 @@ export default defineConfig({
           },
           { text: 'Transformations', link: '/guide/transformations' },
           { text: 'Custom Parsers', link: '/guide/customizing' },
+          { text: 'Recursion', link: '/guide/recursion' },
           { text: 'Formatting', link: '/guide/formatting' },
           { text: 'JSON', link: '/guide/json' },
           { text: 'Performance', link: '/guide/performance' },
