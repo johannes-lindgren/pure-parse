@@ -51,7 +51,7 @@ const isPerson: Guard<Person> = lazy(() =>
 :::
 
 > [!NOTE]
-> You must use explicit type annotations for recursive types. Type inferrence is not available in this case.
+> You must use explicit type annotations for recursive types. Type inference is not available in this case.
 
 There are two tricks to note here:
 
