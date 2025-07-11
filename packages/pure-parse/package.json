@@ -20,7 +20,11 @@
     "parsing",
     "type",
     "inference",
-    "CRDT"
+    "CRDT",
+    "composable",
+    "fast",
+    "declarative",
+    "functional"
   ],
   "license": "MIT",
   "sideEffects": false,
