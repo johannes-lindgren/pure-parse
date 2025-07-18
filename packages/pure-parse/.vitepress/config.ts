@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 import typedocSidebar from '../docs/api/typedoc-sidebar.json'
 
-const baseUrl = 'https://pure-parse.vercel.app'
+const baseUrl = 'https://pureparse.dev'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
