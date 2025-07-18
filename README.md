@@ -1,12 +1,12 @@
 <div align="center">
-  <img src="https://pure-parse.vercel.app/logo-small.webp" width="200px" align="center" alt="PureParse logo" />  
+  <img src="https://pureparse.dev/logo-small.webp" width="200px" align="center" alt="PureParse logo" />  
   <h1 align="center">PureParse</h1>
   <h3>Typesafe, lightweight parsers</h3>
   <p align="center">
     Strongly typed validation library that decouples type aliases from validation logic
   </p>
   <p align="center">
-  <a href="https://pure-parse.vercel.app" style="padding: 10px 15px; background-color: #3d9efe; color: white; border-radius: 20px; line-height: 38px; font-size: 14px">Documentation</a>
+  <a href="https://pureparse.dev" style="padding: 10px 15px; background-color: #3d9efe; color: white; border-radius: 20px; line-height: 38px; font-size: 14px">Documentation</a>
   </p>
 </div>
 
