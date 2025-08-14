@@ -35,13 +35,13 @@
   "type": "module",
   "module": "./dist/index.js",
   "main": "./dist/index.cjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "dev": "vite build --watch",
@@ -67,6 +67,7 @@
     "vite-bundle-visualizer": "^1.2.1",
     "vitepress": "^1.4.0",
     "prettier": "3.1.0",
+    "tsdown": "^0.14.1",
     "typedoc": "^0.26.8",
     "typedoc-plugin-markdown": "^4.2.9",
     "typedoc-vitepress-theme": "^1.0.2",
