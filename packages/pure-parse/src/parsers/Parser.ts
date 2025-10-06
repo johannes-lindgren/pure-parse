@@ -120,6 +120,7 @@ export const recover =
  *   name: isString,
  * })
  * const parseUser = parserFromGuard(isUser)
+ * ```
  * @param guard
  */
 export const parserFromGuard =
