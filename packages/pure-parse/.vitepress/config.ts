@@ -141,8 +141,13 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern:
-        'https://github.com/johannes-lindgren/pure-parse/edit/main/packages/pure-parse/docs/:path',
+      pattern: ({ filePath }) => {
+        if (filePath.startsWith('api')) {
+          const path = filePath.replace(/^api\//, '').replace(/\.md$/, '.ts')
+          return `https://github.com/johannes-lindgren/pure-parse/edit/main/packages/pure-parse/src/${path}`
+        }
+        return `https://github.com/johannes-lindgren/pure-parse/edit/main/packages/pure-parse/docs/${filePath}`
+      },
     },
   },
 })
