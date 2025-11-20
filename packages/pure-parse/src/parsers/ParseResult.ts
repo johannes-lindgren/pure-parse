@@ -141,3 +141,75 @@ export const propagateFailure = (
     path: [pathSegment, ...failureRes.error.path],
   },
 })
+
+/**
+ * Transform a successful result to a new value.
+ * @example
+ * Transform a successful parse result to a different type:
+ * ```ts
+ * const idResult = parseNumber(123)
+ * mapParseResult(idResult, (id) => id.toString()) // -> ParseSuccess<'123'>
+ * ```
+ * @see `map`
+ * @param result
+ * @param fn
+ */
+export const mapSuccess = <A, B>(
+  result: ParseResult<A>,
+  fn: (value: A) => B,
+): ParseResult<B> => (isSuccess(result) ? success(fn(result.value)) : result)
+
+/**
+ * Chain together a sequence of computations that may fail.
+ * @example
+ * ```
+ * const result = parseNumber(5)
+ * flatMapSuccess(result, (value) => success(value * 2)) // -> ParseSuccess<10>
+ * ```
+ * @see `chain`
+ * @param result
+ * @param fn
+ */
+export const flatMapSuccess = <T, U>(
+  result: ParseResult<T>,
+  fn: (value: T) => ParseResult<U>,
+): ParseResult<U> => (isSuccess(result) ? fn(result.value) : result)
+
+/**
+ * Transform a failure.
+ * @example
+ * An error contains too ambiguous information:
+ * ```ts
+ * const idResult = parseNumberFromString('abc')
+ * mapFailure(idResult, (error) => ({ message: 'An ID must be a number', path: error.path }))
+ * ```
+ * Map a failure result to a new value.
+ * @param result
+ * @param fn
+ */
+export const mapFailure = <T>(
+  result: ParseResult<T>,
+  fn: (failure: Failure) => Failure,
+): ParseResult<T> =>
+  isFailure(result)
+    ? {
+        tag: 'failure',
+        error: fn(result.error),
+      }
+    : result
+
+/**
+ * Recover from a failure by providing an alternative parsing result.
+ * @example
+ * ```
+ * const result = parseNumberFromString('abc')
+ * flatMapFailure(result, (error) => success(0)) // -> ParseSuccess<0>
+ * ```
+ * @see `withDefault`
+ * @param result
+ * @param fn
+ */
+export const flatMapFailure = <T>(
+  result: ParseResult<T>,
+  fn: (result: Failure) => ParseResult<T>,
+): ParseResult<T> => (isSuccess(result) ? result : fn(result.error))

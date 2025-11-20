@@ -82,3 +82,14 @@ const parseUuid = recover(parseString, () => failure('A UUID must be a string'))
 formatResult(parseUuid('123e4567-e89b-12d3-a456-426614174000')) // -> ParseSuccess: 123e4567-e89b-12d3-a456-426614174000
 formatResult(parseUuid(123)) // -> ParseFailure: A UUID must be a string at $
 ```
+
+## Natural Transformations of `ParseResult`
+
+It's also possible to apply transformations on the `ParseResult` data type:
+
+| Function Name                                              | Use case                                                | Type Signature                                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [mapResult](/api/utils/ParseResult.md#mapSuccess)          | Transform successful values                             | `(result: ParseResult<A>, fn: (A) => B) => ParseResult<B>`                         |
+| [mapFailure](/api/utils/ParseResult.md#mapFailure)         | Improve failure messages                                | `(result: ParseResult<A>, fn: (ParseFailure) => ParseFailure) => ParseResult<A>`   |
+| [flatMapResult](/api/utils/ParseResult.md#flatMapSuccess)  | Chain together a sequence of computations that may fail | `(result: ParseResult<A>, fn: (A) => ParseResult<B>) => ParseResult<B>`            |
+| [flatMapFailure](/api/utils/ParseResult.md#flatMapFailure) | Recover from failures                                   | `(result: ParseResult<A>, fn: (ParseFailure) => ParseResult<A>) => ParseResult<A>` |
