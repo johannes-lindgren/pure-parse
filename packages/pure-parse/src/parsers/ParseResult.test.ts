@@ -12,9 +12,11 @@ import {
   mapFailure,
   flatMapSuccess,
   flatMapFailure,
+  unwrap,
 } from './ParseResult'
 import { Equals } from '../internals'
 import { parseNumber } from './primitives'
+import { formatResult } from './formatting'
 
 describe('ParseResult', () => {
   describe('the `.error` property', () => {
@@ -206,6 +208,22 @@ describe('ParseResult', () => {
         )
         expect(flatMapped).toEqual(failure('Still failed: Initial error'))
       })
+    })
+  })
+  describe(unwrap, () => {
+    it('returns the success value', () => {
+      const res = success(77)
+      const value = unwrap(res)
+      expect(value).toBe(77)
+    })
+    it('throws on failure', () => {
+      const res = failure('Cannot unwrap failure')
+      expect(() => unwrap(res)).toThrow()
+    })
+    test('that the error contains the formatted Failure', () => {
+      const message = 'Detailed error message'
+      const res = failure(message)
+      expect(() => unwrap(res)).toThrowError(new RegExp(formatResult(res)))
     })
   })
 })

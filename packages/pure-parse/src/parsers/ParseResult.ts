@@ -1,4 +1,5 @@
 import { Parser } from './Parser'
+import { formatResult } from './formatting'
 
 /*
  * Type Definitions
@@ -213,3 +214,31 @@ export const flatMapFailure = <T>(
   result: ParseResult<T>,
   fn: (result: Failure) => ParseResult<T>,
 ): ParseResult<T> => (isSuccess(result) ? result : fn(result.error))
+
+const panic = (message: string): never => {
+  throw new Error(message)
+}
+
+/**
+ * Unwrap a successful parsing result, or throw an error if it is a failure.
+ * DANGER: This function can throw!
+ * @example
+ * Assert that a parsing result is successful:
+ * ```ts
+ * const result = parseNumberFromString('1')
+ * const one = unwrap(result) // -> 123
+ * const two = one + 1 // No need to map the Result type
+ * ```
+ * @example
+ * But be aware, this _will_ throw if the result is a failure:
+ * ```ts
+ * const result = parseNumberFromString('abc')
+ * const value = unwrap(result) // Throws!
+ * const value2 = value + 1 // Never reached :(
+ * ```
+ * @param value
+ */
+export const unwrap = <T>(value: ParseResult<T>): T =>
+  isSuccess(value)
+    ? value.value
+    : panic(`Tried to unwrap a ParseFailure: ${formatResult(value)}`)
