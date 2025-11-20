@@ -226,7 +226,7 @@ const panic = (message: string): never => {
  * Assert that a parsing result is successful:
  * ```ts
  * const result = parseNumberFromString('1')
- * const one = unwrap(result) // -> 123
+ * const one = unwrap(result) // -> 1
  * const two = one + 1 // No need to map the Result type
  * ```
  * @example
