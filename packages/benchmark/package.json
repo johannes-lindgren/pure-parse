@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "pure-parse": "file:../pure-parse",
-    "benny": "^3.7.1"
+    "benny": "^3.7.1",
+    "pure-parse": "file:../pure-parse"
   }
 }

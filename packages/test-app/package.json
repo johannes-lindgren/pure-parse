@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "pure-parse": "file:../pure-parse",
-    "vitest": "^4.1.5"
+    "pure-parse": "file:../pure-parse"
   },
   "devDependencies": {
-    "typescript": "^5.5.4",
-    "vite": "^5.2.0"
+    "typescript": "5.5.4",
+    "vite": "8.0.11",
+    "vitest": "4.1.5"
   }
 }
