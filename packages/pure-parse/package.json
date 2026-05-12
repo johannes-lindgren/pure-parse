@@ -5,6 +5,7 @@
   "author": {
     "name": "Johannes Lindgren"
   },
+  "homepage": "https://pureparse.dev/",
   "repository": {
     "type": "git",
     "url": "https://github.com/johannes-lindgren/pure-parse"
