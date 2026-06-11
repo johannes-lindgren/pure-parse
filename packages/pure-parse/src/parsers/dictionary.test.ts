@@ -233,7 +233,7 @@ describe('record', () => {
       )
     })
     describe('property errors', () => {
-      test('keys', () => {
+      describe('keys', () => {
         test('values', () => {
           expect(
             dictionary(
@@ -249,7 +249,7 @@ describe('record', () => {
                 path: [
                   {
                     tag: 'object',
-                    key: 'a',
+                    key: 'b',
                   },
                 ],
               }),

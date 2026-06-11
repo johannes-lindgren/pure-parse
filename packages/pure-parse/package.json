@@ -1,11 +1,11 @@
 {
   "name": "pure-parse",
-  "version": "1.0.1",
-  "private": false,
+  "version": "1.0.2",
   "description": "Strongly typed validation library that decouples type aliases from validation logic",
   "author": {
     "name": "Johannes Lindgren"
   },
+  "homepage": "https://pureparse.dev/",
   "repository": {
     "type": "git",
     "url": "https://github.com/johannes-lindgren/pure-parse"
@@ -63,20 +63,20 @@
     "packages/*"
   ],
   "devDependencies": {
-    "highlight.js": "^11.10.0",
-    "vite-bundle-visualizer": "^1.2.1",
-    "vitepress": "^1.4.0",
+    "@egjs/flicking-plugins": "4.7.1",
+    "@egjs/vue3-flicking": "4.11.4",
+    "dpdm": "3.14.0",
+    "highlight.js": "11.10.0",
     "prettier": "3.1.0",
-    "typedoc": "^0.26.8",
-    "typedoc-plugin-markdown": "^4.2.9",
-    "typedoc-vitepress-theme": "^1.0.2",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.8",
-    "vite-plugin-dts": "^4.2.3",
-    "vitest": "0.34.6",
-    "sass-embedded": "^1.79.4",
-    "@egjs/vue3-flicking": "^4.11.4",
-    "@egjs/flicking-plugins": "^4.7.1",
-    "dpdm": "^3.14.0"
+    "sass-embedded": "1.79.4",
+    "typedoc": "0.26.8",
+    "typedoc-plugin-markdown": "4.2.9",
+    "typedoc-vitepress-theme": "1.0.2",
+    "typescript": "5.5.4",
+    "vite": "8.0.11",
+    "vite-bundle-visualizer": "1.2.1",
+    "vite-plugin-dts": "4.2.3",
+    "vitepress": "1.6.4",
+    "vitest": "4.1.5"
   }
 }

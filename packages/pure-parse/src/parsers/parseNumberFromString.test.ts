@@ -91,7 +91,7 @@ describe('numberFromString', () => {
     })
   })
   describe('scientific notation', () => {
-    it('parses scientific notation', () => {
+    describe('parses scientific notation', () => {
       test('upper and lower case', () => {
         expect(parseNumberFromString('1e2')).toEqual({
           tag: 'success',
@@ -202,22 +202,10 @@ describe('numberFromString', () => {
         })
       })
       test('decimals in the exponent', () => {
-        expect(parseNumberFromString('1e0.2')).toEqual({
-          tag: 'success',
-          value: 1.5848931924611136,
-        })
-        expect(parseNumberFromString('1e-0.2')).toEqual({
-          tag: 'success',
-          value: 0.6309573444801932,
-        })
-        expect(parseNumberFromString('1e+0.2')).toEqual({
-          tag: 'success',
-          value: 1.5848931924611136,
-        })
-        expect(parseNumberFromString('1E0.2')).toEqual({
-          tag: 'success',
-          value: 1.5848931924611136,
-        })
+        expect(parseNumberFromString('1e0.2')).toEqual(expectFailure())
+        expect(parseNumberFromString('1e-0.2')).toEqual(expectFailure())
+        expect(parseNumberFromString('1e+0.2')).toEqual(expectFailure())
+        expect(parseNumberFromString('1E0.2')).toEqual(expectFailure())
       })
       test('decimals in the base', () => {
         expect(parseNumberFromString('0.2e0')).toEqual({
@@ -226,10 +214,7 @@ describe('numberFromString', () => {
         })
       })
       test('decimals in the base and exponent', () => {
-        expect(parseNumberFromString('0.2e0.2')).toEqual({
-          tag: 'success',
-          value: 0.2,
-        })
+        expect(parseNumberFromString('0.2e0.2')).toEqual(expectFailure())
       })
     })
   })
