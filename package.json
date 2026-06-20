@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "check:formatting": "turbo run check:formatting"
   },
