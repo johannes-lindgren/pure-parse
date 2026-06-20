@@ -5,9 +5,11 @@
   "license": "MIT",
   "packageManager": "pnpm@10.12.1",
   "scripts": {
-    "check:formatting": "turbo run check:formatting"
+    "check:formatting": "prettier . --check",
+    "format": "prettier . --write"
   },
   "devDependencies": {
-    "turbo": "2.9.18"
+    "turbo": "2.9.18",
+    "prettier": "3.1.0"
   }
 }
