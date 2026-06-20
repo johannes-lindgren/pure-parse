@@ -4,11 +4,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node ./src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src/index.js"
   },
   "dependencies": {
     "benny": "^3.7.1",
-    "pure-parse": "file:../pure-parse"
+    "pure-parse": "workspace:*"
   }
 }
