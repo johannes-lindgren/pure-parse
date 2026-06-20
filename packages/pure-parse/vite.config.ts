@@ -17,20 +17,14 @@ export default defineConfig({
       preserveEntrySignatures: 'exports-only',
       output: [
         {
-          // ESM build
           format: 'es',
           entryFileNames: '[name].js',
           dir: 'dist',
-          preserveModules: true, // Keeps module structure
-          preserveModulesRoot: 'src',
         },
         {
-          // CJS build
           format: 'cjs',
           entryFileNames: '[name].cjs',
           dir: 'dist',
-          preserveModules: true, // Keeps module structure
-          preserveModulesRoot: 'src',
         },
       ],
     },
