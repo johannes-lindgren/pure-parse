@@ -1,0 +1,17 @@
+{
+  "name": "test-app-imports",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "echo 'ok'",
+    "test:build": "vite build && tsc -p tsconfig.nodenext.json",
+    "test:types": "tsc -p tsconfig.bundler.json && tsc -p tsconfig.nodenext.json --noEmit && tsc -p tsconfig.cjs.json"
+  },
+  "dependencies": {
+    "pure-parse": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.5.4",
+    "vite": "8.0.11"
+  }
+}
