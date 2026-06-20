@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
-  "workspaces": [
-    "packages/*"
-  ]
+  "scripts": {
+    "check:formatting": "turbo run check:formatting"
+  },
+  "devDependencies": {
+    "turbo": "2.9.18"
+  }
 }

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "check:types": {
+      "dependsOn": ["^build"]
+    },
+    "check:circular-dependencies": {
+      "dependsOn": ["^build"]
+    },
+    "check:formatting": {},
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "start": {
+      "dependsOn": ["^build"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "persistent": true
+    }
+  }
+}

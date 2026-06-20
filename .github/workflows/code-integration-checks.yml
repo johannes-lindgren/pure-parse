@@ -6,28 +6,21 @@ jobs:
     name: Code Inspection
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
       - name: Set up node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
       - name: Install
-        run: npm install --frozen-lockfile
-      - name: Check Code Formatting
-        run: npm run check:formatting --workspace=pure-parse
+        run: pnpm install --frozen-lockfile
+      - name: Check Formatting
+        run: pnpm exec turbo run check:formatting
+      - name: Check Circular Dependencies
+        run: pnpm exec turbo run check:circular-dependencies
       - name: Check Types
-        run: npm run check:circular-dependencies --workspace=pure-parse
-      - name: Check Types
-        run: npm run check:types --workspace=pure-parse
-      #        No linters for this repo
-      #      - name: Lint
-      #        run: |
-      #          npm run lint
+        run: pnpm exec turbo run check:types
       - name: Test
-        run: npm run test --workspace=pure-parse
-      - name: Build
-        run: npm run build --workspace=pure-parse
-      - name: Test Build Output
-        run: npm run build --workspace=test-app
+        run: pnpm exec turbo run test

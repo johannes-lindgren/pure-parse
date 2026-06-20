@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "benny": "^3.7.1",
-    "pure-parse": "file:../pure-parse"
+    "pure-parse": "workspace:*"
   }
 }

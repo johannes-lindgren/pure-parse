@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "pure-parse": "file:../pure-parse"
+    "pure-parse": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.5.4",
