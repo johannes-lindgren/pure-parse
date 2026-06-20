@@ -21,6 +21,13 @@
     "dev": {
       "dependsOn": ["^build"],
       "persistent": true
+    },
+    "test:build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test:types": {
+      "dependsOn": ["^build"]
     }
   }
 }
