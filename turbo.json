@@ -28,6 +28,18 @@
     },
     "test:types": {
       "dependsOn": ["^build"]
+    },
+    "docs:build": {
+      "dependsOn": ["^build"],
+      "outputs": [".vitepress/dist/**"]
+    },
+    "docs:dev": {
+      "dependsOn": ["^build"],
+      "persistent": true
+    },
+    "docs:preview": {
+      "dependsOn": ["docs:build"],
+      "persistent": true
     }
   }
 }
