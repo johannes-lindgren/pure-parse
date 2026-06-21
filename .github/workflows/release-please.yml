@@ -5,7 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
-      release-as:
+      release_as:
         description: 'Force a release bump'
         required: true
         type: choice
@@ -26,4 +26,4 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          release-as: ${{ inputs.release-as }}
+          release-as: ${{ inputs.release_as }}
