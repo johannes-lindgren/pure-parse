@@ -21,6 +21,10 @@ Releases are automated via [Release Please](https://github.com/googleapis/releas
 
 > Nothing is published until you merge the Release PR. You can let commits accumulate across multiple PRs before releasing.
 
+### Forcing a release manually
+
+If no releasable commits exist (e.g. only `chore:` commits), Release Please will skip creating a PR. To force one, trigger the workflow manually from the [Actions tab](https://github.com/johannes-lindgren/pure-parse/actions/workflows/release-please.yml) and pass a bump type in the **release-as** field: `patch`, `minor`, `major`, or an exact version like `1.2.3`.
+
 ### npm token
 
 The publish workflow requires an `NPM_TOKEN` secret set in the repository settings with publish access to the `pure-parse` package.

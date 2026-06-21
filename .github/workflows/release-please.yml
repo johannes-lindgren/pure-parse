@@ -3,6 +3,11 @@ name: Release Please
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      release-as:
+        description: 'Force a release bump: patch, minor, major, or an exact version (e.g. 1.2.3)'
+        required: false
 
 permissions:
   contents: write
@@ -16,3 +21,4 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+          release-as: ${{ inputs.release-as }}
