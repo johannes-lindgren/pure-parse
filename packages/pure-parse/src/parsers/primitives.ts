@@ -19,7 +19,7 @@ import { failure, ParseFailure, ParseSuccess, success } from './ParseResult'
 export const parseUndefined = (
   data: unknown,
 ): ParseSuccess<undefined> | ParseFailure =>
-  isUndefined(data) ? success(data) : failure('Expected undefined')
+  isUndefined(data) ? success(data) : failure('Expected value to be undefined')
 
 /**
  * Parse `null`
@@ -30,7 +30,7 @@ export const parseUndefined = (
  * @param data data to be validated
  */
 export const parseNull = (data: unknown): ParseSuccess<null> | ParseFailure =>
-  isNull(data) ? success(data) : failure('Expected null')
+  isNull(data) ? success(data) : failure('Expected value to be null')
 
 /**
  * Parse `boolean`
@@ -45,7 +45,7 @@ export const parseNull = (data: unknown): ParseSuccess<null> | ParseFailure =>
 export const parseBoolean = (
   data: unknown,
 ): ParseSuccess<boolean> | ParseFailure =>
-  isBoolean(data) ? success(data) : failure('Expected boolean')
+  isBoolean(data) ? success(data) : failure('Expected value to be of type boolean')
 
 /**
  * Parse `number`
@@ -58,7 +58,7 @@ export const parseBoolean = (
 export const parseNumber = (
   data: unknown,
 ): ParseSuccess<number> | ParseFailure =>
-  isNumber(data) ? success(data) : failure('Expected type number')
+  isNumber(data) ? success(data) : failure('Expected value to be of type number')
 
 /**
  * Parse `string`
@@ -71,7 +71,7 @@ export const parseNumber = (
 export const parseString = (
   data: unknown,
 ): ParseSuccess<string> | ParseFailure =>
-  isString(data) ? success(data) : failure('Expected type string')
+  isString(data) ? success(data) : failure('Expected value to be of type string')
 
 /**
  * Parse `bigint`
@@ -84,7 +84,7 @@ export const parseString = (
 export const parseBigInt = (
   data: unknown,
 ): ParseSuccess<bigint> | ParseFailure =>
-  isBigInt(data) ? success(data) : failure('Expected type bigint')
+  isBigInt(data) ? success(data) : failure('Expected value to be of type bigint')
 
 /**
  * Parse `symbol`
@@ -97,4 +97,4 @@ export const parseBigInt = (
 export const parseSymbol = (
   data: unknown,
 ): ParseSuccess<symbol> | ParseFailure =>
-  isSymbol(data) ? success(data) : failure('Expected type symbol')
+  isSymbol(data) ? success(data) : failure('Expected value to be of type symbol')

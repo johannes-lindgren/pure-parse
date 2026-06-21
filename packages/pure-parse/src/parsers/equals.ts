@@ -36,4 +36,4 @@ export const equals =
   (data: unknown): ParseSuccess<T> | ParseFailure =>
     data === constant
       ? success(data as T)
-      : failure(`Does not equal to the value in ${stringify(constant)}`)
+      : failure(`Expected value to equal ${stringify(constant)}`)

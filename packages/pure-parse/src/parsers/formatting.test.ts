@@ -54,7 +54,7 @@ describe('formatting', () => {
           formatResult({
             tag: 'failure',
             error: {
-              message: 'Expected string',
+              message: 'Expected value to be of type string',
               path: [
                 {
                   tag: 'object',
@@ -71,18 +71,18 @@ describe('formatting', () => {
               ],
             },
           }),
-        ).toEqual('ParseFailure: Expected string at $.users[2].name')
+        ).toEqual('ParseFailure: Expected value to be of type string at $.users[2].name')
       })
       test('empty path', () => {
         expect(
           formatResult({
             tag: 'failure',
             error: {
-              message: 'Expected type string',
+              message: 'Expected value to be of type string',
               path: [],
             },
           }),
-        ).toEqual('ParseFailure: Expected type string')
+        ).toEqual('ParseFailure: Expected value to be of type string')
       })
       test('while parsing', () => {
         const parseDb = object({
@@ -109,7 +109,7 @@ describe('formatting', () => {
           throw new Error('Expected failure')
         }
         expect(formatResult(result)).toEqual(
-          'ParseFailure: Expected type string at $.users[1].color',
+          'ParseFailure: Expected value to be of type string at $.users[1].color',
         )
       })
     })

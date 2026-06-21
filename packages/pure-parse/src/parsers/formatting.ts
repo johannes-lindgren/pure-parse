@@ -12,7 +12,7 @@ import { isUndefined } from '../guards'
  * ```ts
  * const parseUser = object({ name: parseString })
  * const res = parseUser({ name: 123 })
- * console.log(formatResult(res)) // -> "ParseFailure: Expected type string at $.name"
+ * console.log(formatResult(res)) // -> "ParseFailure: Expected value to be of type string at $.name"
  * ```
  * @example
  * Format a successful parse result:

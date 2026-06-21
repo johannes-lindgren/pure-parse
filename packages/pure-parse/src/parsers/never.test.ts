@@ -3,6 +3,10 @@ import { parseNever } from './never'
 import { isSuccess, ParseFailure, ParseSuccess } from './ParseResult'
 import { Equals } from '../internals'
 import { Infer } from '../common'
+import { oneOf } from './oneOf'
+import { parseNumber } from './primitives'
+import { parseString } from './primitives'
+import { Parser } from './Parser'
 
 describe('parseNever', () => {
   it('it always fails', () => {
@@ -14,6 +18,16 @@ describe('parseNever', () => {
     expect(isSuccess(parseNever(null))).toEqual(false)
     expect(isSuccess(parseNever({}))).toEqual(false)
     expect(isSuccess(parseNever([]))).toEqual(false)
+  })
+  it('acts as identity element for oneOf', () => {
+    const parsers = [parseString, parseNumber]
+    const parse = parsers.reduce(
+      (prevParser, currentParser) => oneOf(prevParser, currentParser),
+      parseNever as Parser<unknown>,
+    )
+    expect(isSuccess(parse('hello'))).toEqual(true)
+    expect(isSuccess(parse(42))).toEqual(true)
+    expect(isSuccess(parse(true))).toEqual(false)
   })
   describe('types', () => {
     it('infers never', () => {
