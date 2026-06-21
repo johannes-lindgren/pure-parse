@@ -15,6 +15,7 @@ import { failure } from './ParseResult'
  * parseNever('abc')  // => ParseFailure
  * parseNever(null)   // => ParseFailure
  * ```
+ * @param data data to be validated
  * @see {@link parseUnknown} for the opposite: a parser that always succeeds
  */
 export const parseNever: UnsuccessfulParser = (data) =>
