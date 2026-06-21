@@ -15,19 +15,7 @@ import { failure } from './ParseResult'
  * parseNever('abc')  // => ParseFailure
  * parseNever(null)   // => ParseFailure
  * ```
- * @example
- * Use as the base case when folding a list of parsers into a union:
- * ```ts
- * const parsers = [parseString, parseNumber]
- * const parse = parsers.reduce(
- *   (prevParser, currentParser) => oneOf(prevParser, currentParser),
- *   parseNever as Parser<unknown>,
- * )
- * parse('hello') // => ParseSuccess<string | number>
- * parse(42)      // => ParseSuccess<string | number>
- * parse(true)    // => ParseFailure
- * ```
  * @see {@link parseUnknown} for the opposite: a parser that always succeeds
  */
 export const parseNever: UnsuccessfulParser = (data) =>
-  failure('Unexpected value')
+  failure('Unexpected value. No value can match the type never.')
