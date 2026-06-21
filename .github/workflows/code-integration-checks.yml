@@ -1,6 +1,7 @@
 name: Code Integration Checks
 on:
   pull_request:
+  workflow_call:
 
 jobs:
   integration-checks:
