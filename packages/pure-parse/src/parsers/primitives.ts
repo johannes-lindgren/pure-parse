@@ -45,7 +45,7 @@ export const parseNull = (data: unknown): ParseSuccess<null> | ParseFailure =>
 export const parseBoolean = (
   data: unknown,
 ): ParseSuccess<boolean> | ParseFailure =>
-  isBoolean(data) ? success(data) : failure('Expected type boolean')
+  isBoolean(data) ? success(data) : failure('Expected boolean')
 
 /**
  * Parse `number`
