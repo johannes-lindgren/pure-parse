@@ -11,7 +11,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
       },
@@ -21,11 +21,13 @@ export default defineConfig({
           format: 'es',
           entryFileNames: '[name].js',
           dir: 'dist',
+          preserveModules: true,
         },
         {
           format: 'cjs',
           entryFileNames: '[name].cjs',
           dir: 'dist',
+          preserveModules: true,
         },
       ],
     },

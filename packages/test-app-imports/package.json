@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "echo 'ok'",
+    "test": "pnpm run test:build && pnpm run test:types",
     "test:build": "vite build && tsc -p tsconfig.nodenext.json",
     "test:types": "tsc -p tsconfig.bundler.json && tsc -p tsconfig.nodenext.json --noEmit && tsc -p tsconfig.cjs.json"
   },
