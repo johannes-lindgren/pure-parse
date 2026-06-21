@@ -23,7 +23,7 @@ Releases are automated via [Release Please](https://github.com/googleapis/releas
 
 ### Forcing a release manually
 
-If no releasable commits exist (e.g. only `chore:` commits), Release Please will skip creating a PR. To force one, trigger the workflow manually from the [Actions tab](https://github.com/johannes-lindgren/pure-parse/actions/workflows/release-please.yml) and pass a bump type in the **release_as** field: `patch`, `minor`, or `major`.
+If no releasable commits exist (e.g. only `chore:` commits), Release Please skips creating a PR. In that case, create the GitHub Release manually via the [Releases page](https://github.com/johannes-lindgren/pure-parse/releases/new) with the appropriate tag (e.g. `v1.0.3`), which triggers publishing to npm.
 
 ### npm token
 
