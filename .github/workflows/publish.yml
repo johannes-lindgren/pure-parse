@@ -1,0 +1,36 @@
+name: Publish
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish-npm:
+    name: Publish NPM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm exec turbo run build --filter=pure-parse
+      - name: Copy README into the workspace
+        run: |
+          cp README.md packages/pure-parse/
+          cp LICENSE packages/pure-parse/
+      - name: Publish to NPM
+        run: pnpm publish --access public --provenance --filter pure-parse
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
