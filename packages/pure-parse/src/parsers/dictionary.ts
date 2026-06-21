@@ -37,7 +37,7 @@ export const dictionary =
   ): Parser<string extends K ? Record<K, V> : Partial<Record<K, V>>> =>
   (data) => {
     if (!isObject(data)) {
-      return failure('Expected type object')
+      return failure('Expected value to be of type object')
     }
     const resultData: Record<string, V> = {}
     for (const key in data) {

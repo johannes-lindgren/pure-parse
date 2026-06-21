@@ -21,8 +21,17 @@ export type ParseFailure = {
   error: Failure
 }
 
+/**
+ * Describes why and where parsing failed.
+ */
 export type Failure = {
+  /**
+   * A human-readable description of why parsing failed. Intended for logging and debugging — do not pattern-match on this string, as its exact wording may change between releases.
+   */
   message: string
+  /**
+   * The location in the data structure where parsing failed, as a sequence of path segments from the root. Use {@link formatPath} to format it as a JSONPath string.
+   */
   path: PathSegment[]
 }
 
