@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       release-as:
-        description: 'Force a release bump: patch, minor, major, or an exact version (e.g. 1.2.3)'
-        required: false
+        description: 'Force a release bump'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: write
