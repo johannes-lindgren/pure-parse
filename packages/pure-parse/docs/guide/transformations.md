@@ -87,9 +87,9 @@ formatResult(parseUuid(123)) // -> ParseFailure: A UUID must be a string at $
 
 It's also possible to apply transformations on the `ParseResult` data type:
 
-| Function Name                                              | Use case                                                | Type Signature                                                                     |
-| ---------------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [mapResult](/api/utils/ParseResult.md#mapSuccess)          | Transform successful values                             | `(result: ParseResult<A>, fn: (A) => B) => ParseResult<B>`                         |
-| [mapFailure](/api/utils/ParseResult.md#mapFailure)         | Improve failure messages                                | `(result: ParseResult<A>, fn: (ParseFailure) => ParseFailure) => ParseResult<A>`   |
-| [flatMapResult](/api/utils/ParseResult.md#flatMapSuccess)  | Chain together a sequence of computations that may fail | `(result: ParseResult<A>, fn: (A) => ParseResult<B>) => ParseResult<B>`            |
-| [flatMapFailure](/api/utils/ParseResult.md#flatMapFailure) | Recover from failures                                   | `(result: ParseResult<A>, fn: (ParseFailure) => ParseResult<A>) => ParseResult<A>` |
+| Function Name                                                | Use case                                                | Type Signature                                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [mapResult](/api/parsers/ParseResult.md#mapSuccess)          | Transform successful values                             | `(result: ParseResult<A>, fn: (A) => B) => ParseResult<B>`                         |
+| [mapFailure](/api/parsers/ParseResult.md#mapFailure)         | Improve failure messages                                | `(result: ParseResult<A>, fn: (ParseFailure) => ParseFailure) => ParseResult<A>`   |
+| [flatMapResult](/api/parsers/ParseResult.md#flatMapSuccess)  | Chain together a sequence of computations that may fail | `(result: ParseResult<A>, fn: (A) => ParseResult<B>) => ParseResult<B>`            |
+| [flatMapFailure](/api/parsers/ParseResult.md#flatMapFailure) | Recover from failures                                   | `(result: ParseResult<A>, fn: (ParseFailure) => ParseResult<A>) => ParseResult<A>` |
