@@ -1,16 +1,25 @@
 name: Publish
 
 on:
-  release:
-    types: [published]
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+  workflow_dispatch:
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
+  ci:
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/code-integration-checks.yml
+
   publish-npm:
     name: Publish NPM
+    needs: ci
+    if: always() && (needs.ci.result == 'success' || needs.ci.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

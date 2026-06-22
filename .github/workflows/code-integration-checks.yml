@@ -1,6 +1,10 @@
 name: Code Integration Checks
 on:
   pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   integration-checks:
