@@ -23,3 +23,24 @@ export const array =
     }
     return success(dataOutput as T[])
   }
+
+/**
+ * Validate non-empty arrays
+ * @return a function that parses non-empty arrays
+ * @param parseItem
+ */
+export const nonEmptyArray =
+  <T>(parseItem: Parser<T>): Parser<[T, ...T[]]> =>
+  (data) => {
+    if (!Array.isArray(data)) {
+      return failure('Expected array')
+    }
+    if (data.length === 0) {
+      return failure('Expected non-empty array')
+    }
+    const result = array(parseItem)(data)
+    if (result.tag === 'failure') {
+      return result
+    }
+    return success(result.value as [T, ...T[]])
+  }

@@ -28,7 +28,7 @@ export const lazy = <T extends (...args: never[]) => unknown>(
 ): T => {
   let fn: T | undefined
   return ((...args) => {
-    if (!fn) {
+    if (fn === undefined) {
       fn = constructFn()
     }
     return fn(...args)

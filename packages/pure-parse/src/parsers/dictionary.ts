@@ -1,5 +1,5 @@
 import { Parser } from './Parser'
-import { failure, propagateFailure, success } from './ParseResult'
+import { failure, ParseResult, propagateFailure, success } from './ParseResult'
 import { isObject } from '../guards'
 
 /**
@@ -12,15 +12,15 @@ import { isObject } from '../guards'
  * @example
  * Validate a dictionary:
  * ```ts
- * const parseDictionary = dictionary(isString, isString)
+ * const parseDictionary = dictionary(parseString, parseString)
  * parseDictionary({ hello: 'world' }) // -> Success
  * parseDictionary({ hello: 1 }) // -> Failure
  * ```
  * @example
  * You can transform the keys and values; for example, to only allow lowercase strings:
  * ```ts
- * const parseLowerCase = (data: unknown): data is Lowercase<string> =>
- *   typeof data === 'string' ? failure('Not a string') : success(data.toLowerCase())
+ * const parseLowerCase = (data: unknown): ParseResult<Lowercase<string>> =>
+ *   typeof data !== 'string' ? failure('Not a string') : success(data.toLowerCase() as Lowercase<string>)
  * const parseDictionary = dictionary(parseLowerCase, parseLowerCase)
  * parseDictionary({ hello: 'world' }) // -> Success<{ hello: 'world' }>
  * parseDictionary({ Hello: 'world' }) // -> Success<{ hello: 'world' }>
@@ -40,19 +40,19 @@ export const dictionary =
       return failure('Expected value to be of type object')
     }
     const resultData: Record<string, V> = {}
-    for (const key in data) {
+    for (const key of Object.keys(data as object)) {
       // This type assertion just makes TypeScript allow us to index with a key
       const value = (data as Record<keyof any, unknown>)[key]
       const parsedKey = parseKey(key)
       if (parsedKey.tag === 'failure') {
-        return propagateFailure(failure('Invalid property key'), {
+        return propagateFailure(parsedKey, {
           tag: 'object',
           key,
         })
       }
       const parsedValue = parseValue(value)
       if (parsedValue.tag === 'failure') {
-        return propagateFailure(failure('Invalid property value'), {
+        return propagateFailure(parsedValue, {
           tag: 'object',
           key,
         })
