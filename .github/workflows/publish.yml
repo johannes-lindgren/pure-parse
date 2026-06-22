@@ -37,4 +37,5 @@ jobs:
           cp README.md packages/pure-parse/
           cp LICENSE packages/pure-parse/
       - name: Publish to NPM
-        run: pnpm publish --access public --provenance --no-git-checks --filter pure-parse
+        run: npm publish --access public --provenance
+        working-directory: packages/pure-parse
