@@ -27,6 +27,6 @@ jobs:
 
   publish:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     uses: ./.github/workflows/publish.yml
     secrets: inherit
