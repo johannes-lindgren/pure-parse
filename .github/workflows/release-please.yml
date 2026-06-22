@@ -10,7 +10,11 @@ permissions:
   id-token: write
 
 jobs:
+  ci:
+    uses: ./.github/workflows/code-integration-checks.yml
+
   release-please:
+    needs: ci
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
@@ -21,13 +25,8 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  ci:
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
-    uses: ./.github/workflows/code-integration-checks.yml
-
   publish:
-    needs: [release-please, ci]
+    needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
     uses: ./.github/workflows/publish.yml
     secrets: inherit

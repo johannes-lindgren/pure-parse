@@ -9,8 +9,12 @@ permissions:
   contents: read
 
 jobs:
+  ci:
+    uses: ./.github/workflows/code-integration-checks.yml
+
   publish-npm:
     name: Publish NPM
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
