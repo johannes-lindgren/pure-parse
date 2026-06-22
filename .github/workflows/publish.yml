@@ -25,7 +25,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
       - name: Install
@@ -37,5 +37,4 @@ jobs:
           cp README.md packages/pure-parse/
           cp LICENSE packages/pure-parse/
       - name: Publish to NPM
-        run: npm publish --access public --provenance
-        working-directory: packages/pure-parse
+        run: pnpm publish --access public --provenance --no-git-checks --filter pure-parse
