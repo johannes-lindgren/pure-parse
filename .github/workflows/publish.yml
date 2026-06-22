@@ -41,5 +41,3 @@ jobs:
           cp LICENSE packages/pure-parse/
       - name: Publish to NPM
         run: pnpm publish --access public --provenance --no-git-checks --filter pure-parse
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
