@@ -47,6 +47,13 @@ describe('formatting', () => {
           formatResult(success({ name: 'Alice' }), JSON.stringify),
         ).toEqual('ParseSuccess: {"name":"Alice"}')
       })
+      it('falls back to "<unserializable>" when the custom toString throws', () => {
+        const circular: Record<string, unknown> = {}
+        circular.self = circular
+        expect(formatResult(success(circular), JSON.stringify)).toEqual(
+          'ParseSuccess: <unserializable>',
+        )
+      })
     })
     describe('formatFailure', () => {
       it('should parse a simple string', () => {
@@ -122,6 +129,39 @@ describe('formatting', () => {
     describe('object paths', () => {
       test('depth 1', () => {
         expect(formatPath([{ tag: 'object', key: 'users' }])).toEqual('$.users')
+      })
+      describe('bracket notation for non-identifier keys', () => {
+        test('key with a dot', () => {
+          expect(formatPath([{ tag: 'object', key: 'foo.bar' }])).toEqual(
+            '$["foo.bar"]',
+          )
+        })
+        test('key with a space', () => {
+          expect(formatPath([{ tag: 'object', key: 'foo bar' }])).toEqual(
+            '$["foo bar"]',
+          )
+        })
+        test('key starting with a digit', () => {
+          expect(formatPath([{ tag: 'object', key: '1foo' }])).toEqual(
+            '$["1foo"]',
+          )
+        })
+        test('empty key', () => {
+          expect(formatPath([{ tag: 'object', key: '' }])).toEqual('$[""]')
+        })
+        test('key with double quotes', () => {
+          expect(formatPath([{ tag: 'object', key: 'foo"bar' }])).toEqual(
+            '$["foo\\"bar"]',
+          )
+        })
+        test('nested: identifier then non-identifier', () => {
+          expect(
+            formatPath([
+              { tag: 'object', key: 'users' },
+              { tag: 'object', key: 'display name' },
+            ]),
+          ).toEqual('$.users["display name"]')
+        })
       })
       test('depth 2', () => {
         expect(

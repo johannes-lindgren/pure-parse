@@ -2,6 +2,7 @@ import { memoizeValidatorConstructor } from './memo'
 import {
   array,
   dictionary,
+  nonEmptyArray,
   object,
   objectCompiled,
   objectStrict,
@@ -19,4 +20,4 @@ export const objectStrictCompiledMemo =
 export const dictionaryMemo = memoizeValidatorConstructor(dictionary)
 export const tupleMemo = memoizeValidatorConstructor(tuple)
 export const arrayMemo = memoizeValidatorConstructor(array)
-// TODO export const nonEmptyArrayMemo = memoizeValidatorConstructor(nonEmptyArray)
+export const nonEmptyArrayMemo = memoizeValidatorConstructor(nonEmptyArray)

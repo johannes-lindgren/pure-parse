@@ -1,9 +1,11 @@
 import { describe, expect, it, test } from 'vitest'
-import { array } from './arrays'
+import { array, nonEmptyArray } from './arrays'
 import { failure, success } from './ParseResult'
 import { equals } from './equals'
 import { parseString } from './primitives'
 import { withDefault } from './withDefault'
+import { Infer } from '../common'
+import { Equals } from '../internals'
 
 describe('arrays', () => {
   it('validates when all elements pass validation', () => {
@@ -40,6 +42,50 @@ describe('arrays', () => {
       }),
     )
   })
+  describe('nonEmptyArray', () => {
+    it('validates non-empty arrays', () => {
+      expect(nonEmptyArray(parseString)(['a'])).toEqual(
+        expect.objectContaining({ tag: 'success', value: ['a'] }),
+      )
+      expect(nonEmptyArray(parseString)(['a', 'b'])).toEqual(
+        expect.objectContaining({ tag: 'success', value: ['a', 'b'] }),
+      )
+    })
+    it('invalidates empty arrays', () => {
+      expect(nonEmptyArray(parseString)([])).toEqual(
+        expect.objectContaining({ tag: 'failure' }),
+      )
+    })
+    it('invalidates non-arrays', () => {
+      ;[1, 'a', null, undefined, {}].forEach((data) => {
+        expect(nonEmptyArray(parseString)(data)).toEqual(
+          expect.objectContaining({ tag: 'failure' }),
+        )
+      })
+    })
+    it('invalidates arrays with invalid elements', () => {
+      expect(nonEmptyArray(parseString)([1])).toEqual(
+        expect.objectContaining({ tag: 'failure' }),
+      )
+    })
+    it('reports element errors with path', () => {
+      expect(nonEmptyArray(parseString)([1])).toEqual(
+        expect.objectContaining({
+          tag: 'failure',
+          error: expect.objectContaining({
+            path: [{ tag: 'array', index: 0 }],
+          }),
+        }),
+      )
+    })
+    describe('types', () => {
+      it('infers a non-empty tuple type', () => {
+        const parse = nonEmptyArray(parseString)
+        const t: Equals<Infer<typeof parse>, [string, ...string[]]> = true
+      })
+    })
+  })
+
   describe('errors', () => {
     it('reports non-arrays', () => {
       const parse = array(parseString)
