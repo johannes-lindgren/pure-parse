@@ -1,5 +1,5 @@
 import { Parser } from './Parser'
-import { failure, ParseResult, propagateFailure, success } from './ParseResult'
+import { failure, propagateFailure, success } from './ParseResult'
 import { isObject } from '../guards'
 
 /**
@@ -13,8 +13,8 @@ import { isObject } from '../guards'
  * Validate a dictionary:
  * ```ts
  * const parseDictionary = dictionary(parseString, parseString)
- * parseDictionary({ hello: 'world' }) // -> Success
- * parseDictionary({ hello: 1 }) // -> Failure
+ * parseDictionary({ hello: 'world' }) // -> ParseSuccess
+ * parseDictionary({ hello: 1 }) // -> ParseFailure
  * ```
  * @example
  * You can transform the keys and values; for example, to only allow lowercase strings:
@@ -22,9 +22,9 @@ import { isObject } from '../guards'
  * const parseLowerCase = (data: unknown): ParseResult<Lowercase<string>> =>
  *   typeof data !== 'string' ? failure('Not a string') : success(data.toLowerCase() as Lowercase<string>)
  * const parseDictionary = dictionary(parseLowerCase, parseLowerCase)
- * parseDictionary({ hello: 'world' }) // -> Success<{ hello: 'world' }>
- * parseDictionary({ Hello: 'world' }) // -> Success<{ hello: 'world' }>
- * parseDictionary({ hello: 'World' }) // -> Success<{ hello: 'world' }>
+ * parseDictionary({ hello: 'world' }) // -> ParseSuccess<{ hello: 'world' }>
+ * parseDictionary({ Hello: 'world' }) // -> ParseSuccess<{ hello: 'world' }>
+ * parseDictionary({ hello: 'World' }) // -> ParseSuccess<{ hello: 'world' }>
  * ```
  * @param parseKey parses every key
  * @param parseValue parses every value

@@ -1,5 +1,12 @@
 import { Parser } from './Parser'
-import { failure, ParseSuccess, propagateFailure, success } from './ParseResult'
+import {
+  failure,
+  ParseResult,
+  ParseSuccess,
+  propagateFailure,
+  success,
+} from './ParseResult'
+import { isArray } from '../guards'
 
 /**
  * Validate arrays
@@ -26,21 +33,29 @@ export const array =
 
 /**
  * Validate non-empty arrays
+ * @example
+ * ```ts
+ * const parseNonEmptyNumberArray = parseNonEmptyArray(parseNumber)
+ *
+ * parseNonEmptyNumberArray([1,2,3]) // -> ParseSuccess<[number, ...number[]]>
+ * parseNonEmptyNumberArray([1]) // -> ParseSuccess<[number, ...number[]]>
+ *
+ * parseNonEmptyNumberArray([]) // -> ParseFailure
+ * parseNonEmptyNumberArray(['a']) // -> ParseFailure
+ * parseNonEmptyNumberArray(1) // -> ParseFailure
+ * ```
  * @return a function that parses non-empty arrays
  * @param parseItem
  */
-export const nonEmptyArray =
-  <T>(parseItem: Parser<T>): Parser<[T, ...T[]]> =>
-  (data) => {
-    if (!Array.isArray(data)) {
+export const nonEmptyArray = <T>(parseItem: Parser<T>): Parser<[T, ...T[]]> => {
+  const parseTArray = array(parseItem)
+  return (data) => {
+    if (!isArray(data)) {
       return failure('Expected array')
     }
     if (data.length === 0) {
       return failure('Expected non-empty array')
     }
-    const result = array(parseItem)(data)
-    if (result.tag === 'failure') {
-      return result
-    }
-    return success(result.value as [T, ...T[]])
+    return parseTArray(data) as ParseResult<[T, ...T[]]>
   }
+}
