@@ -52,13 +52,13 @@ export type UnsuccessfulParser = (data: unknown) => ParseFailure
  * parseToUpperCase(123) // -> ParseFailure
  * ```
  * @param parser
- * @param mapSuccess
+ * @param transformSuccess
  */
 export const map =
-  <A, B>(parser: Parser<A>, mapSuccess: (value: A) => B): Parser<B> =>
+  <A, B>(parser: Parser<A>, transformSuccess: (value: A) => B): Parser<B> =>
   (value) => {
     const result = parser(value)
-    return isSuccess(result) ? success(mapSuccess(result.value)) : result
+    return isSuccess(result) ? success(transformSuccess(result.value)) : result
   }
 
 /**
