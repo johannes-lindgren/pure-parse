@@ -263,24 +263,21 @@ describe('record', () => {
           )
         })
         test('preserves the inner parser error message', () => {
+          const msg = 'Expected exactly "a" 1234'
           const parseExact: Parser<'a'> = (data) =>
-            data === 'a' ? success('a') : failure('Expected exactly "a"')
-          expect(
-            dictionary(parseExact, parseBoolean)({ b: true }),
-          ).toEqual(
+            data === 'a' ? success('a') : failure(msg)
+          expect(dictionary(parseExact, parseBoolean)({ b: true })).toEqual(
             expect.objectContaining({
               tag: 'failure',
               error: expect.objectContaining({
-                message: 'Expected exactly "a"',
+                message: msg,
               }),
             }),
           )
         })
       })
       test('points to the failing value', () => {
-        expect(
-          dictionary(parseString, parseBoolean)({ a: 1 }),
-        ).toEqual(
+        expect(dictionary(parseString, parseBoolean)({ a: 1 })).toEqual(
           expect.objectContaining({
             tag: 'failure',
             error: expect.objectContaining({
@@ -292,9 +289,7 @@ describe('record', () => {
       test('preserves the inner parser error message', () => {
         const parseExact: Parser<true> = (data) =>
           data === true ? success(true) : failure('Expected exactly true')
-        expect(
-          dictionary(parseString, parseExact)({ a: false }),
-        ).toEqual(
+        expect(dictionary(parseString, parseExact)({ a: false })).toEqual(
           expect.objectContaining({
             tag: 'failure',
             error: expect.objectContaining({
