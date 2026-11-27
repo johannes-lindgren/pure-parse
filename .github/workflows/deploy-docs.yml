@@ -35,3 +35,4 @@ jobs:
           account-id: ${{ vars.VERCEL_ORG_ID }}
           project-id: ${{ vars.VERCEL_PROJECT_ID }}
           directory: packages/pure-parse/.vitepress/dist
+          root-directory: packages/pure-parse

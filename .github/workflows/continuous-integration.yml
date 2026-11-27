@@ -46,6 +46,7 @@ jobs:
           project-id: ${{ vars.VERCEL_PROJECT_ID }}
           name: pr-${{ github.event.pull_request.number }}
           directory: packages/pure-parse/.vitepress/dist
+          root-directory: packages/pure-parse
 
   cleanup:
     name: Delete docs preview

@@ -17,6 +17,10 @@ inputs:
   directory:
     description: The built site.
     required: true
+  root-directory:
+    description: The project's Root Directory setting in Vercel, if set.
+    required: false
+    default: ''
   alias-domain:
     description: Optional domain for a stable URL (<name>.<alias-domain>).
     required: false
@@ -42,15 +46,18 @@ runs:
         VERCEL_PROJECT_ID: ${{ inputs.project-id }}
         PREVIEW: ${{ inputs.name }}
         DIRECTORY: ${{ inputs.directory }}
+        ROOT_DIRECTORY: ${{ inputs.root-directory }}
         ALIAS_DOMAIN: ${{ inputs.alias-domain }}
         VERCEL: npx --yes vercel@${{ inputs.vercel-version }}
       run: |
         set -o pipefail
         # Minimal Build Output API: static files only
         out=$(mktemp -d "$RUNNER_TEMP/vercel-XXXXXX")
-        mkdir -p "$out/.vercel/output"
-        cp -R "$DIRECTORY/." "$out/.vercel/output/static"
-        echo '{"version":3}' >"$out/.vercel/output/config.json"
+        # The CLI looks for the output under the project's Root Directory
+        build="$out/${ROOT_DIRECTORY:-.}/.vercel/output"
+        mkdir -p "$build"
+        cp -R "$DIRECTORY/." "$build/static"
+        echo '{"version":3}' >"$build/config.json"
         cd "$out"
         url=$($VERCEL deploy --prebuilt --yes --meta "preview=$PREVIEW" | tail -n 1)
         if [ -n "$ALIAS_DOMAIN" ]; then
