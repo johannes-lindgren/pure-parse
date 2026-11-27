@@ -51,6 +51,9 @@ const formatFailure = (failure: ParseFailure): string =>
     ? failure.error.message
     : `${failure.error.message} at ${formatPath(failure.error.path)}`
 
+const isIdentifier = (key: string): boolean =>
+  /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
+
 /**
  * Formats a failure `Path` to a JsonPath.
  * @example
@@ -61,9 +64,6 @@ const formatFailure = (failure: ParseFailure): string =>
  * ```
  * @param path
  */
-const isIdentifier = (key: string): boolean =>
-  /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
-
 export const formatPath = (path: PathSegment[]): string =>
   '$' +
   path

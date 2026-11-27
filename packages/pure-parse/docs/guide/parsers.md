@@ -61,6 +61,7 @@ Secondly, there is a category of higher order functions that constructs new pars
 - [object](/api/parsers/object#object)
 - [dictionary](/api/parsers/dictionary#dictionary)
 - [array](/api/parsers/arrays#array)
+- [nonEmptyArray](/api/parsers/arrays#nonEmptyArray)
 - [optional](/api/parsers/optional#optional)
 - [map](/api/parsers/Parser#map)—to transform the successful result of a parser.
 - [chain](/api/parsers/Parser#chain)—to compose parsers together.

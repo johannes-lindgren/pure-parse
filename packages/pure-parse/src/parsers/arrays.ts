@@ -35,7 +35,7 @@ export const array =
  * Validate non-empty arrays
  * @example
  * ```ts
- * const parseNonEmptyNumberArray = parseNonEmptyArray(parseNumber)
+ * const parseNonEmptyNumberArray = nonEmptyArray(parseNumber)
  *
  * parseNonEmptyNumberArray([1,2,3]) // -> ParseSuccess<[number, ...number[]]>
  * parseNonEmptyNumberArray([1]) // -> ParseSuccess<[number, ...number[]]>
