@@ -1,0 +1,45 @@
+name: Vercel preview cleanup
+description: Delete all deployments of a named Vercel preview.
+
+inputs:
+  api-token:
+    description: Vercel access token.
+    required: true
+  account-id:
+    description: Vercel team ID.
+    required: true
+  project-id:
+    description: Vercel project ID.
+    required: true
+  name:
+    description: Preview name, e.g. pr-123.
+    required: true
+  vercel-version:
+    description: Vercel CLI version.
+    required: false
+    default: 65.14.0
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.api-token }}
+        VERCEL_ORG_ID: ${{ inputs.account-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.project-id }}
+        PREVIEW: ${{ inputs.name }}
+        VERCEL: npx --yes vercel@${{ inputs.vercel-version }}
+      run: |
+        set -o pipefail
+        cd "$(mktemp -d "$RUNNER_TEMP/vercel-XXXXXX")"
+        for _ in $(seq 1 20); do
+          ids=$($VERCEL list --meta "preview=$PREVIEW" --limit 100 --json | jq -r '.deployments[].id')
+          if [ -z "$ids" ]; then
+            echo "No deployments left for Preview $PREVIEW"
+            exit 0
+          fi
+          # shellcheck disable=SC2086
+          $VERCEL remove $ids --yes
+        done
+        echo "::error::Deployments of Preview $PREVIEW are still there after 20 rounds"
+        exit 1

@@ -1,6 +1,5 @@
 name: Code Integration Checks
 on:
-  pull_request:
   workflow_call:
 
 permissions:
@@ -18,7 +17,7 @@ jobs:
       - name: Set up node
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: 'pnpm'
       - name: Install
         run: pnpm install --frozen-lockfile

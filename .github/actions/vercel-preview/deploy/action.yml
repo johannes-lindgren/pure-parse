@@ -1,0 +1,47 @@
+name: Vercel deploy
+description: Upload a built site to Vercel production and output its URL.
+
+inputs:
+  api-token:
+    description: Vercel access token.
+    required: true
+  account-id:
+    description: Vercel team ID.
+    required: true
+  project-id:
+    description: Vercel project ID.
+    required: true
+  directory:
+    description: The built site.
+    required: true
+  vercel-version:
+    description: Vercel CLI version.
+    required: false
+    default: 65.14.0
+
+outputs:
+  url:
+    description: Deployment URL.
+    value: ${{ steps.deploy.outputs.url }}
+
+runs:
+  using: composite
+  steps:
+    - id: deploy
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.api-token }}
+        VERCEL_ORG_ID: ${{ inputs.account-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.project-id }}
+        DIRECTORY: ${{ inputs.directory }}
+        VERCEL: npx --yes vercel@${{ inputs.vercel-version }}
+      run: |
+        set -o pipefail
+        # Minimal Build Output API: static files only
+        out=$(mktemp -d "$RUNNER_TEMP/vercel-XXXXXX")
+        mkdir -p "$out/.vercel/output"
+        cp -R "$DIRECTORY/." "$out/.vercel/output/static"
+        echo '{"version":3}' >"$out/.vercel/output/config.json"
+        cd "$out"
+        url=$($VERCEL deploy --prebuilt --prod --yes | tail -n 1)
+        echo "url=$url" >>"$GITHUB_OUTPUT"

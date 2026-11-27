@@ -1,0 +1,30 @@
+name: Cloudflare preview cleanup
+description: Delete a named Worker preview.
+
+inputs:
+  api-token:
+    description: Cloudflare API token.
+    required: true
+  account-id:
+    description: Cloudflare account ID.
+    required: true
+  name:
+    description: Preview name, e.g. pr-123.
+    required: true
+  working-directory:
+    description: Directory with wrangler.jsonc.
+    required: false
+    default: .
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ inputs.api-token }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.account-id }}
+        PREVIEW: ${{ inputs.name }}
+      run: |
+        npx --no-install wrangler preview delete --name "$PREVIEW" --skip-confirmation \
+          || echo "::notice::Could not delete $PREVIEW (may not exist)"

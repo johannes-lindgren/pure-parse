@@ -1,0 +1,37 @@
+name: Deploy docs
+
+# Called by publish.yml after each npm release. Run by hand for docs-only fixes.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    environment:
+      name: Vercel
+      url: ${{ steps.deploy.outputs.url }}
+    concurrency:
+      group: docs-production
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec turbo run docs:build --filter=pure-parse
+      - id: deploy
+        uses: ./.github/actions/vercel-preview/deploy
+        with:
+          api-token: ${{ secrets.VERCEL_TOKEN }}
+          account-id: ${{ vars.VERCEL_ORG_ID }}
+          project-id: ${{ vars.VERCEL_PROJECT_ID }}
+          directory: packages/pure-parse/.vitepress/dist
