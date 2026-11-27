@@ -6,7 +6,7 @@ import { failure, success } from './ParseResult'
  * @example
  * ```ts
  * const parseError = instanceOf(Error)
- * parseError(new Error()) // -> Success<Error>
+ * parseError(new Error()) // -> ParseSuccess<Error>
  * ```
  * @param constructor the right-hand side argument of the `instanceof` operator
  */

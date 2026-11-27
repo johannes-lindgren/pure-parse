@@ -221,6 +221,17 @@ describe('record', () => {
       )
     })
   })
+  describe('inherited properties', () => {
+    it('ignores inherited enumerable properties', () => {
+      const proto = { inherited: 'x' }
+      const data = Object.create(proto)
+      data.own = 'y'
+      expect(dictionary(parseString, parseString)(data)).toEqual(
+        expect.objectContaining({ tag: 'success', value: { own: 'y' } }),
+      )
+    })
+  })
+
   describe('error handling', () => {
     test('that the error points to the object when it is not an object', () => {
       expect(dictionary(parseString, parseBoolean)(1)).toEqual(
@@ -234,7 +245,7 @@ describe('record', () => {
     })
     describe('property errors', () => {
       describe('keys', () => {
-        test('values', () => {
+        test('points to the failing key', () => {
           expect(
             dictionary(
               equals('a'),
@@ -246,35 +257,43 @@ describe('record', () => {
             expect.objectContaining({
               tag: 'failure',
               error: expect.objectContaining({
-                path: [
-                  {
-                    tag: 'object',
-                    key: 'b',
-                  },
-                ],
+                path: [{ tag: 'object', key: 'b' }],
+              }),
+            }),
+          )
+        })
+        test('preserves the inner parser error message', () => {
+          const msg = 'Expected exactly "a" 1234'
+          const parseExact: Parser<'a'> = (data) =>
+            data === 'a' ? success('a') : failure(msg)
+          expect(dictionary(parseExact, parseBoolean)({ b: true })).toEqual(
+            expect.objectContaining({
+              tag: 'failure',
+              error: expect.objectContaining({
+                message: msg,
               }),
             }),
           )
         })
       })
-      test('values', () => {
-        expect(
-          dictionary(
-            parseString,
-            parseBoolean,
-          )({
-            a: 1,
-          }),
-        ).toEqual(
+      test('points to the failing value', () => {
+        expect(dictionary(parseString, parseBoolean)({ a: 1 })).toEqual(
           expect.objectContaining({
             tag: 'failure',
             error: expect.objectContaining({
-              path: [
-                {
-                  tag: 'object',
-                  key: 'a',
-                },
-              ],
+              path: [{ tag: 'object', key: 'a' }],
+            }),
+          }),
+        )
+      })
+      test('preserves the inner parser error message', () => {
+        const parseExact: Parser<true> = (data) =>
+          data === true ? success(true) : failure('Expected exactly true')
+        expect(dictionary(parseString, parseExact)({ a: false })).toEqual(
+          expect.objectContaining({
+            tag: 'failure',
+            error: expect.objectContaining({
+              message: 'Expected exactly true',
             }),
           }),
         )

@@ -241,7 +241,10 @@ Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
     const dataKeys = Object.keys(data)
     for (const key of dataKeys) {
       if (!schemaKeys.has(key)) {
-        return failure(`Object has an extra property ${JSON.stringify(key)}`)
+        return propagateFailure(
+          failure(`Object has an extra property ${JSON.stringify(key)}`),
+          { tag: 'object', key },
+        )
       }
     }
     return parseLoose(data)
@@ -275,7 +278,10 @@ Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
     const dataKeys = Object.keys(data)
     for (const key of dataKeys) {
       if (!schemaKeys.has(key)) {
-        return failure(`Object has an extra property ${JSON.stringify(key)}`)
+        return propagateFailure(
+          failure(`Object has an extra property ${JSON.stringify(key)}`),
+          { tag: 'object', key },
+        )
       }
     }
     return parseLoose(data)

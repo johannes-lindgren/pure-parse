@@ -876,6 +876,16 @@ describe('object', () => {
             expect.objectContaining({ tag: 'failure' }),
           )
         })
+        it('includes the extra property key in the error path', () => {
+          expect(objectStrict({})({ a: 'a' })).toEqual(
+            expect.objectContaining({
+              tag: 'failure',
+              error: expect.objectContaining({
+                path: [{ tag: 'object', key: 'a' }],
+              }),
+            }),
+          )
+        })
         it('invalidates objects with missing properties', () => {
           expect(
             objectStrict({ a: parseString, b: parseBoolean })({ a: 'a' }),

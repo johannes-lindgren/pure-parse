@@ -30,7 +30,11 @@ export const formatResult = <T>(
 ): string => {
   if (result.tag === 'success') {
     if (!isUndefined(formatValue)) {
-      return `ParseSuccess: ${formatValue(result.value)}`
+      try {
+        return `ParseSuccess: ${formatValue(result.value)}`
+      } catch {
+        return `ParseSuccess: <unserializable>`
+      }
     }
     try {
       return `ParseSuccess: ${result.value}`
@@ -46,6 +50,9 @@ const formatFailure = (failure: ParseFailure): string =>
   failure.error.path.length === 0
     ? failure.error.message
     : `${failure.error.message} at ${formatPath(failure.error.path)}`
+
+const isIdentifier = (key: string): boolean =>
+  /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
 
 /**
  * Formats a failure `Path` to a JsonPath.
@@ -63,7 +70,9 @@ export const formatPath = (path: PathSegment[]): string =>
     .map((segment) => {
       switch (segment.tag) {
         case 'object':
-          return `.${segment.key}`
+          return isIdentifier(segment.key)
+            ? `.${segment.key}`
+            : `[${JSON.stringify(segment.key)}]`
         case 'array':
           return `[${segment.index}]`
       }
