@@ -29,3 +29,5 @@ jobs:
         run: pnpm exec turbo run check:types
       - name: Test
         run: pnpm exec turbo run test
+      - name: Build Docs
+        run: pnpm exec turbo run docs:build
