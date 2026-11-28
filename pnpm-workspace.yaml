@@ -2,5 +2,7 @@ packages:
   - 'packages/*'
 allowBuilds:
   esbuild: true
+  # Ships prebuilt binaries
+  '@parcel/watcher': false
   # Only wrangler dev needs it; deploy and preview do not
   workerd: false

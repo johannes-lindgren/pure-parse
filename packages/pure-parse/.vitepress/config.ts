@@ -58,6 +58,10 @@ export default defineConfig({
   ],
 
   srcDir: 'docs',
+  vite: {
+    // Its CommonJS build has no named exports; bundle the ESM build instead
+    ssr: { noExternal: ['@egjs/flicking-plugins'] },
+  },
   themeConfig: {
     logo: '/logo-small.webp',
     // https://vitepress.dev/reference/default-theme-config
