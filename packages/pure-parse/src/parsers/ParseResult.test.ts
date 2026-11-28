@@ -8,6 +8,10 @@ import {
   ParseFailure,
   PathSegment,
   propagateFailure,
+  mapSuccess,
+  mapFailure,
+  flatMapSuccess,
+  flatMapFailure,
 } from './ParseResult'
 import { Equals } from '../internals'
 import { parseNumber } from './primitives'
@@ -141,6 +145,66 @@ describe('ParseResult', () => {
             }),
           }),
         )
+      })
+    })
+  })
+  describe('natural transformations', () => {
+    describe(mapSuccess, () => {
+      it('maps success values', () => {
+        const res = success(2)
+        const mapped = mapSuccess(res, (n) => n * 3)
+        expect(mapped).toEqual(success(6))
+      })
+      it('does not map failure values', () => {
+        const res = failure('Error occurred')
+        const mapped = mapSuccess(res, (n: number) => n * 3)
+        expect(mapped).toEqual(res)
+      })
+    })
+    describe(flatMapSuccess, () => {
+      it('allows chaining to another success', () => {
+        const res = parseNumber(5)
+        const flatMapped = flatMapSuccess(res, (n) => success(n * 2))
+        expect(flatMapped).toEqual(success(10))
+      })
+      it('allows chaining to failure', () => {
+        const res = parseNumber(5)
+        const flatMapped = flatMapSuccess(res, (n) =>
+          n > 10 ? success(n) : failure('Number is too small'),
+        )
+        expect(flatMapped).toEqual(failure('Number is too small'))
+      })
+    })
+    describe(mapFailure, () => {
+      it('maps failure values', () => {
+        const res = failure('Original error')
+        const mapped = mapFailure(res, (err) => ({
+          ...err,
+          message: 'Mapped error',
+        }))
+        expect(mapped).toEqual(failure('Mapped error'))
+      })
+      it('does not map success values', () => {
+        const res = success(42)
+        const mapped = mapFailure(res, (err) => ({
+          ...err,
+          message: 'Mapped error',
+        }))
+        expect(mapped).toEqual(res)
+      })
+    })
+    describe(flatMapFailure, () => {
+      it('allows recovery to success', () => {
+        const res = failure('Initial error')
+        const flatMapped = flatMapFailure(res, (err) => success(100))
+        expect(flatMapped).toEqual(success(100))
+      })
+      it('allows recovery to another failure', () => {
+        const res = failure('Initial error')
+        const flatMapped = flatMapFailure(res, (err) =>
+          failure(`Still failed: ${err.message}`),
+        )
+        expect(flatMapped).toEqual(failure('Still failed: Initial error'))
       })
     })
   })
