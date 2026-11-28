@@ -921,3 +921,37 @@ describe('object', () => {
     })
   })
 })
+
+describe('shadowed properties', () => {
+  ;[...looseSuites, ...strictSuites].forEach(({ name, fn: object }) => {
+    describe(name, () => {
+      test('a property that shadows hasOwnProperty', () => {
+        const parse = object({
+          hasOwnProperty: parseNumber,
+          name: optional(parseString),
+        })
+        expect(parse(JSON.parse('{"hasOwnProperty": 1}'))).toEqual(
+          expect.objectContaining({
+            tag: 'success',
+            value: { hasOwnProperty: 1 },
+          }),
+        )
+      })
+      test('a missing property next to one that shadows hasOwnProperty', () => {
+        const parse = object({ name: parseString })
+        expect(parse(JSON.parse('{"hasOwnProperty": 1}'))).toEqual(
+          expect.objectContaining({ tag: 'failure' }),
+        )
+      })
+      test('an object without a prototype', () => {
+        const data = Object.assign(Object.create(null), { id: 1 })
+        expect(
+          object({ id: parseNumber, name: optional(parseString) })(data),
+        ).toEqual(expect.objectContaining({ tag: 'success', value: { id: 1 } }))
+        expect(object({ name: parseString })(Object.create(null))).toEqual(
+          expect.objectContaining({ tag: 'failure' }),
+        )
+      })
+    })
+  })
+})
