@@ -922,7 +922,7 @@ describe('object', () => {
   })
 })
 
-describe('untrusted input does not make the parser throw', () => {
+describe('shadowed properties', () => {
   ;[...looseSuites, ...strictSuites].forEach(({ name, fn: object }) => {
     describe(name, () => {
       test('a property that shadows hasOwnProperty', () => {

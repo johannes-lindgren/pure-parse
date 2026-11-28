@@ -378,7 +378,7 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
   })
 })
 
-describe('untrusted input does not make the guard throw', () => {
+describe('shadowed properties', () => {
   suits.forEach(({ name, fn: objectGuard }) => {
     describe(name, () => {
       test('a property that shadows hasOwnProperty', () => {
