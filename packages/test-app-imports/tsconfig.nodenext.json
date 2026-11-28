@@ -6,6 +6,7 @@
     "lib": ["ES2020"],
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "rootDir": "src",
     "outDir": "dist/node",
     "strict": true,
     "skipLibCheck": true
