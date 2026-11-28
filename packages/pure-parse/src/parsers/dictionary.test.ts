@@ -13,6 +13,7 @@ import { Parser } from './Parser'
 import { failure, success } from './ParseResult'
 import { isString } from '../guards'
 import { oneOf } from './oneOf'
+import { parseUnknown } from './unknown'
 import { object } from './object'
 
 const parseCapitalized: Parser<string> = (data) => {
@@ -298,6 +299,23 @@ describe('record', () => {
           }),
         )
       })
+    })
+  })
+})
+
+describe('__proto__ keys', () => {
+  const parseDictionary = dictionary(parseString, parseUnknown)
+  test('are copied as own properties', () => {
+    const result = parseDictionary(
+      JSON.parse('{"__proto__": {"a": 1}}'),
+    )
+    expect(result.tag).toBe('success')
+    const value = (result as { value: Record<string, unknown> }).value
+    expect(Object.getPrototypeOf(value)).toBe(Object.prototype)
+    expect(value.a).toBeUndefined()
+    expect(Object.keys(value)).toEqual(['__proto__'])
+    expect(Object.getOwnPropertyDescriptor(value, '__proto__')?.value).toEqual({
+      a: 1,
     })
   })
 })
