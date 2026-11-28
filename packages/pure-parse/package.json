@@ -70,7 +70,7 @@
     "typedoc": "0.28.20",
     "typedoc-plugin-markdown": "4.14.1",
     "typedoc-vitepress-theme": "1.1.4",
-    "typescript": "5.5.4",
+    "typescript": "6.0.3",
     "vite": "8.3.8",
     "vite-bundle-visualizer": "1.2.1",
     "vite-plugin-dts": "5.1.2",

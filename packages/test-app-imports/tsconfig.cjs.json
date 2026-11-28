@@ -3,6 +3,8 @@
     "target": "ES2020",
     "module": "CommonJS",
     "moduleResolution": "node",
+    // Tests consumers that still use node10 resolution
+    "ignoreDeprecations": "6.0",
     "lib": ["ES2020"],
     "resolveJsonModule": true,
     "noEmit": true,
