@@ -57,7 +57,17 @@ export const dictionary =
           key,
         })
       }
-      resultData[parsedKey.value] = parsedValue.value
+      if (parsedKey.value === '__proto__') {
+        // Define `__proto__` as an own property
+        Object.defineProperty(resultData, parsedKey.value, {
+          value: parsedValue.value,
+          enumerable: true,
+          writable: true,
+          configurable: true,
+        })
+      } else {
+        resultData[parsedKey.value] = parsedValue.value
+      }
     }
     return success(
       resultData as string extends K ? Record<K, V> : Partial<Record<K, V>>,
