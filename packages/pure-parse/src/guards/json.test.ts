@@ -64,4 +64,25 @@ describe('isJsonValue', () => {
     }
     expect(isJsonValue(complexJson)).toEqual(true)
   })
+  it('validates deeply nested data', () => {
+    let nested: unknown = null
+    for (let i = 0; i < 100_000; i++) {
+      nested = i % 2 === 0 ? [nested] : { a: nested }
+    }
+    expect(isJsonValue(nested)).toEqual(true)
+  })
+  it('invalidates circular objects', () => {
+    const obj: Record<string, unknown> = { a: 1 }
+    obj.self = obj
+    expect(isJsonValue(obj)).toEqual(false)
+  })
+  it('invalidates circular arrays', () => {
+    const arr: unknown[] = [1]
+    arr.push([arr])
+    expect(isJsonValue(arr)).toEqual(false)
+  })
+  it('validates shared references', () => {
+    const shared = { a: 1 }
+    expect(isJsonValue({ x: shared, y: [shared, shared] })).toEqual(true)
+  })
 })
