@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: Vercel
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Previews of recently closed pull requests
         id: closed
         env:
@@ -34,7 +33,7 @@ jobs:
           echo "Sweeping: ${names:-nothing}"
           echo "names=$names" >>"$GITHUB_OUTPUT"
       - if: steps.closed.outputs.names != ''
-        uses: ./.github/actions/vercel-preview/sweep
+        uses: $/.github/actions/vercel-preview/sweep
         with:
           api-token: ${{ secrets.VERCEL_TOKEN }}
           account-id: ${{ vars.VERCEL_ORG_ID }}

@@ -4,22 +4,27 @@ on:
   workflow_call:
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
+permissions: {}
 
 jobs:
   ci:
     if: github.event_name == 'workflow_dispatch'
-    uses: ./.github/workflows/code-integration-checks.yml
+    permissions:
+      contents: read
+    uses: $/.github/workflows/code-integration-checks.yml
 
   publish-npm:
     name: Publish NPM
     needs: ci
     if: always() && (needs.ci.result == 'success' || needs.ci.result == 'skipped')
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up pnpm
         uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - name: Setup node
@@ -44,4 +49,4 @@ jobs:
     needs: publish-npm
     permissions:
       contents: read
-    uses: ./.github/workflows/deploy-docs.yml
+    uses: $/.github/workflows/deploy-docs.yml

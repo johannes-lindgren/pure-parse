@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up pnpm
         uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - name: Set up node
@@ -31,3 +33,19 @@ jobs:
         run: pnpm exec turbo run test
       - name: Build Docs
         run: pnpm exec turbo run docs:build
+
+  zizmor:
+    runs-on: ubuntu-latest
+    name: Zizmor
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Offline: no GitHub API calls, no SARIF upload
+      - name: Audit workflows
+        uses: zizmorcore/zizmor-action@1b4550e929643b8b26a62303c6bd64814271a4f1 # v0.9.2
+        with:
+          version: 1.33.1
+          online-audits: false
+          advanced-security: false
