@@ -68,7 +68,10 @@ Parser<OptionalKeys<T> extends undefined ? T : WithOptionalFields<T>> => {
       const [key, parser] = entries[i]!
       const value = (data as Record<string, unknown>)[key]
       // Perf: only check if the property exists the value is undefined => huge performance boost
-      if (value === undefined && !data.hasOwnProperty(key)) {
+      if (
+        value === undefined &&
+        !Object.prototype.hasOwnProperty.call(data, key)
+      ) {
         // Property is absent
         const parseResult = parser(propertyAbsent)
         if (
@@ -140,7 +143,7 @@ export const objectCompiled = <T extends Record<string, unknown>>(schema: {
       const value = `data[${key}]`
       const parser = `parsers[${i}]`
       return `
-        if(${value} === undefined && !data.hasOwnProperty(${key}))  {
+        if(${value} === undefined && !Object.prototype.hasOwnProperty.call(data, ${key}))  {
           const parseResult = ${parser}(propertyAbsent)
           if(parseResult.tag === 'failure' || parseResult.value === propertyAbsent){
             return ${JSON.stringify(missingPropertyError(unescapedKey))}
