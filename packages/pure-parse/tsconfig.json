@@ -8,7 +8,6 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    // not understood by vite-plugin-dts: it will not resolve .ts -> .d.ts
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
