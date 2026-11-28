@@ -63,6 +63,7 @@
   "devDependencies": {
     "@egjs/flicking-plugins": "4.7.1",
     "@egjs/vue3-flicking": "4.11.4",
+    "@microsoft/api-extractor": "^7.60.2",
     "dpdm": "3.14.0",
     "highlight.js": "11.10.0",
     "sass-embedded": "1.79.4",
