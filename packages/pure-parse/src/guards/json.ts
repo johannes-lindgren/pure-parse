@@ -7,26 +7,41 @@ import { JsonValue } from '../common'
  * @param data
  */
 export const isJsonValue: Guard<JsonValue> = (data): data is JsonValue => {
-  if (data === null) {
-    return true
-  }
-  if (typeof data === 'boolean') {
-    return true
-  }
-  if (typeof data === 'number') {
-    return true
-  }
-  if (typeof data === 'string') {
-    return true
-  }
-  if (Array.isArray(data)) {
-    return data.every(isJsonValue)
-  }
-  if (typeof data === 'object') {
-    if (Object.getPrototypeOf(data) !== Object.prototype) {
+  // Iterative, so that the depth of the data is not limited by the call stack
+  const stack: { value: unknown; leave: boolean }[] = [
+    { value: data, leave: false },
+  ]
+  const ancestors = new Set<object>()
+  while (stack.length > 0) {
+    const { value, leave } = stack.pop()!
+    if (leave) {
+      ancestors.delete(value as object)
+      continue
+    }
+    if (
+      value === null ||
+      typeof value === 'boolean' ||
+      typeof value === 'number' ||
+      typeof value === 'string'
+    ) {
+      continue
+    }
+    if (typeof value !== 'object') {
       return false
     }
-    return Object.entries(data).every(isJsonValue)
+    const isArray = Array.isArray(value)
+    if (!isArray && Object.getPrototypeOf(value) !== Object.prototype) {
+      return false
+    }
+    if (ancestors.has(value)) {
+      // Circular reference
+      return false
+    }
+    ancestors.add(value)
+    stack.push({ value, leave: true })
+    ;(isArray ? value : Object.values(value)).forEach((child: unknown) => {
+      stack.push({ value: child, leave: false })
+    })
   }
-  return false
+  return true
 }
