@@ -1,0 +1,40 @@
+name: Cloudflare deploy
+description: Deploy the Worker to production and output its URL.
+
+inputs:
+  api-token:
+    description: Cloudflare API token.
+    required: true
+  account-id:
+    description: Cloudflare account ID.
+    required: true
+  working-directory:
+    description: Directory with wrangler.jsonc.
+    required: false
+    default: .
+
+outputs:
+  url:
+    description: Deployment URL.
+    value: ${{ steps.deploy.outputs.url }}
+
+runs:
+  using: composite
+  steps:
+    - id: deploy
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ inputs.api-token }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.account-id }}
+      run: |
+        # Wrangler writes deploy results here
+        WRANGLER_OUTPUT_FILE_PATH=$(mktemp "$RUNNER_TEMP/wrangler-deploy-XXXXXX")
+        export WRANGLER_OUTPUT_FILE_PATH
+        npx --no-install wrangler deploy
+        target=$(jq -ers 'map(select(.type == "deploy")) | last | .targets[0]' "$WRANGLER_OUTPUT_FILE_PATH")
+        case "$target" in
+          http*) url=$target ;;
+          *) url="https://$target" ;;
+        esac
+        echo "url=$url" >>"$GITHUB_OUTPUT"

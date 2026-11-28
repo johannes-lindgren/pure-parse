@@ -1,0 +1,42 @@
+name: Docs preview sweep
+
+# Deletes previews of PRs closed in the last 14 days, in case cleanup missed them.
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    name: Sweep docs previews
+    runs-on: ubuntu-latest
+    environment: Vercel
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Previews of recently closed pull requests
+        id: closed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          since=$(date -u -d '14 days ago' +%F)
+          names=$(gh pr list --repo "$GITHUB_REPOSITORY" --state closed \
+            --search "closed:>=$since" --limit 1000 \
+            --json number --jq 'map("pr-\(.number)") | join(" ")')
+          echo "Sweeping: ${names:-nothing}"
+          echo "names=$names" >>"$GITHUB_OUTPUT"
+      - if: steps.closed.outputs.names != ''
+        uses: ./.github/actions/vercel-preview/sweep
+        with:
+          api-token: ${{ secrets.VERCEL_TOKEN }}
+          account-id: ${{ vars.VERCEL_ORG_ID }}
+          project-id: ${{ vars.VERCEL_PROJECT_ID }}
+          names: ${{ steps.closed.outputs.names }}

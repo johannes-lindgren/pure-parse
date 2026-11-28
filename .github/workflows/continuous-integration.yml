@@ -1,0 +1,66 @@
+name: Continuous Integration
+
+# Code checks and a docs preview on Vercel (deleted on close).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+
+# Latest commit per branch wins
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/code-integration-checks.yml
+
+  preview:
+    name: Docs preview
+    # Fork PRs get no secrets, so skip (a skipped job counts as passing)
+    if: >-
+      github.event.action != 'closed' &&
+      !github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+    environment:
+      name: Vercel
+      url: ${{ steps.preview.outputs.url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec turbo run docs:build --filter=pure-parse
+      - id: preview
+        uses: ./.github/actions/vercel-preview/preview
+        with:
+          api-token: ${{ secrets.VERCEL_TOKEN }}
+          account-id: ${{ vars.VERCEL_ORG_ID }}
+          project-id: ${{ vars.VERCEL_PROJECT_ID }}
+          name: pr-${{ github.event.pull_request.number }}
+          directory: packages/pure-parse/.vitepress/dist
+          root-directory: packages/pure-parse
+
+  cleanup:
+    name: Delete docs preview
+    # Fork PRs get no secrets, so skip (a skipped job counts as passing)
+    if: >-
+      github.event.action == 'closed' &&
+      !github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+    environment: Vercel
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/vercel-preview/cleanup
+        with:
+          api-token: ${{ secrets.VERCEL_TOKEN }}
+          account-id: ${{ vars.VERCEL_ORG_ID }}
+          project-id: ${{ vars.VERCEL_PROJECT_ID }}
+          name: pr-${{ github.event.pull_request.number }}

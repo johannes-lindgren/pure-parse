@@ -1,0 +1,68 @@
+name: Vercel preview
+description: Upload a built site as a named Vercel preview and output its URL.
+
+inputs:
+  api-token:
+    description: Vercel access token.
+    required: true
+  account-id:
+    description: Vercel team ID.
+    required: true
+  project-id:
+    description: Vercel project ID.
+    required: true
+  name:
+    description: Preview name, e.g. pr-123.
+    required: true
+  directory:
+    description: The built site.
+    required: true
+  root-directory:
+    description: The project's Root Directory setting in Vercel, if set.
+    required: false
+    default: ''
+  alias-domain:
+    description: Optional domain for a stable URL (<name>.<alias-domain>).
+    required: false
+    default: ''
+  vercel-version:
+    description: Vercel CLI version.
+    required: false
+    default: 65.14.0
+
+outputs:
+  url:
+    description: Preview URL.
+    value: ${{ steps.preview.outputs.url }}
+
+runs:
+  using: composite
+  steps:
+    - id: preview
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.api-token }}
+        VERCEL_ORG_ID: ${{ inputs.account-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.project-id }}
+        PREVIEW: ${{ inputs.name }}
+        DIRECTORY: ${{ inputs.directory }}
+        ROOT_DIRECTORY: ${{ inputs.root-directory }}
+        ALIAS_DOMAIN: ${{ inputs.alias-domain }}
+        VERCEL: npx --yes vercel@${{ inputs.vercel-version }}
+      run: |
+        set -o pipefail
+        # Minimal Build Output API: static files only
+        out=$(mktemp -d "$RUNNER_TEMP/vercel-XXXXXX")
+        # The CLI wants the Root Directory to exist, but reads .vercel/output at the top
+        mkdir -p "$out/${ROOT_DIRECTORY:-.}"
+        build="$out/.vercel/output"
+        mkdir -p "$build"
+        cp -R "$DIRECTORY/." "$build/static"
+        echo '{"version":3}' >"$build/config.json"
+        cd "$out"
+        url=$($VERCEL deploy --prebuilt --yes --meta "preview=$PREVIEW" | tail -n 1)
+        if [ -n "$ALIAS_DOMAIN" ]; then
+          $VERCEL alias set "$url" "$PREVIEW.$ALIAS_DOMAIN"
+          url="https://$PREVIEW.$ALIAS_DOMAIN"
+        fi
+        echo "url=$url" >>"$GITHUB_OUTPUT"

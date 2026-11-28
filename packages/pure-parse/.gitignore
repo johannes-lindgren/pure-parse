@@ -29,3 +29,5 @@ vite.config.ts.timestamp-*
 # Docs
 /docs/api/
 .vitepress/cache/
+# Cloudflare
+.wrangler/

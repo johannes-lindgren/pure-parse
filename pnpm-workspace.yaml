@@ -1,4 +1,6 @@
 packages:
   - 'packages/*'
 allowBuilds:
-  - esbuild
+  esbuild: true
+  # Only wrangler dev needs it; deploy and preview do not
+  workerd: false
