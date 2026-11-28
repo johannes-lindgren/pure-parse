@@ -42,7 +42,10 @@ export const objectGuard = <T extends Record<string, unknown>>(schema: {
     Object.keys(schema).every((key) => {
       const guard = schema[key]!
       const value = (data as Record<string, unknown>)[key]
-      if (value === undefined && !data.hasOwnProperty(key)) {
+      if (
+        value === undefined &&
+        !Object.prototype.hasOwnProperty.call(data, key)
+      ) {
         // If the key is not present, the guard must represent an optional property
         return guard(optionalSymbol)
       }
@@ -78,7 +81,7 @@ export const objectGuardCompiled = <T extends Record<string, unknown>>(schema: {
         const sanitizedKey = JSON.stringify(unescapedKey)
         const value = `data[${sanitizedKey}]`
         const guard = `guards[${i}]`
-        return `(${value} === undefined && !data.hasOwnProperty(${sanitizedKey}) ? ${guard}(optionalSymbol) :  ${guard}(${value}))`
+        return `(${value} === undefined && !Object.prototype.hasOwnProperty.call(data, ${sanitizedKey}) ? ${guard}(optionalSymbol) :  ${guard}(${value}))`
       }),
     )
     .join(' && ')

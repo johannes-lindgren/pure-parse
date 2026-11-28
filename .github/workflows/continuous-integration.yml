@@ -21,10 +21,11 @@ jobs:
 
   preview:
     name: Docs preview
-    # Fork PRs get no secrets, so skip (a skipped job counts as passing)
+    # Fork and Dependabot PRs get no secrets, so skip (a skipped job counts as passing)
     if: >-
       github.event.action != 'closed' &&
-      !github.event.pull_request.head.repo.fork
+      !github.event.pull_request.head.repo.fork &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     environment:
       name: Vercel
@@ -52,10 +53,11 @@ jobs:
 
   cleanup:
     name: Delete docs preview
-    # Fork PRs get no secrets, so skip (a skipped job counts as passing)
+    # Fork and Dependabot PRs get no secrets, so skip (a skipped job counts as passing)
     if: >-
       github.event.action == 'closed' &&
-      !github.event.pull_request.head.repo.fork
+      !github.event.pull_request.head.repo.fork &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     environment: Vercel
     steps:

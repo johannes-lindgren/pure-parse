@@ -6,6 +6,10 @@ PureParse is designed to be secure by default.
 
 To protect your app against prototype pollution, it is generally recommended to validate external data with parsers instead of guard functions. The parsers return a copy of the parsed data, which contains only those properties that were declared. However, the guards only validate that the structure of the data fits the inferred type, and thus does not consider the presence of additional properties.
 
+## Shadowed Properties
+
+The [object](/api/parsers/object#object) parsers and [objectGuard](/api/guards/object#objectGuard) guards support data with properties that shadow built-in methods, such as `{"hasOwnProperty": 1}`, and objects without a prototype.
+
 ## Content Security Policy
 
 The [objectCompiled](/api/parsers/object#objectCompiled) and [objectGuardCompiled](/api/guards/object#objectGuardCompiled) functions perform just-in-time (JIT) compilation with the `Function` constructor. This increases parsing performance, but browser pages that enable

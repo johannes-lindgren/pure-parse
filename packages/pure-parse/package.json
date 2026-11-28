@@ -61,21 +61,21 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@egjs/flicking-plugins": "4.7.1",
-    "@egjs/vue3-flicking": "4.11.4",
-    "@microsoft/api-extractor": "^7.60.2",
+    "@egjs/flicking-plugins": "4.8.1",
+    "@egjs/vue3-flicking": "4.17.1",
+    "@microsoft/api-extractor": "7.60.2",
     "dpdm": "3.14.0",
-    "highlight.js": "11.10.0",
-    "sass-embedded": "1.79.4",
-    "typedoc": "0.26.8",
-    "typedoc-plugin-markdown": "4.2.9",
-    "typedoc-vitepress-theme": "1.0.2",
+    "highlight.js": "11.12.0",
+    "sass-embedded": "1.108.2",
+    "typedoc": "0.28.20",
+    "typedoc-plugin-markdown": "4.14.1",
+    "typedoc-vitepress-theme": "1.1.4",
     "typescript": "5.5.4",
-    "vite": "8.0.11",
+    "vite": "8.3.8",
     "vite-bundle-visualizer": "1.2.1",
     "vite-plugin-dts": "5.1.2",
     "vitepress": "1.6.4",
-    "vitest": "4.1.5",
-    "wrangler": "4.165.0"
+    "vitest": "5.1.1",
+    "wrangler": "4.166.0"
   }
 }

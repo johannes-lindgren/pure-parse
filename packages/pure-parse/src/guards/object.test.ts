@@ -377,3 +377,27 @@ suits.forEach(({ name: suiteName, fn: objectGuard }) => {
     })
   })
 })
+
+describe('shadowed properties', () => {
+  suits.forEach(({ name, fn: objectGuard }) => {
+    describe(name, () => {
+      test('a property that shadows hasOwnProperty', () => {
+        const guard = objectGuard({
+          hasOwnProperty: isNumber,
+          name: optionalGuard(isString),
+        })
+        expect(guard(JSON.parse('{"hasOwnProperty": 1}'))).toBe(true)
+        expect(
+          objectGuard({ name: isString })(JSON.parse('{"hasOwnProperty": 1}')),
+        ).toBe(false)
+      })
+      test('an object without a prototype', () => {
+        const data = Object.assign(Object.create(null), { id: 1 })
+        expect(
+          objectGuard({ id: isNumber, name: optionalGuard(isString) })(data),
+        ).toBe(true)
+        expect(objectGuard({ name: isString })(Object.create(null))).toBe(false)
+      })
+    })
+  })
+})
